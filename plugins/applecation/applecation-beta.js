@@ -1542,6 +1542,10 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
         const bodyStyle = document.body.getAttribute('style') || 'нет атрибута style';
         metaParts.push('DEBUG: body style = [' + bodyStyle + ']');
 
+        // ДЕБАГ: вычисляем 1vw в пикселях
+        const oneVwInPixels = window.innerWidth / 100;
+        metaParts.push('1vw = ' + oneVwInPixels.toFixed(2) + 'px');
+
         metaTextContainer.html(metaParts.join(' · '));
         
         // Загружаем иконку студии/сети
