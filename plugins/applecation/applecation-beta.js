@@ -842,8 +842,8 @@
 
 .applecation__logo img {
     display: block;
-    max-width: 29.46em;
-    max-height: 9.75em;
+    max-width: 35vw;
+    max-height: 180px;
     width: auto;
     height: auto;
     object-fit: contain;
@@ -974,7 +974,7 @@ body.applecation--ratings-corner .applecation__ratings {
     font-size: 0.95em;
     line-height: 1.5;
     margin-bottom: 0.5em;
-    max-width: 31em;
+    max-width: 35vw;
     display: -webkit-box;
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
