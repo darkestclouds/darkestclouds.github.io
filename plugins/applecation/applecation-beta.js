@@ -1538,6 +1538,10 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
             metaParts.push(...genres);
         }
 
+        // ДЕБАГ: добавляем значение style тега body
+        const bodyStyle = document.body.getAttribute('style') || 'нет атрибута style';
+        metaParts.push('DEBUG: body style = [' + bodyStyle + ']');
+
         metaTextContainer.html(metaParts.join(' · '));
         
         // Загружаем иконку студии/сети
