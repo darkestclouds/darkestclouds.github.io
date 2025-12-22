@@ -842,7 +842,7 @@
 
 .applecation__logo img {
     display: block;
-    max-width: 31em;
+    max-width: 29.46em;
     max-height: 9.75em;
     width: auto;
     height: auto;
