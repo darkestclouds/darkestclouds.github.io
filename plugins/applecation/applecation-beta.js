@@ -343,9 +343,12 @@
                         else list.push(r);
                     }
 
+                    // Сортируем по номеру эпизода
                     list.sort(function(a,b){
                         return (a.episode_number || 0) - (b.episode_number || 0);
                     });
+
+                    
 
                     element.results = list.concat(next);
                 }catch(e){}
@@ -415,13 +418,15 @@
             Lampa.Utils.createInstance = function(BaseClass, element, add_params, replace){
                 var isEpisodesLine = looksLikeEpisodesLinePayload(element);
 
-                if(isEpisodesLine){
+                var shouldReverse = Lampa.Storage.get('applecation_reverse_episodes', true);
+
+                if(isEpisodesLine && shouldReverse){
                     normalizeEpisodesResults(element);
                 }
 
                 var instance = original.call(this, BaseClass, element, add_params, replace);
 
-                if(isEpisodesLine){
+                if(isEpisodesLine && shouldReverse){
                     patchLineCreate(instance);
                 }
 
@@ -454,27 +459,27 @@
             pt: 'Exibir classificações IMDB e KinoPoisk',
             zh: '显示 IMDB 和 KinoPoisk 评分'
         },
-        hide_reactions: {
-            ru: 'Скрыть реакции Lampa',
-            en: 'Hide Lampa reactions',
-            uk: 'Сховати реакції Lampa',
-            be: 'Схаваць рэакцыі Lampa',
-            bg: 'Скриване на реакции Lampa',
-            cs: 'Skrýt reakce Lampa',
-            he: 'הסתר תגובות Lampa',
-            pt: 'Ocultar reações Lampa',
-            zh: '隐藏 Lampa 反应'
+        show_reactions: {
+            ru: 'Показывать реакции Lampa',
+            en: 'Show Lampa Reactions',
+            uk: 'Показувати реакції Lampa',
+            be: 'Паказваць рэакцыі Lampa',
+            bg: 'Показване на реакции Lampa',
+            cs: 'Zobrazit reakce Lampa',
+            he: 'הצג תגובות Lampa',
+            pt: 'Mostrar reações Lampa',
+            zh: '显示 Lampa 反应'
         },
-        hide_reactions_desc: {
-            ru: 'Скрыть блок с реакциями',
-            en: 'Hide reactions block',
-            uk: 'Сховати блок з реакціями',
-            be: 'Схаваць блок з рэакцыямі',
-            bg: 'Скриване на блока с реакции',
-            cs: 'Skrýt blok s reakcemi',
-            he: 'הסתר בלוק תגובות',
-            pt: 'Ocultar bloco de reações',
-            zh: '隐藏反应块'
+        show_reactions_desc: {
+            ru: 'Отображать блок с реакциями на карточке',
+            en: 'Display reactions block on card',
+            uk: 'Відображати блок з реакціями на картці',
+            be: 'Адлюстроўваць блок з рэакцыямі на картцы',
+            bg: 'Показване на блока с реакции на картата',
+            cs: 'Zobrazit blok s reakcemi na kartě',
+            he: 'הצג בלוק תגובות בכרטיס',
+            pt: 'Exibir bloco de reações no cartão',
+            zh: '在卡片上显示反应块'
         },
         ratings_position: {
             ru: 'Расположение рейтингов',
@@ -530,6 +535,127 @@
             he: '',
             pt: '',
             zh: '年'
+        },
+        logo_scale: {
+            ru: 'Размер логотипа',
+            en: 'Logo Size',
+            uk: 'Розмір логотипу',
+            be: 'Памер лагатыпа',
+            bg: 'Размер на логото',
+            cs: 'Velikost loga',
+            he: 'גודל לוגו',
+            pt: 'Tamanho do logotipo',
+            zh: '徽标大小'
+        },
+        logo_scale_desc: {
+            ru: 'Масштаб логотипа фильма',
+            en: 'Movie logo scale',
+            uk: 'Масштаб логотипу фільму',
+            be: 'Маштаб лагатыпа фільма',
+            bg: 'Мащаб на логото на филма',
+            cs: 'Měřítko loga filmu',
+            he: 'קנה מידה של לוגו הסרט',
+            pt: 'Escala do logotipo do filme',
+            zh: '电影徽标比例'
+        },
+        text_scale: {
+            ru: 'Размер текста',
+            en: 'Text Size',
+            uk: 'Розмір тексту',
+            be: 'Памер тэксту',
+            bg: 'Размер на текста',
+            cs: 'Velikost textu',
+            he: 'גודל טקסט',
+            pt: 'Tamanho do texto',
+            zh: '文本大小'
+        },
+        text_scale_desc: {
+            ru: 'Масштаб текста данных о фильме',
+            en: 'Movie data text scale',
+            uk: 'Масштаб тексту даних про фільм',
+            be: 'Маштаб тэксту даных пра фільм',
+            bg: 'Мащаб на текста с данни за филма',
+            cs: 'Měřítko textu dat filmu',
+            he: 'קנה מידה של טקסט נתוני הסרט',
+            pt: 'Escala do texto de dados do filme',
+            zh: '电影数据文本比例'
+        },
+        scale_default: {
+            ru: 'По умолчанию',
+            en: 'Default',
+            uk: 'За замовчуванням',
+            be: 'Па змаўчанні',
+            bg: 'По подразбиране',
+            cs: 'Výchozí',
+            he: 'ברירת מחדל',
+            pt: 'Padrão',
+            zh: '默认'
+        },
+        spacing_scale: {
+            ru: 'Отступы между строками',
+            en: 'Spacing Between Lines',
+            uk: 'Відступи між рядками',
+            be: 'Адступы паміж радкамі',
+            bg: 'Разстояние между редовете',
+            cs: 'Mezery mezi řádky',
+            he: 'מרווח בין שורות',
+            pt: 'Espaçamento entre linhas',
+            zh: '行间距'
+        },
+        spacing_scale_desc: {
+            ru: 'Расстояние между элементами информации',
+            en: 'Distance between information elements',
+            uk: 'Відстань між елементами інформації',
+            be: 'Адлегласць паміж элементамі інфармацыі',
+            bg: 'Разстояние между информационни елементи',
+            cs: 'Vzdálenost mezi informačními prvky',
+            he: 'מרחק בין אלמנטי מידע',
+            pt: 'Distância entre elementos de informação',
+            zh: '信息元素之间的距离'
+        },
+        settings_title_display: {
+            ru: 'Отображение',
+            en: 'Display',
+            uk: 'Відображення',
+            be: 'Адлюстраванне',
+            bg: 'Показване',
+            cs: 'Zobrazení',
+            he: 'תצוגה',
+            pt: 'Exibição',
+            zh: '显示'
+        },
+        settings_title_scaling: {
+            ru: 'Масштабирование',
+            en: 'Scaling',
+            uk: 'Масштабування',
+            be: 'Маштабаванне',
+            bg: 'Мащабиране',
+            cs: 'Škálování',
+            he: 'קנה מידה',
+            pt: 'Dimensionamento',
+            zh: '缩放'
+        },
+        reverse_episodes: {
+            ru: 'Перевернуть список эпизодов',
+            en: 'Reverse Episodes List',
+            uk: 'Перевернути список епізодів',
+            be: 'Перавярнуць спіс эпізодаў',
+            bg: 'Обърни списъка с епизоди',
+            cs: 'Obrátit seznam epizod',
+            he: 'הפוך את רשימת הפרקים',
+            pt: 'Inverter lista de episódios',
+            zh: '反转剧集列表'
+        },
+        reverse_episodes_desc: {
+            ru: 'Показывать эпизоды в обратном порядке (от новых к старым)',
+            en: 'Show episodes in reverse order (from newest to oldest)',
+            uk: 'Показувати епізоди у зворотному порядку (від нових до старих)',
+            be: 'Паказваць эпізоды ў адваротным парадку (ад новых да старых)',
+            bg: 'Показване на епизоди в обратен ред (от нови към стари)',
+            cs: 'Zobrazit epizody v opačném pořadí (od nejnovějších po nejstarší)',
+            he: 'הצג פרקים בסדר הפוך (מהחדש לישן)',
+            pt: 'Mostrar episódios em ordem inversa (do mais novo ao mais antigo)',
+            zh: '以相反顺序显示剧集（从新到旧）'
         }
     };
 
@@ -544,11 +670,20 @@
         if (Lampa.Storage.get('applecation_show_ratings') === undefined) {
             Lampa.Storage.set('applecation_show_ratings', false);
         }
-        if (Lampa.Storage.get('applecation_hide_reactions') === undefined) {
-            Lampa.Storage.set('applecation_hide_reactions', false);
-        }
         if (Lampa.Storage.get('applecation_ratings_position') === undefined) {
             Lampa.Storage.set('applecation_ratings_position', 'card');
+        }
+        if (Lampa.Storage.get('applecation_logo_scale') === undefined) {
+            Lampa.Storage.set('applecation_logo_scale', '100');
+        }
+        if (Lampa.Storage.get('applecation_text_scale') === undefined) {
+            Lampa.Storage.set('applecation_text_scale', '100');
+        }
+        if (Lampa.Storage.get('applecation_spacing_scale') === undefined) {
+            Lampa.Storage.set('applecation_spacing_scale', '100');
+        }
+        if (Lampa.Storage.get('applecation_reverse_episodes') === undefined) {
+            Lampa.Storage.set('applecation_reverse_episodes', true);
         }
 
         // Создаем раздел настроек
@@ -575,6 +710,21 @@
                     'margin-bottom': '0.3em'
                 });
                 item.append('<div style="font-size: 0.9em; padding: 0 1.2em; line-height: 1.4;">Автор: DarkestClouds<br>Делает интерфейс в карточке фильма похожим на Apple TV и оптимизирует под 4K</div>');
+            }
+        });
+
+        // Заголовок: Отображение
+        Lampa.SettingsApi.addParam({
+            component: 'applecation_settings',
+            param: {
+                name: 'applecation_display_title',
+                type: 'static'
+            },
+            field: {
+                name: t('settings_title_display')
+            },
+            onRender: function(item) {
+                item.addClass('settings-param-title');
             }
         });
 
@@ -625,24 +775,154 @@
             }
         });
 
-        // Скрыть реакции
+        // Показывать реакции (дефолтная настройка Lampa)
         Lampa.SettingsApi.addParam({
             component: 'applecation_settings',
             param: {
-                name: 'applecation_hide_reactions',
+                name: 'card_interfice_reactions',
                 type: 'trigger',
-                default: false
+                default: true
             },
             field: {
-                name: t('hide_reactions'),
-                description: t('hide_reactions_desc')
+                name: t('show_reactions'),
+                description: t('show_reactions_desc')
+            }
+        });
+
+        // Перевернуть список эпизодов
+        Lampa.SettingsApi.addParam({
+            component: 'applecation_settings',
+            param: {
+                name: 'applecation_reverse_episodes',
+                type: 'trigger',
+                default: true
+            },
+            field: {
+                name: t('reverse_episodes'),
+                description: t('reverse_episodes_desc')
             },
             onChange: function(value) {
-                if (value) {
-                    $('body').addClass('applecation--hide-reactions');
-                } else {
-                    $('body').removeClass('applecation--hide-reactions');
-                }
+                Lampa.Storage.set('applecation_reverse_episodes', value);
+            }
+        });
+
+        // Заголовок: Масштабирование
+        Lampa.SettingsApi.addParam({
+            component: 'applecation_settings',
+            param: {
+                name: 'applecation_scaling_title',
+                type: 'static'
+            },
+            field: {
+                name: t('settings_title_scaling')
+            },
+            onRender: function(item) {
+                item.addClass('settings-param-title');
+            }
+        });
+
+        // Размер логотипа
+        Lampa.SettingsApi.addParam({
+            component: 'applecation_settings',
+            param: {
+                name: 'applecation_logo_scale',
+                type: 'select',
+                values: {
+                    '50': '50%',
+                    '60': '60%',
+                    '70': '70%',
+                    '80': '80%',
+                    '90': '90%',
+                    '100': t('scale_default'),
+                    '110': '110%',
+                    '120': '120%',
+                    '130': '130%',
+                    '140': '140%',
+                    '150': '150%',
+                    '160': '160%',
+                    '170': '170%',
+                    '180': '180%'
+                },
+                default: '100'
+            },
+            field: {
+                name: t('logo_scale'),
+                description: t('logo_scale_desc')
+            },
+            onChange: function(value) {
+                Lampa.Storage.set('applecation_logo_scale', value);
+                applyScales();
+            }
+        });
+
+        // Размер текста
+        Lampa.SettingsApi.addParam({
+            component: 'applecation_settings',
+            param: {
+                name: 'applecation_text_scale',
+                type: 'select',
+                values: {
+                    '50': '50%',
+                    '60': '60%',
+                    '70': '70%',
+                    '80': '80%',
+                    '90': '90%',
+                    '100': t('scale_default'),
+                    '110': '110%',
+                    '120': '120%',
+                    '130': '130%',
+                    '140': '140%',
+                    '150': '150%',
+                    '160': '160%',
+                    '170': '170%',
+                    '180': '180%'
+                },
+                default: '100'
+            },
+            field: {
+                name: t('text_scale'),
+                description: t('text_scale_desc')
+            },
+            onChange: function(value) {
+                Lampa.Storage.set('applecation_text_scale', value);
+                applyScales();
+            }
+        });
+
+        // Отступы между строками
+        Lampa.SettingsApi.addParam({
+            component: 'applecation_settings',
+            param: {
+                name: 'applecation_spacing_scale',
+                type: 'select',
+                values: {
+                    '50': '50%',
+                    '60': '60%',
+                    '70': '70%',
+                    '80': '80%',
+                    '90': '90%',
+                    '100': t('scale_default'),
+                    '110': '110%',
+                    '120': '120%',
+                    '130': '130%',
+                    '140': '140%',
+                    '150': '150%',
+                    '160': '160%',
+                    '170': '170%',
+                    '180': '180%',
+                    '200': '200%',
+                    '250': '250%',
+                    '300': '300%'
+                },
+                default: '100'
+            },
+            field: {
+                name: t('spacing_scale'),
+                description: t('spacing_scale_desc')
+            },
+            onChange: function(value) {
+                Lampa.Storage.set('applecation_spacing_scale', value);
+                applyScales();
             }
         });
 
@@ -651,9 +931,58 @@
             $('body').addClass('applecation--hide-ratings');
         }
         $('body').addClass('applecation--ratings-' + Lampa.Storage.get('applecation_ratings_position', 'card'));
-        if (Lampa.Storage.get('applecation_hide_reactions', false)) {
-            $('body').addClass('applecation--hide-reactions');
-        }
+        applyScales();
+    }
+
+    // Применяем масштабирование контента
+    function applyScales() {
+        const logoScale = parseInt(Lampa.Storage.get('applecation_logo_scale', '100'));
+        const textScale = parseInt(Lampa.Storage.get('applecation_text_scale', '100'));
+        const spacingScale = parseInt(Lampa.Storage.get('applecation_spacing_scale', '100'));
+
+        // Удаляем старые стили если есть
+        $('style[data-id="applecation_scales"]').remove();
+
+        // Создаем новые стили
+        const scaleStyles = `
+            <style data-id="applecation_scales">
+                /* Масштаб логотипа */
+                
+                .applecation .applecation__logo img {
+                    max-width: ${35 * logoScale / 100}vw !important;
+                    max-height: ${180 * logoScale / 100}px !important;
+                }
+
+                /* Масштаб текста и мета-информации */
+                .applecation .applecation__content-wrapper {
+                    font-size: ${textScale}% !important;
+                }
+
+                /* Отступы между элементами */
+                .applecation .full-start-new__title {
+                    margin-bottom: ${0.5 * spacingScale / 100}em !important;
+                }
+                
+                .applecation .applecation__meta {
+                    margin-bottom: ${0.5 * spacingScale / 100}em !important;
+                }
+                
+                .applecation .applecation__ratings {
+                    margin-bottom: ${0.5 * spacingScale / 100}em !important;
+                }
+                
+                .applecation .applecation__description {
+                    max-width: ${35 * textScale / 100}vw !important;
+                    margin-bottom: ${0.5 * spacingScale / 100}em !important;
+                }
+                
+                .applecation .applecation__info {
+                    margin-bottom: ${0.5 * spacingScale / 100}em !important;
+                }
+            </style>
+        `;
+
+        $('body').append(scaleStyles);
     }
 
     function addCustomTemplate() {
@@ -687,20 +1016,25 @@
             <div class="full-start-new__right">
                 <div class="applecation__left">
                     <div class="applecation__logo"></div>
-                    <div class="full-start-new__title" style="display: none;">{title}</div>
                     
-                    <div class="applecation__meta">
-                        <div class="applecation__meta-left">
-                            <span class="applecation__network"></span>
-                            <span class="applecation__meta-text"></span>
-                            <div class="full-start__pg hide"></div>
+                    <div class="applecation__content-wrapper">
+                        <div class="full-start-new__title" style="display: none;">{title}</div>
+                        
+                        <div class="applecation__meta">
+                            <div class="applecation__meta-left">
+                                <span class="applecation__network"></span>
+                                <span class="applecation__meta-text"></span>
+                                <div class="full-start__pg hide"></div>
+                            </div>
                         </div>
+                        
+                        ${ratingsPosition === 'card' ? ratingsBlock : ''}
+                        
+                        <div class="applecation__description-wrapper">
+                            <div class="applecation__description"></div>
+                        </div>
+                        <div class="applecation__info"></div>
                     </div>
-                    
-                    ${ratingsPosition === 'card' ? ratingsBlock : ''}
-                    
-                    <div class="applecation__description"></div>
-                    <div class="applecation__info"></div>
                     
                     <!-- Скрытые оригинальные элементы -->
                     <div class="full-start-new__head" style="display: none;"></div>
@@ -850,6 +1184,11 @@
     object-position: left center;
 }
 
+/* Контейнер для масштабируемого контента */
+.applecation__content-wrapper {
+    font-size: 100%;
+}
+
 /* Мета информация (Тип/Жанр/поджанр) */
 .applecation__meta {
     display: flex;
@@ -954,11 +1293,6 @@ body.applecation--hide-ratings .applecation__ratings {
     display: none !important;
 }
 
-/* Скрытие реакций через настройки */
-body.applecation--hide-reactions .full-start-new__reactions {
-    display: none !important;
-}
-
 /* Расположение рейтингов - в левом нижнем углу */
 body.applecation--ratings-corner .applecation__right {
     gap: 1em;
@@ -966,6 +1300,35 @@ body.applecation--ratings-corner .applecation__right {
 
 body.applecation--ratings-corner .applecation__ratings {
     margin-bottom: 0;
+}
+
+/* Обертка для описания */
+.applecation__description-wrapper {
+    background-color: transparent;
+    padding: 0;
+    border-radius: 1em;
+    width: fit-content;
+    opacity: 0;
+    transform: translateY(15px);
+    transition:
+        padding 0.25s ease,
+        transform 0.25s ease,
+        opacity 0.4s ease-out;
+    transition-delay: 0.1s;
+}
+
+.applecation__description-wrapper.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.applecation__description-wrapper.focus {
+    background-color: #ffffff3b;
+    padding: .1em .1em .0em .6em;
+    border-radius: 1em;
+    width: fit-content;
+    transform: scale(1.07) translateY(0);
+    transition-delay: 0s;
 }
 
 /* Описание */
@@ -980,15 +1343,6 @@ body.applecation--ratings-corner .applecation__ratings {
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
-    opacity: 0;
-    transform: translateY(15px);
-    transition: opacity 0.4s ease-out, transform 0.4s ease-out;
-    transition-delay: 0.1s;
-}
-
-.applecation__description.show {
-    opacity: 1;
-    transform: translateY(0);
 }
 
 /* Дополнительная информация (Год/длительность) */
@@ -1020,8 +1374,8 @@ body.applecation--ratings-corner .applecation__ratings {
     position: relative;
 }
 
-/* Выравнивание по baseline только если реакции видны и рейтинги в углу */
-body.applecation--ratings-corner:not(.applecation--hide-reactions) .applecation__right {
+/* Выравнивание по baseline если рейтинги в углу */
+body.applecation--ratings-corner .applecation__right {
     align-items: last baseline;
 }
 
@@ -1401,6 +1755,76 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
 .applecation .full-episode--next .full-episode__img:after {
     border-radius: 0.8em !important;
 }
+
+/* Оверлей для полного описания */
+.applecation-description-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.applecation-description-overlay.show {
+    opacity: 1;
+}
+
+.applecation-description-overlay__bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    -webkit-backdrop-filter: blur(100px);
+    backdrop-filter: blur(100px);
+}
+
+.applecation-description-overlay__content {
+    position: relative;
+    z-index: 1;
+    max-width: 60vw;
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+.applecation-description-overlay__title {
+    font-size: 2em;
+    font-weight: 600;
+    margin-bottom: 1em;
+    color: #fff;
+}
+
+.applecation-description-overlay__text {
+    font-size: 1.2em;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+    white-space: pre-wrap;
+}
+
+/* Скроллбар для описания */
+.applecation-description-overlay__content::-webkit-scrollbar {
+    width: 0.5em;
+}
+
+.applecation-description-overlay__content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 1em;
+}
+
+.applecation-description-overlay__content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 1em;
+}
+
+.applecation-description-overlay__content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
+}
 </style>`;
         
         Lampa.Template.add('applecation_css', styles);
@@ -1538,14 +1962,6 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
             metaParts.push(...genres);
         }
 
-        // ДЕБАГ: добавляем значение style тега body
-        const bodyStyle = document.body.getAttribute('style') || 'нет атрибута style';
-        metaParts.push('DEBUG: body style = [' + bodyStyle + ']');
-
-        // ДЕБАГ: вычисляем 1vw в пикселях
-        const oneVwInPixels = window.innerWidth / 100;
-        metaParts.push('1vw = ' + oneVwInPixels.toFixed(2) + 'px');
-
         metaTextContainer.html(metaParts.join(' · '));
         
         // Загружаем иконку студии/сети
@@ -1555,8 +1971,61 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
     // Заполняем описание
     function fillDescription(activity, data) {
         const descContainer = activity.render().find('.applecation__description');
+        const descWrapper = activity.render().find('.applecation__description-wrapper');
         const description = data.overview || '';
         descContainer.text(description);
+        
+        // Добавляем обработчик клика для показа полного описания
+        descWrapper.off('hover:enter').on('hover:enter', function() {
+            showFullDescription(description, data.title || data.name);
+        });
+    }
+    
+    // Показываем полное описание в оверлее
+    function showFullDescription(text, title) {
+        if (!text) return;
+        
+        const overlay = $(`
+            <div class="applecation-description-overlay">
+                <div class="applecation-description-overlay__bg"></div>
+                <div class="applecation-description-overlay__content selector">
+                    <div class="applecation-description-overlay__title"></div>
+                    <div class="applecation-description-overlay__text"></div>
+                </div>
+            </div>
+        `);
+        
+        // Безопасно вставляем текст
+        overlay.find('.applecation-description-overlay__title').text(title);
+        overlay.find('.applecation-description-overlay__text').text(text);
+        
+        $('body').append(overlay);
+        
+        // Анимация появления
+        setTimeout(() => overlay.addClass('show'), 10);
+        
+        // Создаем контроллер для управления
+        const controller = {
+            toggle: function() {
+                Lampa.Controller.collectionSet(overlay);
+                Lampa.Controller.collectionFocus(overlay.find('.applecation-description-overlay__content'), overlay);
+            },
+            back: function() {
+                closeDescriptionOverlay(overlay);
+            }
+        };
+        
+        Lampa.Controller.add('applecation_description', controller);
+        Lampa.Controller.toggle('applecation_description');
+    }
+    
+    // Закрываем оверлей с описанием
+    function closeDescriptionOverlay(overlay) {
+        overlay.removeClass('show');
+        setTimeout(() => {
+            overlay.remove();
+        }, 300);
+        Lampa.Controller.toggle('content');
     }
 
     // Склонение сезонов с локализацией
@@ -1735,7 +2204,13 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
         waitForBackgroundLoad(activity, () => {
             // После загрузки фона показываем контент
             activity.render().find('.applecation__meta').addClass('show');
-            activity.render().find('.applecation__description').addClass('show');
+            
+            const descWrapper = activity.render().find('.applecation__description-wrapper').addClass('show').addClass('selector');
+           
+            if (window.Lampa && Lampa.Controller) {
+                Lampa.Controller.collectionAppend(descWrapper);
+            }
+            
             activity.render().find('.applecation__info').addClass('show');
             activity.render().find('.applecation__ratings').addClass('show');
         });
