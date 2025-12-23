@@ -279,6 +279,7 @@
 
         patchApiImg();
         addCustomTemplate();
+        addOverlayTemplate();
         addStyles();
         addSettings();
         attachLogoLoader();
@@ -769,8 +770,9 @@
                 Lampa.Storage.set('applecation_ratings_position', value);
                 $('body').removeClass('applecation--ratings-card applecation--ratings-corner');
                 $('body').addClass('applecation--ratings-' + value);
-                // Обновляем шаблон и перезагружаем активность
+                // Обновляем шаблоны и перезагружаем активность
                 addCustomTemplate();
+                addOverlayTemplate();
                 Lampa.Activity.back();
             }
         });
@@ -985,6 +987,37 @@
         $('body').append(scaleStyles);
     }
 
+    // Регистрируем шаблон для оверлея описания
+    function addOverlayTemplate() {
+        const overlayTemplate = `
+            <div class="applecation-description-overlay">
+                <div class="applecation-description-overlay__bg"></div>
+                <div class="applecation-description-overlay__content selector">
+                    <div class="applecation-description-overlay__logo"></div>
+                    <div class="applecation-description-overlay__title">{title}</div>
+                    <div class="applecation-description-overlay__text">{text}</div>
+                    <div class="applecation-description-overlay__details">
+                        <div class="applecation-description-overlay__info">
+                            <div class="applecation-description-overlay__info-name">#{full_date_of_release}</div>
+                            <div class="applecation-description-overlay__info-body">{relise}</div>
+                        </div>
+                        <div class="applecation-description-overlay__info applecation--budget">
+                            <div class="applecation-description-overlay__info-name">#{full_budget}</div>
+                            <div class="applecation-description-overlay__info-body">{budget}</div>
+                        </div>
+                        <div class="applecation-description-overlay__info applecation--countries">
+                            <div class="applecation-description-overlay__info-name">#{full_countries}</div>
+                            <div class="applecation-description-overlay__info-body">{countries}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        Lampa.Template.add('applecation_overlay', overlayTemplate);
+    }
+
+    // Регистрируем кастомный шаблон страницы full
     function addCustomTemplate() {
         const ratingsPosition = Lampa.Storage.get('applecation_ratings_position', 'card');
         
@@ -1137,8 +1170,20 @@
         Lampa.Template.add('full_episode', episodeTemplate);
     }
 
+    function disableFullDescription(e) {
+        if (e.type === 'start' && e.link) {
+            // Удаляем 'description' из списка rows перед рендерингом
+            const rows = e.link.rows;
+            const index = rows.indexOf('description');
+            if (index > -1) {
+                rows.splice(index, 1);
+            }
+        }
+    }
+
     function addStyles() {
         const styles = `<style>
+
 /* Основной контейнер */
 .applecation {
     transition: all .3s;
@@ -1768,11 +1813,15 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .applecation-description-overlay.show {
     opacity: 1;
+    visibility: visible;
+    pointer-events: all;
 }
 
 .applecation-description-overlay__bg {
@@ -1789,8 +1838,22 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
     position: relative;
     z-index: 1;
     max-width: 60vw;
-    max-height: 70vh;
+    max-height: 90vh;
     overflow-y: auto;
+}
+
+.applecation-description-overlay__logo {
+    text-align: center;
+    margin-bottom: 1.5em;
+    display: none;
+}
+
+.applecation-description-overlay__logo img {
+    max-width: 40vw;
+    max-height: 150px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
 }
 
 .applecation-description-overlay__title {
@@ -1798,6 +1861,7 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
     font-weight: 600;
     margin-bottom: 1em;
     color: #fff;
+    text-align: center;
 }
 
 .applecation-description-overlay__text {
@@ -1805,6 +1869,27 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
     line-height: 1.6;
     color: rgba(255, 255, 255, 0.9);
     white-space: pre-wrap;
+    margin-bottom: 1.5em;
+}
+
+.applecation-description-overlay__details {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -1em;
+}
+
+.applecation-description-overlay__details > * {
+    margin: 1em;
+}
+
+.applecation-description-overlay__info-name {
+    font-size: 1.1em;
+    margin-bottom: 0.5em;
+}
+
+.applecation-description-overlay__info-body {
+    font-size: 1.2em;
+    opacity: 0.6;
 }
 
 /* Скроллбар для описания */
@@ -1975,57 +2060,124 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
         const description = data.overview || '';
         descContainer.text(description);
         
+        // Создаем оверлей заранее
+        createDescriptionOverlay(activity, data);
+        
         // Добавляем обработчик клика для показа полного описания
         descWrapper.off('hover:enter').on('hover:enter', function() {
-            showFullDescription(description, data.title || data.name);
+            showFullDescription();
         });
     }
     
-    // Показываем полное описание в оверлее
-    function showFullDescription(text, title) {
+    // Обновляем логотип в оверлее
+    function updateOverlayLogo(logoUrl) {
+        const overlay = $('.applecation-description-overlay');
+        
+        if (!overlay.length) return;
+        
+        if (logoUrl) {
+            const newLogoImg = $('<img>').attr('src', logoUrl);
+            overlay.find('.applecation-description-overlay__logo').html(newLogoImg).css('display', 'block');
+            overlay.find('.applecation-description-overlay__title').css('display', 'none');
+        }
+    }
+    
+    // Парсим страны с локализацией (как в ядре Lampa)
+    function parseCountries(movie) {
+        if (!movie.production_countries) return [];
+        
+        return movie.production_countries.map(country => {
+            const isoCode = country.iso_3166_1;
+            const langKey = 'country_' + isoCode.toLowerCase();
+            const translated = Lampa.Lang.translate(langKey);
+            
+            // Если перевод найден (не равен ключу), используем его, иначе оригинальное имя
+            return translated !== langKey ? translated : country.name;
+        });
+    }
+    
+    // Создаем оверлей заранее
+    function createDescriptionOverlay(activity, data) {
+        const text = data.overview || '';
+        const title = data.title || data.name;
+        
         if (!text) return;
         
-        const overlay = $(`
-            <div class="applecation-description-overlay">
-                <div class="applecation-description-overlay__bg"></div>
-                <div class="applecation-description-overlay__content selector">
-                    <div class="applecation-description-overlay__title"></div>
-                    <div class="applecation-description-overlay__text"></div>
-                </div>
-            </div>
-        `);
+        // Удаляем старый оверлей если есть
+        $('.applecation-description-overlay').remove();
         
-        // Безопасно вставляем текст
-        overlay.find('.applecation-description-overlay__title').text(title);
-        overlay.find('.applecation-description-overlay__text').text(text);
+        // Парсим данные как в Lampa
+        const date = (data.release_date || data.first_air_date || '') + '';
+        const relise = date.length > 3 ? Lampa.Utils.parseTime(date).full : date.length > 0 ? date : Lampa.Lang.translate('player_unknown');
+        const budget = '$ ' + Lampa.Utils.numberWithSpaces(data.budget || 0);
+        const countriesArr = parseCountries(data);
+        const countries = countriesArr.join(', ');
         
+        // Создаем оверлей через шаблон Lampa
+        const overlay = $(Lampa.Template.get('applecation_overlay', {
+            title: title,
+            text: text,
+            relise: relise,
+            budget: budget,
+            countries: countries
+        }));
+        
+        // Скрываем бюджет если 0
+        if (!data.budget || data.budget === 0) {
+            overlay.find('.applecation--budget').remove();
+        }
+        
+        // Скрываем страны если пусто
+        if (!countries) {
+            overlay.find('.applecation--countries').remove();
+        }
+        
+        // Добавляем в body но НЕ показываем
         $('body').append(overlay);
+        
+        // Сохраняем ссылку
+        overlay.data('controller-created', false);
+    }
+    
+    // Показываем полное описание в оверлее
+    function showFullDescription() {
+        const overlay = $('.applecation-description-overlay');
+        
+        if (!overlay.length) return;
         
         // Анимация появления
         setTimeout(() => overlay.addClass('show'), 10);
         
-        // Создаем контроллер для управления
-        const controller = {
-            toggle: function() {
-                Lampa.Controller.collectionSet(overlay);
-                Lampa.Controller.collectionFocus(overlay.find('.applecation-description-overlay__content'), overlay);
-            },
-            back: function() {
-                closeDescriptionOverlay(overlay);
-            }
-        };
+        // Создаем контроллер только один раз
+        if (!overlay.data('controller-created')) {
+            const controller = {
+                toggle: function() {
+                    Lampa.Controller.collectionSet(overlay);
+                    Lampa.Controller.collectionFocus(overlay.find('.applecation-description-overlay__content'), overlay);
+                },
+                back: function() {
+                    closeDescriptionOverlay();
+                }
+            };
+            
+            Lampa.Controller.add('applecation_description', controller);
+            overlay.data('controller-created', true);
+        }
         
-        Lampa.Controller.add('applecation_description', controller);
         Lampa.Controller.toggle('applecation_description');
     }
     
     // Закрываем оверлей с описанием
-    function closeDescriptionOverlay(overlay) {
+    function closeDescriptionOverlay() {
+        const overlay = $('.applecation-description-overlay');
+        
+        if (!overlay.length) return;
+        
         overlay.removeClass('show');
+        
         setTimeout(() => {
-            overlay.remove();
+            Lampa.Controller.toggle('content');
         }, 300);
-        Lampa.Controller.toggle('content');
     }
 
     // Склонение сезонов с локализацией
@@ -2236,6 +2388,9 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
                     waitForBackgroundLoad(activity, () => {
                         logoContainer.addClass('loaded');
                     });
+                    
+                    // Обновляем логотип в оверлее
+                    updateOverlayLogo(logoUrl);
                 };
                 img.src = logoUrl;
             } else {
@@ -2361,6 +2516,9 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
     // Подключаем загрузку логотипов
     function attachLogoLoader() {
         Lampa.Listener.follow('full', (event) => {
+            // Отключаем блок "Подробно"
+            disableFullDescription(event);
+            
             if (event.type === 'complite') {
                 const activity = event.object.activity;
                 const render = activity.render();
