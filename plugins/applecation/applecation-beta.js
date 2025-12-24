@@ -657,6 +657,28 @@
             he: 'הצג פרקים בסדר הפוך (מהחדש לישן)',
             pt: 'Mostrar episódios em ordem inversa (do mais novo ao mais antigo)',
             zh: '以相反顺序显示剧集（从新到旧）'
+        },
+        description_overlay: {
+            ru: 'Описание в оверлее',
+            en: 'Description in Overlay',
+            uk: 'Опис в оверлеї',
+            be: 'Апісанне ў аверлеі',
+            bg: 'Описание в овърлей',
+            cs: 'Popis v překryvné vrstvě',
+            he: 'תיאור בשכבת על',
+            pt: 'Descrição em sobreposição',
+            zh: '叠加层中的描述'
+        },
+        description_overlay_desc: {
+            ru: 'Показывать описание в отдельном окне при нажатии',
+            en: 'Show description in a separate window when clicked',
+            uk: 'Показувати опис в окремому вікні при натисканні',
+            be: 'Паказваць апісанне ў асобным акне пры націску',
+            bg: 'Показване на описанието в отделен прозорец при щракване',
+            cs: 'Při kliknutí zobrazit popis v samostatném okně',
+            he: 'הצг תיאور בחлון נפרд בעת לחיצה',
+            pt: 'Mostrar описание em uma janela separada quando clicado',
+            zh: '点击时在单独的窗口中显示描述'
         }
     };
 
@@ -685,6 +707,9 @@
         }
         if (Lampa.Storage.get('applecation_reverse_episodes') === undefined) {
             Lampa.Storage.set('applecation_reverse_episodes', true);
+        }
+        if (Lampa.Storage.get('applecation_description_overlay') === undefined) {
+            Lampa.Storage.set('applecation_description_overlay', true);
         }
 
         // Создаем раздел настроек
@@ -719,13 +744,10 @@
             component: 'applecation_settings',
             param: {
                 name: 'applecation_display_title',
-                type: 'static'
+                type: 'title'
             },
             field: {
                 name: t('settings_title_display')
-            },
-            onRender: function(item) {
-                item.addClass('settings-param-title');
             }
         });
 
@@ -808,18 +830,32 @@
             }
         });
 
+        // Описание в оверлее
+        Lampa.SettingsApi.addParam({
+            component: 'applecation_settings',
+            param: {
+                name: 'applecation_description_overlay',
+                type: 'trigger',
+                default: true
+            },
+            field: {
+                name: t('description_overlay'),
+                description: t('description_overlay_desc')
+            },
+            onChange: function(value) {
+                Lampa.Storage.set('applecation_description_overlay', value);
+            }
+        });
+
         // Заголовок: Масштабирование
         Lampa.SettingsApi.addParam({
             component: 'applecation_settings',
             param: {
                 name: 'applecation_scaling_title',
-                type: 'static'
+                type: 'title'
             },
             field: {
                 name: t('settings_title_scaling')
-            },
-            onRender: function(item) {
-                item.addClass('settings-param-title');
             }
         });
 
@@ -1368,12 +1404,24 @@ body.applecation--ratings-corner .applecation__ratings {
 }
 
 .applecation__description-wrapper.focus {
-    background-color: #ffffff3b;
-    padding: .1em .1em .0em .6em;
-    border-radius: 1em;
-    width: fit-content;
-    transform: scale(1.07) translateY(0);
-    transition-delay: 0s;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.28),
+    rgba(255, 255, 255, 0.18)
+  );
+  padding: .15em .4em 0 .7em;
+  border-radius: 1em;
+  width: fit-content;
+
+//   box-shadow:
+//     inset 0 1px 0 rgba(255, 255, 255, 0.35),
+//     0 8px 24px rgba(0, 0, 0, 0.25);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+
+  transform: scale(1.07) translateY(0);
+  
+  transition-delay: 0s;
 }
 
 /* Описание */
@@ -1388,6 +1436,11 @@ body.applecation--ratings-corner .applecation__ratings {
     -webkit-box-orient: vertical;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+
+.focus .applecation__description {
+  color: rgba(255, 255, 255, 0.92);
 }
 
 /* Дополнительная информация (Год/длительность) */
@@ -1961,6 +2014,17 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
     border-radius: 50% !important;
 }
 
+/* Смещаем лицо только при высоком качестве (w500), так как там другой кроп у TMDB */
+.applecation.applecation--poster-high .full-person__photo img {
+    object-position: center calc(50% + 20px) !important;
+}
+
+/* Дефолтные заглушки оставляем по центру, чтобы не ломать симметрию иконок */
+.applecation .full-person__photo img[src*="actor.svg"],
+.applecation .full-person__photo img[src*="img_broken.svg"] {
+    object-position: center !important;
+}
+
 /* ЖИДКОЕ СТЕКЛО — БАЗОВЫЕ СЛОИ (скрыты) */
 .applecation .full-person__photo::before,
 .applecation .full-person__photo::after {
@@ -2136,6 +2200,10 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
                 size = episodeMap[posterSize] || 'w300';
             }
 
+            if (size === 'w276_and_h350_face' && posterSize === 'w500') {
+                size = 'w600_and_h900_face';
+            }
+
             return originalImg.call(tmdbSource, src, size);
         };
 
@@ -2228,15 +2296,23 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
         const descContainer = activity.render().find('.applecation__description');
         const descWrapper = activity.render().find('.applecation__description-wrapper');
         const description = data.overview || '';
+        const useOverlay = Lampa.Storage.get('applecation_description_overlay', true);
+        
         descContainer.text(description);
         
-        // Создаем оверлей заранее
-        createDescriptionOverlay(activity, data);
-        
-        // Добавляем обработчик клика для показа полного описания
-        descWrapper.off('hover:enter').on('hover:enter', function() {
-            showFullDescription();
-        });
+        if (useOverlay) {
+            // Создаем оверлей заранее
+            createDescriptionOverlay(activity, data);
+            
+            // Добавляем обработчик клика для показа полного описания
+            descWrapper.off('hover:enter').on('hover:enter', function() {
+                showFullDescription();
+            });
+        } else {
+            // Если оверлей отключен, убираем обработчики и удаляем оверлей
+            descWrapper.off('hover:enter');
+            $('.applecation-description-overlay').remove();
+        }
     }
     
     // Обновляем логотип в оверлее
@@ -2527,10 +2603,14 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
             // После загрузки фона показываем контент
             activity.render().find('.applecation__meta').addClass('show');
             
-            const descWrapper = activity.render().find('.applecation__description-wrapper').addClass('show').addClass('selector');
-           
-            if (window.Lampa && Lampa.Controller) {
-                Lampa.Controller.collectionAppend(descWrapper);
+            const useOverlay = Lampa.Storage.get('applecation_description_overlay', true);
+            const descWrapper = activity.render().find('.applecation__description-wrapper').addClass('show');
+            
+            if (useOverlay) {
+                descWrapper.addClass('selector');
+                if (window.Lampa && Lampa.Controller) {
+                    Lampa.Controller.collectionAppend(descWrapper);
+                }
             }
             
             activity.render().find('.applecation__info').addClass('show');
@@ -2740,8 +2820,10 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
     // Подключаем загрузку логотипов
     function attachLogoLoader() {
         Lampa.Listener.follow('full', (event) => {
-            // Отключаем блок "Подробно"
-            disableFullDescription(event);
+            // Отключаем блок "Подробно", если включен оверлей
+            if (Lampa.Storage.get('applecation_description_overlay', true)) {
+                disableFullDescription(event);
+            }
             
             if (event.type === 'complite') {
                 const activity = event.object.activity;
@@ -2749,6 +2831,10 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
                 
                 // Добавляем класс для применения стилей
                 render.addClass('applecation');
+
+                // Добавляем класс качества постеров для CSS
+                const posterSize = Lampa.Storage.field('poster_size');
+                render.toggleClass('applecation--poster-high', posterSize === 'w500');
 
                 addOverlay(activity);
                 loadLogo(event);
