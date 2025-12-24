@@ -1910,6 +1910,176 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
 .applecation-description-overlay__content::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.5);
 }
+
+/* =========================================================
+   ПЕРСОНЫ (АКТЕРЫ И СЪЕМОЧНАЯ ГРУППА) - APPLE TV СТИЛЬ
+   ========================================================= */
+
+.applecation .full-person {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    width: 10.7em !important;
+    background: none !important;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    will-change: transform;
+    -webkit-animation: none !important;
+    animation: none !important;
+    margin-left: 0;
+}
+
+.applecation .full-person.focus {
+    transform: scale(1.08) translateY(-6px) !important;
+    z-index: 10;
+}
+
+/* Фото персоны - круглое */
+.applecation .full-person__photo {
+    position: relative !important;
+    width: 9.4em !important;
+    height: 9.4em !important;
+    margin: 0 0 .3em 0 !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    flex-shrink: 0 !important;
+    transition: 
+        box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+        backdrop-filter 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+        -webkit-backdrop-filter 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+        background 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    will-change: transform, box-shadow, backdrop-filter;
+    -webkit-animation: none !important;
+    animation: none !important;
+}
+
+.applecation .full-person__photo img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    border-radius: 50% !important;
+}
+
+/* ЖИДКОЕ СТЕКЛО — БАЗОВЫЕ СЛОИ (скрыты) */
+.applecation .full-person__photo::before,
+.applecation .full-person__photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    will-change: opacity;
+}
+
+/* толщина стекла */
+.applecation .full-person__photo::before {
+    z-index: 2;
+    box-shadow:
+        inset 2px 2px 1px rgba(255, 255, 255, 0.30),
+        inset -2px -2px 2px rgba(255, 255, 255, 0.30);
+}
+
+/* ореол и блик */
+.applecation .full-person__photo::after {
+    z-index: 3;
+    background:
+        radial-gradient(circle at center,
+            transparent 58%,
+            rgba(255, 255, 255, 0.22) 75%,
+            rgba(255, 255, 255, 0.38) 90%),
+        radial-gradient(120% 85% at 18% 10%,
+            rgba(255, 255, 255, 0.35),
+            rgba(255, 255, 255, 0.10) 38%,
+            transparent 62%);
+    mix-blend-mode: screen;
+}
+
+/* ЭФФЕКТЫ ПРИ ФОКУСЕ */
+
+.applecation .full-person.focus .full-person__photo::before,
+.applecation .full-person.focus .full-person__photo::after {
+    opacity: 1;
+}
+
+.applecation .full-person.focus .full-person__photo::after {
+    opacity: 0.9;
+}
+
+/* Текстовая информация */
+.applecation .full-person__body {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+    padding: 0 0.3em !important;
+}
+
+/* Имя персоны */
+.applecation .full-person__name {
+    font-size: 1em !important;
+    font-weight: 600 !important;
+    color: #fff !important;
+    line-height: 1.3 !important;
+    width: 100% !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    position: relative !important;
+}
+
+/* Бегущая строка для длинных имен */
+.applecation .full-person__name.marquee-active {
+    text-overflow: clip !important;
+    mask-image: linear-gradient(to right, #000 92%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, #000 92%, transparent 100%);
+}
+
+/* При фокусе (когда строка едет) прозрачность с обеих сторон */
+.applecation .full-person.focus .full-person__name.marquee-active {
+    mask-image: linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 7%, #000 93%, transparent 100%);
+}
+
+.applecation .marquee__inner {
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.applecation .marquee__inner span {
+    padding-right: 2.5em;
+    display: inline-block;
+}
+
+/* Запуск анимации при фокусе */
+.applecation .full-person.focus .full-person__name.marquee-active .marquee__inner {
+    animation: marquee var(--marquee-duration, 5s) linear infinite;
+}
+
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+}
+
+/* Роль персоны */
+.applecation .full-person__role {
+    font-size: 0.8em !important;
+    font-weight: 400 !important;
+    color: rgba(255, 255, 255, 0.5) !important;
+    line-height: 1.3 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    width: 100% !important;
+    margin-top: 0;
+}
+
+.applecation .full-person.focus .full-person__role {
+    color: rgb(255, 255, 255) !important;
+}
 </style>`;
         
         Lampa.Template.add('applecation_css', styles);
@@ -2513,6 +2683,60 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
         });
     }
 
+    // Добавляем бегущую строку для длинных имен персон
+    function attachPersonMarquee(activity) {
+        const render = activity.render();
+        const names = render.find('.full-person__name');
+        
+        // Очищаем старые marquee если они есть (на случай повторного вызова)
+        names.each(function() {
+            const nameElement = $(this);
+            if (nameElement.hasClass('marquee-processed')) {
+                const originalText = nameElement.find('span').first().text();
+                if (originalText) {
+                    nameElement.text(originalText);
+                    nameElement.removeClass('marquee-processed marquee-active');
+                    nameElement.css('--marquee-duration', '');
+                }
+            }
+        });
+
+        // Функция для проверки переполнения
+        function isTextOverflowing(element) {
+            // Для корректной проверки на скрытых элементах или в процессе отрисовки
+            return element.scrollWidth > element.clientWidth + 1;
+        }
+        
+        // Инициализируем marquee для тех, кто переполнен
+        // Небольшая задержка, чтобы лайаут успел пересчитаться
+        setTimeout(() => {
+            names.each(function() {
+                const nameElement = $(this);
+                const text = nameElement.text().trim();
+                
+                if (!text) return;
+                
+                if (isTextOverflowing(nameElement[0])) {
+                    // Рассчитываем длительность: ~250мс на символ, но не менее 5с и не более 20с
+                    const duration = Math.min(Math.max(text.length * 0.25, 5), 20);
+                    
+                    nameElement.addClass('marquee-processed marquee-active');
+                    nameElement.css('--marquee-duration', duration + 's');
+                    
+                    // Оборачиваем в структуру для анимации
+                    // Используем text() для безопасности от XSS
+                    const span1 = $('<span>').text(text);
+                    const span2 = $('<span>').text(text);
+                    const inner = $('<div class="marquee__inner">').append(span1).append(span2);
+                    
+                    nameElement.empty().append(inner);
+                } else {
+                    nameElement.addClass('marquee-processed');
+                }
+            });
+        }, 100);
+    }
+
     // Подключаем загрузку логотипов
     function attachLogoLoader() {
         Lampa.Listener.follow('full', (event) => {
@@ -2529,6 +2753,7 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
                 addOverlay(activity);
                 loadLogo(event);
                 attachScrollBlur(activity);
+                attachPersonMarquee(activity);
 
                 // Анализируем качество контента
                 const data = event.data;
