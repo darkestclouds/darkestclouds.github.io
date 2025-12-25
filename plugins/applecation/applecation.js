@@ -270,7 +270,7 @@
 
     // Главная функция плагина
     function initializePlugin() {
-        console.log('Applecation', 'v1.1.0');
+        console.log('Applecation', 'v1.1.1');
         
         if (!Lampa.Platform.screen('tv')) {
             console.log('Applecation', 'TV mode only');
@@ -516,15 +516,15 @@
             zh: '在卡片中'
         },
         position_corner: {
-            ru: 'В левом нижнем углу',
-            en: 'Bottom left corner',
-            uk: 'У лівому нижньому куті',
-            be: 'У левым ніжнім куце',
-            bg: 'В долния ляв ъгъл',
-            cs: 'V levém dolním rohu',
-            he: 'בפינה השמאלית התחתונה',
-            pt: 'Canto inferior esquerdo',
-            zh: '左下角'
+            ru: 'В правом нижнем углу',
+            en: 'Bottom right corner',
+            uk: 'У правому нижньому куті',
+            be: 'У правым ніжнім куце',
+            bg: 'В долния десен ъгъл',
+            cs: 'V pravém dolním rohu',
+            he: 'בפינה הימנית התחתונה',
+            pt: 'Canto inferior direito',
+            zh: '右下角'
         },
         year_short: {
             ru: ' г.',
@@ -727,7 +727,7 @@
                 type: 'static'
             },
             field: {
-                name: '<div>Applecation v1.1.0</div>'
+                name: '<div>Applecation v1.1.1</div>'
             },
             onRender: function(item) {
                 item.css('opacity', '0.7');
@@ -1374,7 +1374,7 @@ body.applecation--hide-ratings .applecation__ratings {
     display: none !important;
 }
 
-/* Расположение рейтингов - в левом нижнем углу */
+/* Расположение рейтингов - в правом нижнем углу */
 body.applecation--ratings-corner .applecation__right {
     gap: 1em;
 }
@@ -2854,7 +2854,7 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
     // Регистрация плагина в манифесте
     var pluginManifest = {
         type: 'other',
-        version: '1.1.0',
+        version: '1.1.1',
         name: 'Applecation',
         description: 'Делает интерфейс в карточке фильма похожим на Apple TV и оптимизирует под 4K',
         author: '@darkestclouds',
