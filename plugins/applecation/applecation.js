@@ -1,8 +1,17 @@
 (function () {
     'use strict';
 
+    const APPLECATION_VERSION = '1.1.2';
+
     // Иконка плагина
     const PLUGIN_ICON = '<svg viewBox="110 90 180 210"xmlns=http://www.w3.org/2000/svg><g id=sphere><circle cx=200 cy=140 fill="hsl(200, 80%, 40%)"opacity=0.3 r=1.2 /><circle cx=230 cy=150 fill="hsl(200, 80%, 45%)"opacity=0.35 r=1.3 /><circle cx=170 cy=155 fill="hsl(200, 80%, 42%)"opacity=0.32 r=1.2 /><circle cx=245 cy=175 fill="hsl(200, 80%, 48%)"opacity=0.38 r=1.4 /><circle cx=155 cy=180 fill="hsl(200, 80%, 44%)"opacity=0.34 r=1.3 /><circle cx=215 cy=165 fill="hsl(200, 80%, 46%)"opacity=0.36 r=1.2 /><circle cx=185 cy=170 fill="hsl(200, 80%, 43%)"opacity=0.33 r=1.3 /><circle cx=260 cy=200 fill="hsl(200, 80%, 50%)"opacity=0.4 r=1.5 /><circle cx=140 cy=200 fill="hsl(200, 80%, 50%)"opacity=0.4 r=1.5 /><circle cx=250 cy=220 fill="hsl(200, 80%, 48%)"opacity=0.38 r=1.4 /><circle cx=150 cy=225 fill="hsl(200, 80%, 47%)"opacity=0.37 r=1.4 /><circle cx=235 cy=240 fill="hsl(200, 80%, 45%)"opacity=0.35 r=1.3 /><circle cx=165 cy=245 fill="hsl(200, 80%, 44%)"opacity=0.34 r=1.3 /><circle cx=220 cy=255 fill="hsl(200, 80%, 42%)"opacity=0.32 r=1.2 /><circle cx=180 cy=258 fill="hsl(200, 80%, 41%)"opacity=0.31 r=1.2 /><circle cx=200 cy=120 fill="hsl(200, 80%, 60%)"opacity=0.5 r=1.8 /><circle cx=240 cy=135 fill="hsl(200, 80%, 65%)"opacity=0.55 r=2 /><circle cx=160 cy=140 fill="hsl(200, 80%, 62%)"opacity=0.52 r=1.9 /><circle cx=270 cy=165 fill="hsl(200, 80%, 70%)"opacity=0.6 r=2.2 /><circle cx=130 cy=170 fill="hsl(200, 80%, 67%)"opacity=0.57 r=2.1 /><circle cx=255 cy=190 fill="hsl(200, 80%, 72%)"opacity=0.62 r=2.3 /><circle cx=145 cy=195 fill="hsl(200, 80%, 69%)"opacity=0.59 r=2.2 /><circle cx=280 cy=200 fill="hsl(200, 80%, 75%)"opacity=0.65 r=2.5 /><circle cx=120 cy=200 fill="hsl(200, 80%, 75%)"opacity=0.65 r=2.5 /><circle cx=275 cy=215 fill="hsl(200, 80%, 73%)"opacity=0.63 r=2.4 /><circle cx=125 cy=220 fill="hsl(200, 80%, 71%)"opacity=0.61 r=2.3 /><circle cx=260 cy=235 fill="hsl(200, 80%, 68%)"opacity=0.58 r=2.2 /><circle cx=140 cy=240 fill="hsl(200, 80%, 66%)"opacity=0.56 r=2.1 /><circle cx=245 cy=255 fill="hsl(200, 80%, 63%)"opacity=0.53 r=2 /><circle cx=155 cy=260 fill="hsl(200, 80%, 61%)"opacity=0.51 r=1.9 /><circle cx=225 cy=270 fill="hsl(200, 80%, 58%)"opacity=0.48 r=1.8 /><circle cx=175 cy=272 fill="hsl(200, 80%, 56%)"opacity=0.46 r=1.7 /><circle cx=200 cy=100 fill="hsl(200, 80%, 85%)"opacity=0.8 r=2.8 /><circle cx=230 cy=115 fill="hsl(200, 80%, 90%)"opacity=0.85 r=3 /><circle cx=170 cy=120 fill="hsl(200, 80%, 87%)"opacity=0.82 r=2.9 /><circle cx=250 cy=140 fill="hsl(200, 80%, 92%)"opacity=0.88 r=3.2 /><circle cx=150 cy=145 fill="hsl(200, 80%, 89%)"opacity=0.84 r=3.1 /><circle cx=265 cy=170 fill="hsl(200, 80%, 95%)"opacity=0.9 r=3.4 /><circle cx=135 cy=175 fill="hsl(200, 80%, 93%)"opacity=0.87 r=3.3 /><circle cx=275 cy=200 fill="hsl(200, 80%, 98%)"opacity=0.95 r=3.5 /><circle cx=125 cy=200 fill="hsl(200, 80%, 98%)"opacity=0.95 r=3.5 /><circle cx=200 cy=200 fill="hsl(200, 80%, 100%)"opacity=1 r=4 /><circle cx=220 cy=195 fill="hsl(200, 80%, 98%)"opacity=0.95 r=3.8 /><circle cx=180 cy=205 fill="hsl(200, 80%, 97%)"opacity=0.93 r=3.7 /><circle cx=240 cy=210 fill="hsl(200, 80%, 96%)"opacity=0.92 r=3.6 /><circle cx=160 cy=215 fill="hsl(200, 80%, 95%)"opacity=0.9 r=3.5 /><circle cx=270 cy=230 fill="hsl(200, 80%, 94%)"opacity=0.88 r=3.4 /><circle cx=130 cy=235 fill="hsl(200, 80%, 92%)"opacity=0.86 r=3.3 /><circle cx=255 cy=250 fill="hsl(200, 80%, 90%)"opacity=0.84 r=3.2 /><circle cx=145 cy=255 fill="hsl(200, 80%, 88%)"opacity=0.82 r=3.1 /><circle cx=235 cy=265 fill="hsl(200, 80%, 86%)"opacity=0.8 r=3 /><circle cx=165 cy=268 fill="hsl(200, 80%, 84%)"opacity=0.78 r=2.9 /><circle cx=215 cy=280 fill="hsl(200, 80%, 82%)"opacity=0.76 r=2.8 /><circle cx=185 cy=282 fill="hsl(200, 80%, 80%)"opacity=0.74 r=2.7 /><circle cx=200 cy=290 fill="hsl(200, 80%, 78%)"opacity=0.72 r=2.6 /><circle cx=210 cy=130 fill="hsl(200, 80%, 88%)"opacity=0.83 r=2.5 /><circle cx=190 cy=135 fill="hsl(200, 80%, 86%)"opacity=0.81 r=2.4 /><circle cx=225 cy=155 fill="hsl(200, 80%, 91%)"opacity=0.86 r=2.8 /><circle cx=175 cy=160 fill="hsl(200, 80%, 89%)"opacity=0.84 r=2.7 /><circle cx=245 cy=185 fill="hsl(200, 80%, 94%)"opacity=0.89 r=3.3 /><circle cx=155 cy=190 fill="hsl(200, 80%, 92%)"opacity=0.87 r=3.2 /><circle cx=260 cy=210 fill="hsl(200, 80%, 95%)"opacity=0.91 r=3.4 /><circle cx=140 cy=215 fill="hsl(200, 80%, 93%)"opacity=0.88 r=3.3 /><circle cx=250 cy=230 fill="hsl(200, 80%, 91%)"opacity=0.85 r=3.2 /><circle cx=150 cy=235 fill="hsl(200, 80%, 89%)"opacity=0.83 r=3.1 /><circle cx=230 cy=245 fill="hsl(200, 80%, 87%)"opacity=0.81 r=3 /><circle cx=170 cy=250 fill="hsl(200, 80%, 85%)"opacity=0.79 r=2.9 /><circle cx=210 cy=260 fill="hsl(200, 80%, 83%)"opacity=0.77 r=2.8 /><circle cx=190 cy=265 fill="hsl(200, 80%, 81%)"opacity=0.75 r=2.7 /></g></svg>';
+
+    /**
+     * Проверяет, является ли активность все еще активной
+     */
+    function isAlive(activity) {
+        return activity && !activity.__destroyed;
+    }
 
     /**
      * Анализирует качество контента из данных ffprobe
@@ -135,6 +144,8 @@
             movie: movie,
             page: 1
         }, (results) => {
+            if (!isAlive(activity)) return;
+
             // Получили результаты парсера
             if (!results || !results.Results || results.Results.length === 0) return;
 
@@ -270,7 +281,7 @@
 
     // Главная функция плагина
     function initializePlugin() {
-        console.log('Applecation', 'v1.1.1');
+        console.log('Applecation', 'v' + APPLECATION_VERSION);
         
         if (!Lampa.Platform.screen('tv')) {
             console.log('Applecation', 'TV mode only');
@@ -727,7 +738,7 @@
                 type: 'static'
             },
             field: {
-                name: '<div>Applecation v1.1.1</div>'
+                name: '<div>Applecation v' + APPLECATION_VERSION + '</div>'
             },
             onRender: function(item) {
                 item.css('opacity', '0.7');
@@ -2600,6 +2611,8 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
 
         // Ждем когда фон загрузится и появится
         waitForBackgroundLoad(activity, () => {
+            if (!isAlive(activity)) return;
+
             // После загрузки фона показываем контент
             activity.render().find('.applecation__meta').addClass('show');
             
@@ -2624,6 +2637,8 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
         );
 
         $.get(apiUrl, (imagesData) => {
+            if (!isAlive(activity)) return;
+
             const logoContainer = activity.render().find('.applecation__logo');
             const titleElement = activity.render().find('.full-start-new__title');
 
@@ -2634,8 +2649,12 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
 
                 const img = new Image();
                 img.onload = () => {
+                    if (!isAlive(activity)) return;
+
                     logoContainer.html(`<img src="${logoUrl}" alt="" />`);
                     waitForBackgroundLoad(activity, () => {
+                        if (!isAlive(activity)) return;
+                        
                         logoContainer.addClass('loaded');
                     });
                     
@@ -2680,16 +2699,23 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
             setTimeout(() => {
                 background.addClass('applecation-animated');
                 callback();
-            }, 650); // 600ms transition + 50ms запас
+            }, 350); // 600ms transition + 50ms запас
             return;
         }
 
         // Ждем загрузки фона
         const checkInterval = setInterval(() => {
+            if (!isAlive(activity)) {
+                clearInterval(checkInterval);
+                return;
+            }
+
             if (background.hasClass('loaded')) {
                 clearInterval(checkInterval);
                 // Ждем завершения transition + небольшая задержка
                 setTimeout(() => {
+                    if (!isAlive(activity)) return;
+                    
                     background.addClass('applecation-animated');
                     callback();
                 }, 650); // 600ms transition + 50ms запас
@@ -2790,6 +2816,8 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
         // Инициализируем marquee для тех, кто переполнен
         // Небольшая задержка, чтобы лайаут успел пересчитаться
         setTimeout(() => {
+            if (!isAlive(activity)) return;
+
             names.each(function() {
                 const nameElement = $(this);
                 const text = nameElement.text().trim();
@@ -2832,6 +2860,16 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
                 // Добавляем класс для применения стилей
                 render.addClass('applecation');
 
+                // Помечаем активность при уничтожении
+                activity.__destroyed = false;
+                
+                // Сохраняем оригинальный метод destroy если он есть
+                var originalDestroy = activity.destroy;
+                activity.destroy = function() {
+                    activity.__destroyed = true;
+                    if (originalDestroy) originalDestroy.apply(activity, arguments);
+                };
+
                 // Добавляем класс качества постеров для CSS
                 const posterSize = Lampa.Storage.field('poster_size');
                 render.toggleClass('applecation--poster-high', posterSize === 'w500');
@@ -2854,7 +2892,7 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
     // Регистрация плагина в манифесте
     var pluginManifest = {
         type: 'other',
-        version: '1.1.1',
+        version: APPLECATION_VERSION,
         name: 'Applecation',
         description: 'Делает интерфейс в карточке фильма похожим на Apple TV и оптимизирует под 4K',
         author: '@darkestclouds',
