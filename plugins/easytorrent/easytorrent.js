@@ -10,8 +10,8 @@
     const PLUGIN_ICON = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/></svg>';
 
     // Supabase config
-    const SUPABASE_URL = 'https://apvhjfnobsabxcyqzxlg.supabase.co';
-    const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwdmhqZm5vYnNhYnhjeXF6eGxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU0OTcyMzYsImV4cCI6MjA1MTA3MzIzNn0.zFfEhLGPRz_3iZTnTfQGmFhqJPkZXJqQPYHQYjPD7Wo';
+    const SUPABASE_URL = 'https://wozuelafumpzgvllcjne.supabase.co';
+    const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvenVlbGFmdW1wemd2bGxjam5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5Mjg1MDgsImV4cCI6MjA4MjUwNDUwOH0.ODnHlq_P-1wr_D6Jwaba1mLXIVuGBnnUZsrHI8Twdug';
     const WIZARD_URL = 'https://darkestclouds.github.io/plugins/easytorrent/';
 
     // Глобальное хранилище топовых рекомендаций
@@ -1436,92 +1436,6 @@ function normalizeTitle(input) {
         display: none;
     }
 }
-
-/* QR-код модальное окно */
-.easytorrent-qr-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0,0,0,0.85);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 10000;
-    animation: fadeIn 0.3s ease;
-}
-
-.easytorrent-qr-content {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    border-radius: 20px;
-    padding: 40px;
-    max-width: 600px;
-    text-align: center;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-    border: 2px solid rgba(102, 126, 234, 0.3);
-}
-
-.easytorrent-qr-header h2 {
-    color: #667eea;
-    font-size: 2em;
-    margin-bottom: 10px;
-}
-
-.easytorrent-qr-header p {
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 30px;
-    font-size: 1.1em;
-}
-
-.easytorrent-qr-code {
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    display: inline-block;
-    margin-bottom: 30px;
-}
-
-.easytorrent-qr-code svg {
-    display: block;
-}
-
-.easytorrent-qr-manual {
-    background: rgba(255,255,255,0.05);
-    border-radius: 12px;
-    padding: 20px;
-    margin-bottom: 20px;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-.easytorrent-qr-manual p {
-    color: rgba(255,255,255,0.8);
-    margin: 10px 0;
-    font-size: 0.95em;
-}
-
-.easytorrent-pair-code {
-    font-size: 2.5em;
-    font-weight: bold;
-    color: #667eea;
-    letter-spacing: 0.3em;
-    margin: 15px 0;
-    font-family: monospace;
-}
-
-.easytorrent-qr-status {
-    color: rgba(255,255,255,0.6);
-    font-size: 1.1em;
-    padding: 15px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.1);
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
 `;
 
         const style = document.createElement('style');
@@ -1716,32 +1630,45 @@ function normalizeTitle(input) {
         const pairCode = generatePairCode();
         const qrUrl = `${WIZARD_URL}?pairCode=${pairCode}`;
         
-        // Создаём модальное окно
-        const modal = $('<div class="easytorrent-qr-modal"></div>');
-        const content = $('<div class="easytorrent-qr-content selector"></div>');
-        
-        content.html(`
-            <div class="easytorrent-qr-header">
-                <h2>🔗 Настройка приоритетов</h2>
-                <p>Отсканируйте QR-код камерой телефона</p>
+        // Создаём содержимое модального окна
+        const modal = $(`
+            <div class="about">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div id="qrCodeContainer" style="background: white; padding: 20px; border-radius: 15px; display: inline-block; margin-bottom: 20px;height: 20em;width: 20em;"></div>
+                </div>
+                <div class="about__text" style="text-align: center; margin-bottom: 15px;">
+                    <strong>Или перейдите вручную:</strong><br>
+                    <span style="word-break: break-all;">${qrUrl}</span>
+                </div>
+                <div class="about__text" style="text-align: center;">
+                    <strong>Код сопряжения:</strong>
+                    <div style="font-size: 2em; font-weight: bold; letter-spacing: 0.3em; margin: 10px 0; color: #667eea;">${pairCode}</div>
+                </div>
+                <div class="about__text" id="qrStatus" style="text-align: center; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 10px; margin-top: 20px;">
+                    ⏳ Ожидание конфигурации...
+                </div>
             </div>
-            <div class="easytorrent-qr-code" id="qrCodeContainer"></div>
-            <div class="easytorrent-qr-manual">
-                <p><strong>Или перейдите вручную:</strong></p>
-                <p style="word-break: break-all; margin: 10px 0;">${qrUrl}</p>
-                <p><strong>Код сопряжения:</strong></p>
-                <div class="easytorrent-pair-code">${pairCode}</div>
-            </div>
-            <div class="easytorrent-qr-status">⏳ Ожидание конфигурации...</div>
         `);
         
-        modal.append(content);
-        $('body').append(modal);
+        // Открываем модалку
+        Lampa.Modal.open({
+            title: '🔗 Настройка приоритетов',
+            html: modal,
+            size: 'medium',
+            onBack: () => {
+                if (pollingInterval) {
+                    clearInterval(pollingInterval);
+                    pollingInterval = null;
+                }
+                Lampa.Modal.close();
+                Lampa.Controller.toggle('settings_component');
+            }
+        });
         
         // Генерируем QR-код
         setTimeout(() => {
             const qrContainer = document.getElementById('qrCodeContainer');
-            if (qrContainer && window.Lampa && Lampa.Utils && Lampa.Utils.qrcode) {
+            if (qrContainer && Lampa.Utils && Lampa.Utils.qrcode) {
                 try {
                     Lampa.Utils.qrcode(qrUrl, qrContainer);
                 } catch (e) {
@@ -1756,7 +1683,6 @@ function normalizeTitle(input) {
             const config = await fetchConfigFromSupabase(pairCode);
             
             if (config) {
-                // Проверяем, что конфиг обновился (чтобы не применять старый)
                 const configUpdated = config.generated;
                 if (configUpdated !== lastUpdated) {
                     lastUpdated = configUpdated;
@@ -1765,48 +1691,23 @@ function normalizeTitle(input) {
                     saveUserConfig(config);
                     
                     // Показываем успех
-                    modal.find('.easytorrent-qr-status')
+                    $('#qrStatus')
                         .html('✅ Конфигурация получена и применена!')
                         .css('color', '#4CAF50');
                     
                     // Закрываем через 2 секунды
                     setTimeout(() => {
-                        closeQRModal();
+                        if (pollingInterval) {
+                            clearInterval(pollingInterval);
+                            pollingInterval = null;
+                        }
+                        Lampa.Modal.close();
                         Lampa.Noty.show('Конфигурация обновлена!');
+                        Lampa.Controller.toggle('settings_component');
                     }, 2000);
                 }
             }
-        }, 5000); // Каждые 5 секунд
-        
-        // Закрытие модального окна
-        const closeQRModal = () => {
-            if (pollingInterval) {
-                clearInterval(pollingInterval);
-                pollingInterval = null;
-            }
-            modal.remove();
-            Lampa.Controller.toggle('settings');
-        };
-        
-        // Обработка закрытия
-        modal.on('click', function(e) {
-            if ($(e.target).hasClass('easytorrent-qr-modal')) {
-                closeQRModal();
-            }
-        });
-        
-        // Контроллер для навигации
-        Lampa.Controller.add('easytorrent_qr', {
-            toggle: () => {
-                Lampa.Controller.collectionSet(content);
-                Lampa.Controller.collectionFocus(content, content);
-            },
-            back: () => {
-                closeQRModal();
-            }
-        });
-        
-        Lampa.Controller.toggle('easytorrent_qr');
+        }, 5000);
     }
 
     // ═══════════════════════════════════════════════════════════════════
