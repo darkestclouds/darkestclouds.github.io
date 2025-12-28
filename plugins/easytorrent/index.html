@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мастер настройки Lampa - Рекомендации торрентов</title>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.1/Sortable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -694,18 +695,22 @@
                 
                 <div class="result-container">
                     <div class="config-output" id="configOutput"></div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="copy-button" onclick="copyConfig()" style="flex: 1;">📋 Копировать JSON</button>
-                        <button class="copy-button" onclick="copyConfigBase64()" style="flex: 1; background: #2196F3;">🔐 Копировать Base64</button>
+                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                        <button class="copy-button" onclick="copyConfig()" style="flex: 1;">📋 JSON</button>
+                        <button class="copy-button" onclick="copyConfigBase64()" style="flex: 1; background: #2196F3;">🔐 Base64</button>
                     </div>
+                    <button class="copy-button" onclick="copyConfigCompressed()" style="width: 100%; background: #4CAF50;">🗜️ Сжатый (до 500 символов)</button>
                 </div>
 
                 <div class="hint">
                     <strong>Как использовать:</strong>
-                    1. Скопируйте конфиг выше (JSON или Base64)<br>
+                    1. Скопируйте конфиг выше (JSON, Base64 или Сжатый)<br>
                     2. Откройте <strong>Настройки Лампы</strong><br>
                     3. Раздел <strong>EasyTorrent</strong><br>
-                    4. Пункт <strong>Конфигурация (JSON)</strong> или <strong>Конфиг Base64</strong><br>
+                    4. Выберите соответствующий пункт:<br>
+                    &nbsp;&nbsp;• <strong>Конфигурация (JSON)</strong> для JSON<br>
+                    &nbsp;&nbsp;• <strong>Конфиг Base64</strong> для Base64<br>
+                    &nbsp;&nbsp;• <strong>Конфиг Сжатый</strong> для сжатого формата<br>
                     5. Вставьте текст и нажмите OK
                 </div>
             </div>
@@ -1104,6 +1109,27 @@
             const originalText = btn.textContent;
             btn.textContent = '✓ Скопировано!';
             setTimeout(() => btn.textContent = originalText, 2000);
+        }
+
+        function copyConfigCompressed() {
+            // Копируем сжатый конфиг с помощью LZ-String
+            const minifiedConfig = JSON.stringify(lastGeneratedConfig);
+            const compressed = LZString.compressToEncodedURIComponent(minifiedConfig);
+            
+            const textArea = document.createElement('textarea');
+            textArea.value = compressed;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            
+            // Показываем размер
+            const reduction = Math.round((1 - compressed.length / minifiedConfig.length) * 100);
+            btn.textContent = `✓ ${compressed.length} символов (−${reduction}%)`;
+            setTimeout(() => btn.textContent = originalText, 3000);
         }
     </script>
 </body>

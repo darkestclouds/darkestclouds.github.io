@@ -2,6 +2,350 @@
     'use strict';
 
     // ═══════════════════════════════════════════════════════════════════
+    // LZ-String (упрощенная версия для сжатия конфигов)
+    // ═══════════════════════════════════════════════════════════════════
+    const LZString = (function() {
+        const keyStrUriSafe = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
+        const baseReverseDic = {};
+        
+        function getBaseValue(alphabet, character) {
+            if (!baseReverseDic[alphabet]) {
+                baseReverseDic[alphabet] = {};
+                for (let i = 0; i < alphabet.length; i++) {
+                    baseReverseDic[alphabet][alphabet.charAt(i)] = i;
+                }
+            }
+            return baseReverseDic[alphabet][character];
+        }
+        
+        const _compress = function(uncompressed, bitsPerChar, getCharFromInt) {
+            if (uncompressed == null) return "";
+            let i, value, context_dictionary = {}, context_dictionaryToCreate = {}, context_c = "", context_wc = "", context_w = "", context_enlargeIn = 2, context_dictSize = 3, context_numBits = 2, context_data = [], context_data_val = 0, context_data_position = 0;
+            for (let ii = 0; ii < uncompressed.length; ii += 1) {
+                context_c = uncompressed.charAt(ii);
+                if (!Object.prototype.hasOwnProperty.call(context_dictionary, context_c)) {
+                    context_dictionary[context_c] = context_dictSize++;
+                    context_dictionaryToCreate[context_c] = true;
+                }
+                context_wc = context_w + context_c;
+                if (Object.prototype.hasOwnProperty.call(context_dictionary, context_wc)) {
+                    context_w = context_wc;
+                } else {
+                    if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
+                        if (context_w.charCodeAt(0) < 256) {
+                            for (i = 0; i < context_numBits; i++) {
+                                context_data_val = (context_data_val << 1);
+                                if (context_data_position == bitsPerChar - 1) {
+                                    context_data_position = 0;
+                                    context_data.push(getCharFromInt(context_data_val));
+                                    context_data_val = 0;
+                                } else {
+                                    context_data_position++;
+                                }
+                            }
+                            value = context_w.charCodeAt(0);
+                            for (i = 0; i < 8; i++) {
+                                context_data_val = (context_data_val << 1) | (value & 1);
+                                if (context_data_position == bitsPerChar - 1) {
+                                    context_data_position = 0;
+                                    context_data.push(getCharFromInt(context_data_val));
+                                    context_data_val = 0;
+                                } else {
+                                    context_data_position++;
+                                }
+                                value = value >> 1;
+                            }
+                        } else {
+                            value = 1;
+                            for (i = 0; i < context_numBits; i++) {
+                                context_data_val = (context_data_val << 1) | value;
+                                if (context_data_position == bitsPerChar - 1) {
+                                    context_data_position = 0;
+                                    context_data.push(getCharFromInt(context_data_val));
+                                    context_data_val = 0;
+                                } else {
+                                    context_data_position++;
+                                }
+                                value = 0;
+                            }
+                            value = context_w.charCodeAt(0);
+                            for (i = 0; i < 16; i++) {
+                                context_data_val = (context_data_val << 1) | (value & 1);
+                                if (context_data_position == bitsPerChar - 1) {
+                                    context_data_position = 0;
+                                    context_data.push(getCharFromInt(context_data_val));
+                                    context_data_val = 0;
+                                } else {
+                                    context_data_position++;
+                                }
+                                value = value >> 1;
+                            }
+                        }
+                        context_enlargeIn--;
+                        if (context_enlargeIn == 0) {
+                            context_enlargeIn = Math.pow(2, context_numBits);
+                            context_numBits++;
+                        }
+                        delete context_dictionaryToCreate[context_w];
+                    } else {
+                        value = context_dictionary[context_w];
+                        for (i = 0; i < context_numBits; i++) {
+                            context_data_val = (context_data_val << 1) | (value & 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            } else {
+                                context_data_position++;
+                            }
+                            value = value >> 1;
+                        }
+                    }
+                    context_enlargeIn--;
+                    if (context_enlargeIn == 0) {
+                        context_enlargeIn = Math.pow(2, context_numBits);
+                        context_numBits++;
+                    }
+                    context_dictionary[context_wc] = context_dictSize++;
+                    context_w = String(context_c);
+                }
+            }
+            if (context_w !== "") {
+                if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
+                    if (context_w.charCodeAt(0) < 256) {
+                        for (i = 0; i < context_numBits; i++) {
+                            context_data_val = (context_data_val << 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            } else {
+                                context_data_position++;
+                            }
+                        }
+                        value = context_w.charCodeAt(0);
+                        for (i = 0; i < 8; i++) {
+                            context_data_val = (context_data_val << 1) | (value & 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            } else {
+                                context_data_position++;
+                            }
+                            value = value >> 1;
+                        }
+                    } else {
+                        value = 1;
+                        for (i = 0; i < context_numBits; i++) {
+                            context_data_val = (context_data_val << 1) | value;
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            } else {
+                                context_data_position++;
+                            }
+                            value = 0;
+                        }
+                        value = context_w.charCodeAt(0);
+                        for (i = 0; i < 16; i++) {
+                            context_data_val = (context_data_val << 1) | (value & 1);
+                            if (context_data_position == bitsPerChar - 1) {
+                                context_data_position = 0;
+                                context_data.push(getCharFromInt(context_data_val));
+                                context_data_val = 0;
+                            } else {
+                                context_data_position++;
+                            }
+                            value = value >> 1;
+                        }
+                    }
+                    context_enlargeIn--;
+                    if (context_enlargeIn == 0) {
+                        context_enlargeIn = Math.pow(2, context_numBits);
+                        context_numBits++;
+                    }
+                    delete context_dictionaryToCreate[context_w];
+                } else {
+                    value = context_dictionary[context_w];
+                    for (i = 0; i < context_numBits; i++) {
+                        context_data_val = (context_data_val << 1) | (value & 1);
+                        if (context_data_position == bitsPerChar - 1) {
+                            context_data_position = 0;
+                            context_data.push(getCharFromInt(context_data_val));
+                            context_data_val = 0;
+                        } else {
+                            context_data_position++;
+                        }
+                        value = value >> 1;
+                    }
+                }
+                context_enlargeIn--;
+                if (context_enlargeIn == 0) {
+                    context_enlargeIn = Math.pow(2, context_numBits);
+                    context_numBits++;
+                }
+            }
+            value = 2;
+            for (i = 0; i < context_numBits; i++) {
+                context_data_val = (context_data_val << 1) | (value & 1);
+                if (context_data_position == bitsPerChar - 1) {
+                    context_data_position = 0;
+                    context_data.push(getCharFromInt(context_data_val));
+                    context_data_val = 0;
+                } else {
+                    context_data_position++;
+                }
+                value = value >> 1;
+            }
+            while (true) {
+                context_data_val = (context_data_val << 1);
+                if (context_data_position == bitsPerChar - 1) {
+                    context_data.push(getCharFromInt(context_data_val));
+                    break;
+                } else context_data_position++;
+            }
+            return context_data.join('');
+        };
+        
+        const _decompress = function(length, resetValue, getNextValue) {
+            let dictionary = [], next, enlargeIn = 4, dictSize = 4, numBits = 3, entry = "", result = [], i, w, bits, resb, maxpower, power, c, data = { val: getNextValue(0), position: resetValue, index: 1 };
+            for (i = 0; i < 3; i += 1) dictionary[i] = i;
+            bits = 0; maxpower = Math.pow(2, 2); power = 1;
+            while (power != maxpower) {
+                resb = data.val & data.position;
+                data.position >>= 1;
+                if (data.position == 0) {
+                    data.position = resetValue;
+                    data.val = getNextValue(data.index++);
+                }
+                bits |= (resb > 0 ? 1 : 0) * power;
+                power <<= 1;
+            }
+            switch (next = bits) {
+                case 0:
+                    bits = 0; maxpower = Math.pow(2, 8); power = 1;
+                    while (power != maxpower) {
+                        resb = data.val & data.position;
+                        data.position >>= 1;
+                        if (data.position == 0) {
+                            data.position = resetValue;
+                            data.val = getNextValue(data.index++);
+                        }
+                        bits |= (resb > 0 ? 1 : 0) * power;
+                        power <<= 1;
+                    }
+                    c = String.fromCharCode(bits);
+                    break;
+                case 1:
+                    bits = 0; maxpower = Math.pow(2, 16); power = 1;
+                    while (power != maxpower) {
+                        resb = data.val & data.position;
+                        data.position >>= 1;
+                        if (data.position == 0) {
+                            data.position = resetValue;
+                            data.val = getNextValue(data.index++);
+                        }
+                        bits |= (resb > 0 ? 1 : 0) * power;
+                        power <<= 1;
+                    }
+                    c = String.fromCharCode(bits);
+                    break;
+                case 2:
+                    return "";
+            }
+            dictionary[3] = c;
+            w = c;
+            result.push(c);
+            while (true) {
+                if (data.index > length) return "";
+                bits = 0; maxpower = Math.pow(2, numBits); power = 1;
+                while (power != maxpower) {
+                    resb = data.val & data.position;
+                    data.position >>= 1;
+                    if (data.position == 0) {
+                        data.position = resetValue;
+                        data.val = getNextValue(data.index++);
+                    }
+                    bits |= (resb > 0 ? 1 : 0) * power;
+                    power <<= 1;
+                }
+                switch (c = bits) {
+                    case 0:
+                        bits = 0; maxpower = Math.pow(2, 8); power = 1;
+                        while (power != maxpower) {
+                            resb = data.val & data.position;
+                            data.position >>= 1;
+                            if (data.position == 0) {
+                                data.position = resetValue;
+                                data.val = getNextValue(data.index++);
+                            }
+                            bits |= (resb > 0 ? 1 : 0) * power;
+                            power <<= 1;
+                        }
+                        dictionary[dictSize++] = String.fromCharCode(bits);
+                        c = dictSize - 1;
+                        enlargeIn--;
+                        break;
+                    case 1:
+                        bits = 0; maxpower = Math.pow(2, 16); power = 1;
+                        while (power != maxpower) {
+                            resb = data.val & data.position;
+                            data.position >>= 1;
+                            if (data.position == 0) {
+                                data.position = resetValue;
+                                data.val = getNextValue(data.index++);
+                            }
+                            bits |= (resb > 0 ? 1 : 0) * power;
+                            power <<= 1;
+                        }
+                        dictionary[dictSize++] = String.fromCharCode(bits);
+                        c = dictSize - 1;
+                        enlargeIn--;
+                        break;
+                    case 2:
+                        return result.join('');
+                }
+                if (enlargeIn == 0) {
+                    enlargeIn = Math.pow(2, numBits);
+                    numBits++;
+                }
+                if (dictionary[c]) {
+                    entry = dictionary[c];
+                } else {
+                    if (c === dictSize) {
+                        entry = w + w.charAt(0);
+                    } else {
+                        return null;
+                    }
+                }
+                result.push(entry);
+                dictionary[dictSize++] = w + entry.charAt(0);
+                enlargeIn--;
+                w = entry;
+                if (enlargeIn == 0) {
+                    enlargeIn = Math.pow(2, numBits);
+                    numBits++;
+                }
+            }
+        };
+        
+        return {
+            compressToEncodedURIComponent: function(input) {
+                if (input == null) return "";
+                return _compress(input, 6, function(a) { return keyStrUriSafe.charAt(a); });
+            },
+            decompressFromEncodedURIComponent: function(input) {
+                if (input == null) return "";
+                if (input == "") return null;
+                input = input.replace(/ /g, "+");
+                return _decompress(input.length, 32, function(index) { return getBaseValue(keyStrUriSafe, input.charAt(index)); });
+            }
+        };
+    })();
+
+    // ═══════════════════════════════════════════════════════════════════
     // РАЗДЕЛ 1: ИНИЦИАЛИЗАЦИЯ И КОНФИГУРАЦИЯ
     // ═══════════════════════════════════════════════════════════════════
 
@@ -62,13 +406,18 @@
         config_json_desc: { ru: 'Нажмите для просмотра или изменения настроек', en: 'Click to view or change settings' },
         config_base64: { ru: 'Конфиг Base64', en: 'Config Base64' },
         config_base64_desc: { ru: 'Импорт/экспорт конфига в формате Base64', en: 'Import/export config in Base64 format' },
+        config_compressed: { ru: 'Конфиг Сжатый', en: 'Config Compressed' },
+        config_compressed_desc: { ru: 'Сжатый формат (до 500 символов)', en: 'Compressed format (up to 500 chars)' },
         config_view: { ru: 'Просмотреть параметры', en: 'View parameters' },
         config_edit: { ru: 'Вставить JSON', en: 'Paste JSON' },
         config_edit_base64: { ru: 'Вставить Base64', en: 'Paste Base64' },
+        config_edit_compressed: { ru: 'Вставить Сжатый', en: 'Paste Compressed' },
         config_export_base64: { ru: 'Экспортировать в Base64', en: 'Export to Base64' },
+        config_export_compressed: { ru: 'Экспортировать Сжатый', en: 'Export Compressed' },
         config_reset: { ru: 'Сбросить к заводским', en: 'Reset to defaults' },
         config_error: { ru: 'Ошибка: Неверный формат JSON', en: 'Error: Invalid JSON format' },
         config_error_base64: { ru: 'Ошибка: Неверный формат Base64', en: 'Error: Invalid Base64 format' },
+        config_error_compressed: { ru: 'Ошибка: Неверный сжатый формат', en: 'Error: Invalid compressed format' },
         config_copied: { ru: 'Скопировано в буфер обмена!', en: 'Copied to clipboard!' }
     };
 
@@ -1672,6 +2021,121 @@ function normalizeTitle(input) {
                                             }
                                             
                                             Lampa.Noty.show(t('config_error_base64') + '\n\nПолучено (' + base64Value.length + ' символов):\n' + preview + decodedPreview + '\n\nОшибка: ' + e.message);
+                                        }
+                                    }
+                                    Lampa.Controller.toggle('settings');
+                                });
+                            }
+                        },
+                        onBack: () => {
+                            Lampa.Controller.toggle('settings');
+                        }
+                    });
+                });
+            }
+        });
+
+        // Параметр для сжатого конфига
+        Lampa.SettingsApi.addParam({
+            component: 'easytorrent',
+            param: {
+                name: 'easytorrent_config_compressed',
+                type: 'static'
+            },
+            field: {
+                name: t('config_compressed'),
+                description: t('config_compressed_desc')
+            },
+            onRender: (item) => {
+                item.find('.settings-param__value').text('🗜️');
+
+                item.on('hover:enter', () => {
+                    Lampa.Select.show({
+                        title: t('config_compressed'),
+                        items: [
+                            { title: t('config_export_compressed'), action: 'export' },
+                            { title: t('config_edit_compressed'), action: 'import' }
+                        ],
+                        onSelect: (a) => {
+                            if (a.action === 'export') {
+                                // Экспорт сжатого
+                                const minifiedConfig = JSON.stringify(USER_CONFIG);
+                                const compressed = LZString.compressToEncodedURIComponent(minifiedConfig);
+                                
+                                // Копируем в буфер обмена (если есть API)
+                                if (navigator.clipboard && navigator.clipboard.writeText) {
+                                    navigator.clipboard.writeText(compressed).then(() => {
+                                        Lampa.Noty.show(t('config_copied') + '\n\n' + compressed.length + ' символов');
+                                    }).catch(() => {
+                                        // Показываем для копирования вручную
+                                        Lampa.Input.edit({
+                                            value: compressed,
+                                            free: true
+                                        }, () => {
+                                            Lampa.Controller.toggle('settings');
+                                        });
+                                    });
+                                } else {
+                                    // Показываем для копирования вручную
+                                    Lampa.Input.edit({
+                                        value: compressed,
+                                        free: true
+                                    }, () => {
+                                        Lampa.Controller.toggle('settings');
+                                    });
+                                }
+                            } else if (a.action === 'import') {
+                                // Импорт сжатого
+                                Lampa.Input.edit({
+                                    value: '',
+                                    free: true,
+                                    placeholder: 'Вставьте сжатый конфиг'
+                                }, (compressedValue) => {
+                                    if (compressedValue) {
+                                        try {
+                                            const jsonString = LZString.decompressFromEncodedURIComponent(compressedValue);
+                                            if (!jsonString) {
+                                                throw new Error('Декомпрессия вернула null');
+                                            }
+                                            const parsed = JSON.parse(jsonString);
+                                            
+                                            if (parsed && (parsed.version === "2.0" || parsed.version === 2.0)) {
+                                                saveUserConfig(parsed);
+                                                Lampa.Noty.show('OK');
+                                            } else {
+                                                // Показываем версию конфига
+                                                Lampa.Noty.show(t('config_error') + '\n\nВерсия: ' + (parsed.version || 'неизвестна') + '\nОжидается: 2.0');
+                                            }
+                                        } catch (e) {
+                                            // Показываем что получили (первые 15 и последние 15 символов)
+                                            let preview;
+                                            if (compressedValue.length <= 30) {
+                                                preview = compressedValue;
+                                            } else {
+                                                const first = compressedValue.substring(0, 15);
+                                                const last = compressedValue.substring(compressedValue.length - 15);
+                                                preview = first + '...' + last;
+                                            }
+                                            
+                                            let decodedPreview = '';
+                                            try {
+                                                const decoded = LZString.decompressFromEncodedURIComponent(compressedValue);
+                                                if (decoded) {
+                                                    if (decoded.length <= 30) {
+                                                        decodedPreview = '\n\nРаспаковано:\n' + decoded;
+                                                    } else {
+                                                        const firstDec = decoded.substring(0, 15);
+                                                        const lastDec = decoded.substring(decoded.length - 15);
+                                                        decodedPreview = '\n\nРаспаковано (' + decoded.length + ' символов):\n' + firstDec + '...' + lastDec;
+                                                    }
+                                                } else {
+                                                    decodedPreview = '\n\nРаспаковано: null';
+                                                }
+                                            } catch (decodeError) {
+                                                decodedPreview = '\n\nОшибка распаковки: ' + decodeError.message;
+                                            }
+                                            
+                                            Lampa.Noty.show(t('config_error_compressed') + '\n\nПолучено (' + compressedValue.length + ' символов):\n' + preview + decodedPreview + '\n\nОшибка: ' + e.message);
                                         }
                                     }
                                     Lampa.Controller.toggle('settings');
