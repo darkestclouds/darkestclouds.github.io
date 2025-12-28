@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Мастер настройки Lampa - Рекомендации торрентов</title>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.1/Sortable.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/lz-string@1.5.0/libs/lz-string.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -695,23 +694,17 @@
                 
                 <div class="result-container">
                     <div class="config-output" id="configOutput"></div>
-                    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-                        <button class="copy-button" onclick="copyConfig()" style="flex: 1;">📋 JSON</button>
-                        <button class="copy-button" onclick="copyConfigBase64()" style="flex: 1; background: #2196F3;">🔐 Base64</button>
-                    </div>
-                    <button class="copy-button" onclick="copyConfigCompressed()" style="width: 100%; background: #4CAF50;">🗜️ Сжатый (до 500 символов)</button>
+                    <button class="copy-button" onclick="copyConfig()">📋 Копировать конфиг</button>
                 </div>
 
                 <div class="hint">
                     <strong>Как использовать:</strong>
-                    1. Скопируйте конфиг выше (JSON, Base64 или Сжатый)<br>
-                    2. Откройте <strong>Настройки Лампы</strong><br>
-                    3. Раздел <strong>EasyTorrent</strong><br>
-                    4. Выберите соответствующий пункт:<br>
-                    &nbsp;&nbsp;• <strong>Конфигурация (JSON)</strong> для JSON<br>
-                    &nbsp;&nbsp;• <strong>Конфиг Base64</strong> для Base64<br>
-                    &nbsp;&nbsp;• <strong>Конфиг Сжатый</strong> для сжатого формата<br>
-                    5. Вставьте текст и нажмите OK
+                    1. Конфиг автоматически отправлен на ТВ (если указан код сопряжения)<br>
+                    2. Или скопируйте конфиг вручную:<br>
+                    &nbsp;&nbsp;&nbsp;• Откройте <strong>Настройки Лампы</strong><br>
+                    &nbsp;&nbsp;&nbsp;• Раздел <strong>EasyTorrent</strong><br>
+                    &nbsp;&nbsp;&nbsp;• Пункт <strong>Конфигурация (JSON)</strong><br>
+                    &nbsp;&nbsp;&nbsp;• Вставьте текст и нажмите OK
                 </div>
             </div>
 
@@ -723,9 +716,15 @@
     </div>
 
     <script>
+        // ═══════════════════════════════════════════════════════════════════
+        // SUPABASE CONFIG
+        // ═══════════════════════════════════════════════════════════════════
+        const SUPABASE_URL = 'https://apvhjfnobsabxcyqzxlg.supabase.co';
+        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwdmhqZm5vYnNhYnhjeXF6eGxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU0OTcyMzYsImV4cCI6MjA1MTA3MzIzNn0.zFfEhLGPRz_3iZTnTfQGmFhqJPkZXJqQPYHQYjPD7Wo';
+
         let currentStep = 1;
         const totalSteps = 8;
-        let lastGeneratedConfig = null; // Сохраняем последний сгенерированный конфиг
+        let pairCode = null;
 
         const VOICE_KEYS = [
             'Дубляж RU', 'Дубляж UKR', 'Дубляж Пифагор', 'Дубляж Red Head Sound', 
@@ -764,10 +763,145 @@
 
         // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
+            checkPairCode();
             renderVoiceSelection();
             updateProgress();
             initSortableParameters();
         });
+
+        // ═══════════════════════════════════════════════════════════════════
+        // PAIR CODE MANAGEMENT
+        // ═══════════════════════════════════════════════════════════════════
+        
+        function checkPairCode() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('pairCode');
+            
+            if (code && /^[A-Za-z0-9]{6}$/.test(code)) {
+                pairCode = code.toUpperCase();
+                console.log('[EasyTorrent] Pair code detected:', pairCode);
+            } else {
+                showPairCodeDialog();
+            }
+        }
+
+        function showPairCodeDialog() {
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.8);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+            `;
+            
+            modal.innerHTML = `
+                <div style="
+                    background: white;
+                    border-radius: 20px;
+                    padding: 40px;
+                    max-width: 500px;
+                    text-align: center;
+                ">
+                    <h2 style="color: #667eea; margin-bottom: 20px;">🔗 Код сопряжения</h2>
+                    <p style="color: #666; margin-bottom: 25px; line-height: 1.6;">
+                        Введите 6-значный код сопряжения из настроек Lampa<br>
+                        (цифры и латинские буквы)
+                    </p>
+                    <input 
+                        type="text" 
+                        id="pairCodeInput" 
+                        placeholder="ABC123" 
+                        maxlength="6"
+                        style="
+                            width: 100%;
+                            padding: 15px;
+                            font-size: 1.5em;
+                            text-align: center;
+                            text-transform: uppercase;
+                            border: 2px solid #e0e0e0;
+                            border-radius: 12px;
+                            margin-bottom: 20px;
+                            letter-spacing: 0.3em;
+                            font-weight: bold;
+                        "
+                    />
+                    <div style="display: flex; gap: 15px;">
+                        <button 
+                            onclick="skipPairCode()"
+                            style="
+                                flex: 1;
+                                padding: 15px;
+                                background: #e0e0e0;
+                                color: #666;
+                                border: none;
+                                border-radius: 12px;
+                                font-size: 1em;
+                                font-weight: 600;
+                                cursor: pointer;
+                            "
+                        >Пропустить</button>
+                        <button 
+                            onclick="confirmPairCode()"
+                            style="
+                                flex: 1;
+                                padding: 15px;
+                                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                                color: white;
+                                border: none;
+                                border-radius: 12px;
+                                font-size: 1em;
+                                font-weight: 600;
+                                cursor: pointer;
+                            "
+                        >Подключить</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            document.getElementById('pairCodeInput').focus();
+            
+            // Enter для подтверждения
+            document.getElementById('pairCodeInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') confirmPairCode();
+            });
+            
+            window.pairCodeModal = modal;
+        }
+
+        function confirmPairCode() {
+            const input = document.getElementById('pairCodeInput');
+            const code = input.value.toUpperCase().trim();
+            
+            if (!/^[A-Z0-9]{6}$/.test(code)) {
+                alert('Код должен содержать ровно 6 символов (буквы и цифры)');
+                return;
+            }
+            
+            pairCode = code;
+            console.log('[EasyTorrent] Pair code set:', pairCode);
+            
+            if (window.pairCodeModal) {
+                document.body.removeChild(window.pairCodeModal);
+                window.pairCodeModal = null;
+            }
+        }
+
+        function skipPairCode() {
+            pairCode = null;
+            console.log('[EasyTorrent] Pair code skipped');
+            
+            if (window.pairCodeModal) {
+                document.body.removeChild(window.pairCodeModal);
+                window.pairCodeModal = null;
+            }
+        }
 
         function renderVoiceSelection() {
             const group = document.getElementById('voiceSelectionGroup');
@@ -997,11 +1131,98 @@
                 },
                 scoring_rules: generateScoringRules()
             };
-            
-            // Сохраняем конфиг для копирования
-            lastGeneratedConfig = config;
-            
             displayConfig(config);
+            
+            // Отправляем конфиг, если есть pairCode
+            if (pairCode) {
+                sendConfigToSupabase(config);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════════
+        // SUPABASE API
+        // ═══════════════════════════════════════════════════════════════════
+        
+        async function sendConfigToSupabase(configObj) {
+            try {
+                const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+                
+                const payload = [{
+                    id: pairCode,
+                    data: configObj,
+                    expires_at: expiresAt
+                }];
+                
+                showStatus('⏳ Отправка конфигурации...', 'info');
+                
+                const res = await fetch(`${SUPABASE_URL}/rest/v1/tv_configs`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': ANON_KEY,
+                        'Authorization': `Bearer ${ANON_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'resolution=merge-duplicates,return=minimal'
+                    },
+                    body: JSON.stringify(payload)
+                });
+                
+                if (!res.ok) {
+                    const text = await res.text();
+                    throw new Error(`${res.status}: ${text}`);
+                }
+                
+                showStatus('✅ Конфигурация успешно отправлена на ТВ!', 'success');
+            } catch (error) {
+                console.error('[EasyTorrent] Send error:', error);
+                showStatus(`❌ Ошибка отправки: ${error.message}`, 'error');
+            }
+        }
+
+        function showStatus(message, type) {
+            // Удаляем старое сообщение если есть
+            const oldStatus = document.getElementById('configStatus');
+            if (oldStatus) oldStatus.remove();
+            
+            const status = document.createElement('div');
+            status.id = 'configStatus';
+            status.style.cssText = `
+                margin-top: 20px;
+                padding: 15px;
+                border-radius: 8px;
+                font-weight: 600;
+                text-align: center;
+                animation: fadeIn 0.3s ease;
+            `;
+            
+            if (type === 'success') {
+                status.style.background = '#d4edda';
+                status.style.color = '#155724';
+                status.style.border = '2px solid #c3e6cb';
+            } else if (type === 'error') {
+                status.style.background = '#f8d7da';
+                status.style.color = '#721c24';
+                status.style.border = '2px solid #f5c6cb';
+            } else {
+                status.style.background = '#d1ecf1';
+                status.style.color = '#0c5460';
+                status.style.border = '2px solid #bee5eb';
+            }
+            
+            status.textContent = message;
+            
+            const container = document.querySelector('.result-container');
+            container.appendChild(status);
+            
+            // Автоматически убираем через 5 секунд для успеха
+            if (type === 'success') {
+                setTimeout(() => {
+                    if (status.parentNode) {
+                        status.style.opacity = '0';
+                        status.style.transition = 'opacity 0.3s ease';
+                        setTimeout(() => status.remove(), 300);
+                    }
+                }, 5000);
+            }
         }
 
         function generateScoringRules() {
@@ -1077,59 +1298,17 @@
         }
 
         function copyConfig() {
-            // Копируем минифицированный JSON (без пробелов и переносов строк)
-            const minifiedConfig = JSON.stringify(lastGeneratedConfig);
-            
+            const output = document.getElementById('configOutput');
             const textArea = document.createElement('textarea');
-            textArea.value = minifiedConfig;
+            textArea.value = output.textContent;
             document.body.appendChild(textArea);
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
-            
             const btn = event.target;
             const originalText = btn.textContent;
             btn.textContent = '✓ Скопировано!';
             setTimeout(() => btn.textContent = originalText, 2000);
-        }
-
-        function copyConfigBase64() {
-            // Копируем в base64
-            const minifiedConfig = JSON.stringify(lastGeneratedConfig);
-            const base64Config = btoa(unescape(encodeURIComponent(minifiedConfig)));
-            
-            const textArea = document.createElement('textarea');
-            textArea.value = base64Config;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            
-            const btn = event.target;
-            const originalText = btn.textContent;
-            btn.textContent = '✓ Скопировано!';
-            setTimeout(() => btn.textContent = originalText, 2000);
-        }
-
-        function copyConfigCompressed() {
-            // Копируем сжатый конфиг с помощью LZ-String
-            const minifiedConfig = JSON.stringify(lastGeneratedConfig);
-            const compressed = LZString.compressToEncodedURIComponent(minifiedConfig);
-            
-            const textArea = document.createElement('textarea');
-            textArea.value = compressed;
-            document.body.appendChild(textArea);
-            textArea.select();
-            document.execCommand('copy');
-            document.body.removeChild(textArea);
-            
-            const btn = event.target;
-            const originalText = btn.textContent;
-            
-            // Показываем размер
-            const reduction = Math.round((1 - compressed.length / minifiedConfig.length) * 100);
-            btn.textContent = `✓ ${compressed.length} символов (−${reduction}%)`;
-            setTimeout(() => btn.textContent = originalText, 3000);
         }
     </script>
 </body>

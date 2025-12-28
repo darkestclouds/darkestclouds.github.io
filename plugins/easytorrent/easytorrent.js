@@ -2,350 +2,6 @@
     'use strict';
 
     // ═══════════════════════════════════════════════════════════════════
-    // LZ-String (упрощенная версия для сжатия конфигов)
-    // ═══════════════════════════════════════════════════════════════════
-    const LZString = (function() {
-        const keyStrUriSafe = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
-        const baseReverseDic = {};
-        
-        function getBaseValue(alphabet, character) {
-            if (!baseReverseDic[alphabet]) {
-                baseReverseDic[alphabet] = {};
-                for (let i = 0; i < alphabet.length; i++) {
-                    baseReverseDic[alphabet][alphabet.charAt(i)] = i;
-                }
-            }
-            return baseReverseDic[alphabet][character];
-        }
-        
-        const _compress = function(uncompressed, bitsPerChar, getCharFromInt) {
-            if (uncompressed == null) return "";
-            let i, value, context_dictionary = {}, context_dictionaryToCreate = {}, context_c = "", context_wc = "", context_w = "", context_enlargeIn = 2, context_dictSize = 3, context_numBits = 2, context_data = [], context_data_val = 0, context_data_position = 0;
-            for (let ii = 0; ii < uncompressed.length; ii += 1) {
-                context_c = uncompressed.charAt(ii);
-                if (!Object.prototype.hasOwnProperty.call(context_dictionary, context_c)) {
-                    context_dictionary[context_c] = context_dictSize++;
-                    context_dictionaryToCreate[context_c] = true;
-                }
-                context_wc = context_w + context_c;
-                if (Object.prototype.hasOwnProperty.call(context_dictionary, context_wc)) {
-                    context_w = context_wc;
-                } else {
-                    if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
-                        if (context_w.charCodeAt(0) < 256) {
-                            for (i = 0; i < context_numBits; i++) {
-                                context_data_val = (context_data_val << 1);
-                                if (context_data_position == bitsPerChar - 1) {
-                                    context_data_position = 0;
-                                    context_data.push(getCharFromInt(context_data_val));
-                                    context_data_val = 0;
-                                } else {
-                                    context_data_position++;
-                                }
-                            }
-                            value = context_w.charCodeAt(0);
-                            for (i = 0; i < 8; i++) {
-                                context_data_val = (context_data_val << 1) | (value & 1);
-                                if (context_data_position == bitsPerChar - 1) {
-                                    context_data_position = 0;
-                                    context_data.push(getCharFromInt(context_data_val));
-                                    context_data_val = 0;
-                                } else {
-                                    context_data_position++;
-                                }
-                                value = value >> 1;
-                            }
-                        } else {
-                            value = 1;
-                            for (i = 0; i < context_numBits; i++) {
-                                context_data_val = (context_data_val << 1) | value;
-                                if (context_data_position == bitsPerChar - 1) {
-                                    context_data_position = 0;
-                                    context_data.push(getCharFromInt(context_data_val));
-                                    context_data_val = 0;
-                                } else {
-                                    context_data_position++;
-                                }
-                                value = 0;
-                            }
-                            value = context_w.charCodeAt(0);
-                            for (i = 0; i < 16; i++) {
-                                context_data_val = (context_data_val << 1) | (value & 1);
-                                if (context_data_position == bitsPerChar - 1) {
-                                    context_data_position = 0;
-                                    context_data.push(getCharFromInt(context_data_val));
-                                    context_data_val = 0;
-                                } else {
-                                    context_data_position++;
-                                }
-                                value = value >> 1;
-                            }
-                        }
-                        context_enlargeIn--;
-                        if (context_enlargeIn == 0) {
-                            context_enlargeIn = Math.pow(2, context_numBits);
-                            context_numBits++;
-                        }
-                        delete context_dictionaryToCreate[context_w];
-                    } else {
-                        value = context_dictionary[context_w];
-                        for (i = 0; i < context_numBits; i++) {
-                            context_data_val = (context_data_val << 1) | (value & 1);
-                            if (context_data_position == bitsPerChar - 1) {
-                                context_data_position = 0;
-                                context_data.push(getCharFromInt(context_data_val));
-                                context_data_val = 0;
-                            } else {
-                                context_data_position++;
-                            }
-                            value = value >> 1;
-                        }
-                    }
-                    context_enlargeIn--;
-                    if (context_enlargeIn == 0) {
-                        context_enlargeIn = Math.pow(2, context_numBits);
-                        context_numBits++;
-                    }
-                    context_dictionary[context_wc] = context_dictSize++;
-                    context_w = String(context_c);
-                }
-            }
-            if (context_w !== "") {
-                if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate, context_w)) {
-                    if (context_w.charCodeAt(0) < 256) {
-                        for (i = 0; i < context_numBits; i++) {
-                            context_data_val = (context_data_val << 1);
-                            if (context_data_position == bitsPerChar - 1) {
-                                context_data_position = 0;
-                                context_data.push(getCharFromInt(context_data_val));
-                                context_data_val = 0;
-                            } else {
-                                context_data_position++;
-                            }
-                        }
-                        value = context_w.charCodeAt(0);
-                        for (i = 0; i < 8; i++) {
-                            context_data_val = (context_data_val << 1) | (value & 1);
-                            if (context_data_position == bitsPerChar - 1) {
-                                context_data_position = 0;
-                                context_data.push(getCharFromInt(context_data_val));
-                                context_data_val = 0;
-                            } else {
-                                context_data_position++;
-                            }
-                            value = value >> 1;
-                        }
-                    } else {
-                        value = 1;
-                        for (i = 0; i < context_numBits; i++) {
-                            context_data_val = (context_data_val << 1) | value;
-                            if (context_data_position == bitsPerChar - 1) {
-                                context_data_position = 0;
-                                context_data.push(getCharFromInt(context_data_val));
-                                context_data_val = 0;
-                            } else {
-                                context_data_position++;
-                            }
-                            value = 0;
-                        }
-                        value = context_w.charCodeAt(0);
-                        for (i = 0; i < 16; i++) {
-                            context_data_val = (context_data_val << 1) | (value & 1);
-                            if (context_data_position == bitsPerChar - 1) {
-                                context_data_position = 0;
-                                context_data.push(getCharFromInt(context_data_val));
-                                context_data_val = 0;
-                            } else {
-                                context_data_position++;
-                            }
-                            value = value >> 1;
-                        }
-                    }
-                    context_enlargeIn--;
-                    if (context_enlargeIn == 0) {
-                        context_enlargeIn = Math.pow(2, context_numBits);
-                        context_numBits++;
-                    }
-                    delete context_dictionaryToCreate[context_w];
-                } else {
-                    value = context_dictionary[context_w];
-                    for (i = 0; i < context_numBits; i++) {
-                        context_data_val = (context_data_val << 1) | (value & 1);
-                        if (context_data_position == bitsPerChar - 1) {
-                            context_data_position = 0;
-                            context_data.push(getCharFromInt(context_data_val));
-                            context_data_val = 0;
-                        } else {
-                            context_data_position++;
-                        }
-                        value = value >> 1;
-                    }
-                }
-                context_enlargeIn--;
-                if (context_enlargeIn == 0) {
-                    context_enlargeIn = Math.pow(2, context_numBits);
-                    context_numBits++;
-                }
-            }
-            value = 2;
-            for (i = 0; i < context_numBits; i++) {
-                context_data_val = (context_data_val << 1) | (value & 1);
-                if (context_data_position == bitsPerChar - 1) {
-                    context_data_position = 0;
-                    context_data.push(getCharFromInt(context_data_val));
-                    context_data_val = 0;
-                } else {
-                    context_data_position++;
-                }
-                value = value >> 1;
-            }
-            while (true) {
-                context_data_val = (context_data_val << 1);
-                if (context_data_position == bitsPerChar - 1) {
-                    context_data.push(getCharFromInt(context_data_val));
-                    break;
-                } else context_data_position++;
-            }
-            return context_data.join('');
-        };
-        
-        const _decompress = function(length, resetValue, getNextValue) {
-            let dictionary = [], next, enlargeIn = 4, dictSize = 4, numBits = 3, entry = "", result = [], i, w, bits, resb, maxpower, power, c, data = { val: getNextValue(0), position: resetValue, index: 1 };
-            for (i = 0; i < 3; i += 1) dictionary[i] = i;
-            bits = 0; maxpower = Math.pow(2, 2); power = 1;
-            while (power != maxpower) {
-                resb = data.val & data.position;
-                data.position >>= 1;
-                if (data.position == 0) {
-                    data.position = resetValue;
-                    data.val = getNextValue(data.index++);
-                }
-                bits |= (resb > 0 ? 1 : 0) * power;
-                power <<= 1;
-            }
-            switch (next = bits) {
-                case 0:
-                    bits = 0; maxpower = Math.pow(2, 8); power = 1;
-                    while (power != maxpower) {
-                        resb = data.val & data.position;
-                        data.position >>= 1;
-                        if (data.position == 0) {
-                            data.position = resetValue;
-                            data.val = getNextValue(data.index++);
-                        }
-                        bits |= (resb > 0 ? 1 : 0) * power;
-                        power <<= 1;
-                    }
-                    c = String.fromCharCode(bits);
-                    break;
-                case 1:
-                    bits = 0; maxpower = Math.pow(2, 16); power = 1;
-                    while (power != maxpower) {
-                        resb = data.val & data.position;
-                        data.position >>= 1;
-                        if (data.position == 0) {
-                            data.position = resetValue;
-                            data.val = getNextValue(data.index++);
-                        }
-                        bits |= (resb > 0 ? 1 : 0) * power;
-                        power <<= 1;
-                    }
-                    c = String.fromCharCode(bits);
-                    break;
-                case 2:
-                    return "";
-            }
-            dictionary[3] = c;
-            w = c;
-            result.push(c);
-            while (true) {
-                if (data.index > length) return "";
-                bits = 0; maxpower = Math.pow(2, numBits); power = 1;
-                while (power != maxpower) {
-                    resb = data.val & data.position;
-                    data.position >>= 1;
-                    if (data.position == 0) {
-                        data.position = resetValue;
-                        data.val = getNextValue(data.index++);
-                    }
-                    bits |= (resb > 0 ? 1 : 0) * power;
-                    power <<= 1;
-                }
-                switch (c = bits) {
-                    case 0:
-                        bits = 0; maxpower = Math.pow(2, 8); power = 1;
-                        while (power != maxpower) {
-                            resb = data.val & data.position;
-                            data.position >>= 1;
-                            if (data.position == 0) {
-                                data.position = resetValue;
-                                data.val = getNextValue(data.index++);
-                            }
-                            bits |= (resb > 0 ? 1 : 0) * power;
-                            power <<= 1;
-                        }
-                        dictionary[dictSize++] = String.fromCharCode(bits);
-                        c = dictSize - 1;
-                        enlargeIn--;
-                        break;
-                    case 1:
-                        bits = 0; maxpower = Math.pow(2, 16); power = 1;
-                        while (power != maxpower) {
-                            resb = data.val & data.position;
-                            data.position >>= 1;
-                            if (data.position == 0) {
-                                data.position = resetValue;
-                                data.val = getNextValue(data.index++);
-                            }
-                            bits |= (resb > 0 ? 1 : 0) * power;
-                            power <<= 1;
-                        }
-                        dictionary[dictSize++] = String.fromCharCode(bits);
-                        c = dictSize - 1;
-                        enlargeIn--;
-                        break;
-                    case 2:
-                        return result.join('');
-                }
-                if (enlargeIn == 0) {
-                    enlargeIn = Math.pow(2, numBits);
-                    numBits++;
-                }
-                if (dictionary[c]) {
-                    entry = dictionary[c];
-                } else {
-                    if (c === dictSize) {
-                        entry = w + w.charAt(0);
-                    } else {
-                        return null;
-                    }
-                }
-                result.push(entry);
-                dictionary[dictSize++] = w + entry.charAt(0);
-                enlargeIn--;
-                w = entry;
-                if (enlargeIn == 0) {
-                    enlargeIn = Math.pow(2, numBits);
-                    numBits++;
-                }
-            }
-        };
-        
-        return {
-            compressToEncodedURIComponent: function(input) {
-                if (input == null) return "";
-                return _compress(input, 6, function(a) { return keyStrUriSafe.charAt(a); });
-            },
-            decompressFromEncodedURIComponent: function(input) {
-                if (input == null) return "";
-                if (input == "") return null;
-                input = input.replace(/ /g, "+");
-                return _decompress(input.length, 32, function(index) { return getBaseValue(keyStrUriSafe, input.charAt(index)); });
-            }
-        };
-    })();
-
-    // ═══════════════════════════════════════════════════════════════════
     // РАЗДЕЛ 1: ИНИЦИАЛИЗАЦИЯ И КОНФИГУРАЦИЯ
     // ═══════════════════════════════════════════════════════════════════
 
@@ -353,8 +9,14 @@
     const VERSION = '1.0.0 Beta';
     const PLUGIN_ICON = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/></svg>';
 
+    // Supabase config
+    const SUPABASE_URL = 'https://apvhjfnobsabxcyqzxlg.supabase.co';
+    const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwdmhqZm5vYnNhYnhjeXF6eGxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU0OTcyMzYsImV4cCI6MjA1MTA3MzIzNn0.zFfEhLGPRz_3iZTnTfQGmFhqJPkZXJqQPYHQYjPD7Wo';
+    const WIZARD_URL = 'https://darkestclouds.github.io/plugins/easytorrent/';
+
     // Глобальное хранилище топовых рекомендаций
     let topRecommendations = [];
+    let pollingInterval = null;
 
     // Конфигурация по умолчанию (используется, если не задана пользовательская)
     const DEFAULT_CONFIG = {
@@ -404,21 +66,10 @@
         recommended_badge: { ru: 'Рекомендуется', en: 'Recommended' },
         config_json: { ru: 'Конфигурация (JSON)', en: 'Configuration (JSON)' },
         config_json_desc: { ru: 'Нажмите для просмотра или изменения настроек', en: 'Click to view or change settings' },
-        config_base64: { ru: 'Конфиг Base64', en: 'Config Base64' },
-        config_base64_desc: { ru: 'Импорт/экспорт конфига в формате Base64', en: 'Import/export config in Base64 format' },
-        config_compressed: { ru: 'Конфиг Сжатый', en: 'Config Compressed' },
-        config_compressed_desc: { ru: 'Сжатый формат (до 500 символов)', en: 'Compressed format (up to 500 chars)' },
         config_view: { ru: 'Просмотреть параметры', en: 'View parameters' },
         config_edit: { ru: 'Вставить JSON', en: 'Paste JSON' },
-        config_edit_base64: { ru: 'Вставить Base64', en: 'Paste Base64' },
-        config_edit_compressed: { ru: 'Вставить Сжатый', en: 'Paste Compressed' },
-        config_export_base64: { ru: 'Экспортировать в Base64', en: 'Export to Base64' },
-        config_export_compressed: { ru: 'Экспортировать Сжатый', en: 'Export Compressed' },
         config_reset: { ru: 'Сбросить к заводским', en: 'Reset to defaults' },
-        config_error: { ru: 'Ошибка: Неверный формат JSON', en: 'Error: Invalid JSON format' },
-        config_error_base64: { ru: 'Ошибка: Неверный формат Base64', en: 'Error: Invalid Base64 format' },
-        config_error_compressed: { ru: 'Ошибка: Неверный сжатый формат', en: 'Error: Invalid compressed format' },
-        config_copied: { ru: 'Скопировано в буфер обмена!', en: 'Copied to clipboard!' }
+        config_error: { ru: 'Ошибка: Неверный формат JSON', en: 'Error: Invalid JSON format' }
     };
 
     function t(key) {
@@ -1785,6 +1436,92 @@ function normalizeTitle(input) {
         display: none;
     }
 }
+
+/* QR-код модальное окно */
+.easytorrent-qr-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease;
+}
+
+.easytorrent-qr-content {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 600px;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    border: 2px solid rgba(102, 126, 234, 0.3);
+}
+
+.easytorrent-qr-header h2 {
+    color: #667eea;
+    font-size: 2em;
+    margin-bottom: 10px;
+}
+
+.easytorrent-qr-header p {
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 30px;
+    font-size: 1.1em;
+}
+
+.easytorrent-qr-code {
+    background: white;
+    padding: 20px;
+    border-radius: 15px;
+    display: inline-block;
+    margin-bottom: 30px;
+}
+
+.easytorrent-qr-code svg {
+    display: block;
+}
+
+.easytorrent-qr-manual {
+    background: rgba(255,255,255,0.05);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+.easytorrent-qr-manual p {
+    color: rgba(255,255,255,0.8);
+    margin: 10px 0;
+    font-size: 0.95em;
+}
+
+.easytorrent-pair-code {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #667eea;
+    letter-spacing: 0.3em;
+    margin: 15px 0;
+    font-family: monospace;
+}
+
+.easytorrent-qr-status {
+    color: rgba(255,255,255,0.6);
+    font-size: 1.1em;
+    padding: 15px;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
 `;
 
         const style = document.createElement('style');
@@ -1898,16 +1635,7 @@ function normalizeTitle(input) {
                                             updateDisplay();
                                             Lampa.Noty.show('OK');
                                         } catch (e) {
-                                            // Показываем что получили (первые 15 и последние 15 символов)
-                                            let preview;
-                                            if (new_value.length <= 30) {
-                                                preview = new_value;
-                                            } else {
-                                                const first = new_value.substring(0, 15);
-                                                const last = new_value.substring(new_value.length - 15);
-                                                preview = first + '...' + last;
-                                            }
-                                            Lampa.Noty.show(t('config_error') + '\n\nПолучено (' + new_value.length + ' символов):\n' + preview + '\n\nОшибка: ' + e.message);
+                                            Lampa.Noty.show(t('config_error'));
                                         }
                                     }
                                     Lampa.Controller.toggle('settings');
@@ -1927,230 +1655,158 @@ function normalizeTitle(input) {
             }
         });
 
-        // Параметр для Base64
+        // Кнопка "Расставить приоритеты"
         Lampa.SettingsApi.addParam({
             component: 'easytorrent',
             param: {
-                name: 'easytorrent_config_base64',
+                name: 'easytorrent_qr_setup',
                 type: 'static'
             },
             field: {
-                name: t('config_base64'),
-                description: t('config_base64_desc')
+                name: 'Расставить приоритеты',
+                description: 'Откройте визард на телефоне через QR-код'
             },
             onRender: (item) => {
-                item.find('.settings-param__value').text('📦');
-
                 item.on('hover:enter', () => {
-                    Lampa.Select.show({
-                        title: t('config_base64'),
-                        items: [
-                            { title: t('config_export_base64'), action: 'export' },
-                            { title: t('config_edit_base64'), action: 'import' }
-                        ],
-                        onSelect: (a) => {
-                            if (a.action === 'export') {
-                                // Экспорт в Base64
-                                const minifiedConfig = JSON.stringify(USER_CONFIG);
-                                const base64Config = btoa(unescape(encodeURIComponent(minifiedConfig)));
-                                
-                                // Копируем в буфер обмена (если есть API)
-                                if (navigator.clipboard && navigator.clipboard.writeText) {
-                                    navigator.clipboard.writeText(base64Config).then(() => {
-                                        Lampa.Noty.show(t('config_copied'));
-                                    }).catch(() => {
-                                        // Показываем для копирования вручную
-                                        Lampa.Input.edit({
-                                            value: base64Config,
-                                            free: true
-                                        }, () => {
-                                            Lampa.Controller.toggle('settings');
-                                        });
-                                    });
-                                } else {
-                                    // Показываем для копирования вручную
-                                    Lampa.Input.edit({
-                                        value: base64Config,
-                                        free: true
-                                    }, () => {
-                                        Lampa.Controller.toggle('settings');
-                                    });
-                                }
-                            } else if (a.action === 'import') {
-                                // Импорт из Base64
-                                Lampa.Input.edit({
-                                    value: '',
-                                    free: true,
-                                    placeholder: 'Вставьте Base64'
-                                }, (base64Value) => {
-                                    if (base64Value) {
-                                        try {
-                                            const jsonString = decodeURIComponent(escape(atob(base64Value)));
-                                            const parsed = JSON.parse(jsonString);
-                                            
-                                            if (parsed && (parsed.version === "2.0" || parsed.version === 2.0)) {
-                                                saveUserConfig(parsed);
-                                                Lampa.Noty.show('OK');
-                                            } else {
-                                                // Показываем версию конфига
-                                                Lampa.Noty.show(t('config_error') + '\n\nВерсия: ' + (parsed.version || 'неизвестна') + '\nОжидается: 2.0');
-                                            }
-                                        } catch (e) {
-                                            // Показываем что получили (первые 15 и последние 15 символов)
-                                            let preview;
-                                            if (base64Value.length <= 30) {
-                                                preview = base64Value;
-                                            } else {
-                                                const first = base64Value.substring(0, 15);
-                                                const last = base64Value.substring(base64Value.length - 15);
-                                                preview = first + '...' + last;
-                                            }
-                                            
-                                            let decodedPreview = '';
-                                            try {
-                                                const decoded = decodeURIComponent(escape(atob(base64Value)));
-                                                if (decoded.length <= 30) {
-                                                    decodedPreview = '\n\nДекодировано:\n' + decoded;
-                                                } else {
-                                                    const firstDec = decoded.substring(0, 15);
-                                                    const lastDec = decoded.substring(decoded.length - 15);
-                                                    decodedPreview = '\n\nДекодировано (' + decoded.length + ' символов):\n' + firstDec + '...' + lastDec;
-                                                }
-                                            } catch (decodeError) {
-                                                decodedPreview = '\n\nОшибка декодирования: ' + decodeError.message;
-                                            }
-                                            
-                                            Lampa.Noty.show(t('config_error_base64') + '\n\nПолучено (' + base64Value.length + ' символов):\n' + preview + decodedPreview + '\n\nОшибка: ' + e.message);
-                                        }
-                                    }
-                                    Lampa.Controller.toggle('settings');
-                                });
-                            }
-                        },
-                        onBack: () => {
-                            Lampa.Controller.toggle('settings');
-                        }
-                    });
+                    showQRSetup();
                 });
             }
         });
+    }
 
-        // Параметр для сжатого конфига
-        Lampa.SettingsApi.addParam({
-            component: 'easytorrent',
-            param: {
-                name: 'easytorrent_config_compressed',
-                type: 'static'
-            },
-            field: {
-                name: t('config_compressed'),
-                description: t('config_compressed_desc')
-            },
-            onRender: (item) => {
-                item.find('.settings-param__value').text('🗜️');
+    // ═══════════════════════════════════════════════════════════════════
+    // QR-КОД И POLLING
+    // ═══════════════════════════════════════════════════════════════════
 
-                item.on('hover:enter', () => {
-                    Lampa.Select.show({
-                        title: t('config_compressed'),
-                        items: [
-                            { title: t('config_export_compressed'), action: 'export' },
-                            { title: t('config_edit_compressed'), action: 'import' }
-                        ],
-                        onSelect: (a) => {
-                            if (a.action === 'export') {
-                                // Экспорт сжатого
-                                const minifiedConfig = JSON.stringify(USER_CONFIG);
-                                const compressed = LZString.compressToEncodedURIComponent(minifiedConfig);
-                                
-                                // Копируем в буфер обмена (если есть API)
-                                if (navigator.clipboard && navigator.clipboard.writeText) {
-                                    navigator.clipboard.writeText(compressed).then(() => {
-                                        Lampa.Noty.show(t('config_copied') + '\n\n' + compressed.length + ' символов');
-                                    }).catch(() => {
-                                        // Показываем для копирования вручную
-                                        Lampa.Input.edit({
-                                            value: compressed,
-                                            free: true
-                                        }, () => {
-                                            Lampa.Controller.toggle('settings');
-                                        });
-                                    });
-                                } else {
-                                    // Показываем для копирования вручную
-                                    Lampa.Input.edit({
-                                        value: compressed,
-                                        free: true
-                                    }, () => {
-                                        Lampa.Controller.toggle('settings');
-                                    });
-                                }
-                            } else if (a.action === 'import') {
-                                // Импорт сжатого
-                                Lampa.Input.edit({
-                                    value: '',
-                                    free: true,
-                                    placeholder: 'Вставьте сжатый конфиг'
-                                }, (compressedValue) => {
-                                    if (compressedValue) {
-                                        try {
-                                            const jsonString = LZString.decompressFromEncodedURIComponent(compressedValue);
-                                            if (!jsonString) {
-                                                throw new Error('Декомпрессия вернула null');
-                                            }
-                                            const parsed = JSON.parse(jsonString);
-                                            
-                                            if (parsed && (parsed.version === "2.0" || parsed.version === 2.0)) {
-                                                saveUserConfig(parsed);
-                                                Lampa.Noty.show('OK');
-                                            } else {
-                                                // Показываем версию конфига
-                                                Lampa.Noty.show(t('config_error') + '\n\nВерсия: ' + (parsed.version || 'неизвестна') + '\nОжидается: 2.0');
-                                            }
-                                        } catch (e) {
-                                            // Показываем что получили (первые 15 и последние 15 символов)
-                                            let preview;
-                                            if (compressedValue.length <= 30) {
-                                                preview = compressedValue;
-                                            } else {
-                                                const first = compressedValue.substring(0, 15);
-                                                const last = compressedValue.substring(compressedValue.length - 15);
-                                                preview = first + '...' + last;
-                                            }
-                                            
-                                            let decodedPreview = '';
-                                            try {
-                                                const decoded = LZString.decompressFromEncodedURIComponent(compressedValue);
-                                                if (decoded) {
-                                                    if (decoded.length <= 30) {
-                                                        decodedPreview = '\n\nРаспаковано:\n' + decoded;
-                                                    } else {
-                                                        const firstDec = decoded.substring(0, 15);
-                                                        const lastDec = decoded.substring(decoded.length - 15);
-                                                        decodedPreview = '\n\nРаспаковано (' + decoded.length + ' символов):\n' + firstDec + '...' + lastDec;
-                                                    }
-                                                } else {
-                                                    decodedPreview = '\n\nРаспаковано: null';
-                                                }
-                                            } catch (decodeError) {
-                                                decodedPreview = '\n\nОшибка распаковки: ' + decodeError.message;
-                                            }
-                                            
-                                            Lampa.Noty.show(t('config_error_compressed') + '\n\nПолучено (' + compressedValue.length + ' символов):\n' + preview + decodedPreview + '\n\nОшибка: ' + e.message);
-                                        }
-                                    }
-                                    Lampa.Controller.toggle('settings');
-                                });
-                            }
-                        },
-                        onBack: () => {
-                            Lampa.Controller.toggle('settings');
-                        }
-                    });
-                });
+    function generatePairCode() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let code = '';
+        for (let i = 0; i < 6; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return code;
+    }
+
+    async function fetchConfigFromSupabase(id) {
+        try {
+            const url = `${SUPABASE_URL}/rest/v1/tv_configs?id=eq.${encodeURIComponent(id)}&select=data,updated_at`;
+            
+            const res = await fetch(url, {
+                headers: {
+                    'apikey': ANON_KEY,
+                    'Authorization': `Bearer ${ANON_KEY}`
+                }
+            });
+            
+            if (!res.ok) {
+                throw new Error(`Fetch failed: ${res.status}`);
             }
-        });
+            
+            const rows = await res.json();
+            if (!rows.length) return null;
+            
+            return rows[0].data;
+        } catch (error) {
+            console.error('[EasyTorrent] Fetch error:', error);
+            return null;
+        }
+    }
 
+    function showQRSetup() {
+        const pairCode = generatePairCode();
+        const qrUrl = `${WIZARD_URL}?pairCode=${pairCode}`;
         
+        // Создаём модальное окно
+        const modal = $('<div class="easytorrent-qr-modal"></div>');
+        const content = $('<div class="easytorrent-qr-content selector"></div>');
+        
+        content.html(`
+            <div class="easytorrent-qr-header">
+                <h2>🔗 Настройка приоритетов</h2>
+                <p>Отсканируйте QR-код камерой телефона</p>
+            </div>
+            <div class="easytorrent-qr-code" id="qrCodeContainer"></div>
+            <div class="easytorrent-qr-manual">
+                <p><strong>Или перейдите вручную:</strong></p>
+                <p style="word-break: break-all; margin: 10px 0;">${qrUrl}</p>
+                <p><strong>Код сопряжения:</strong></p>
+                <div class="easytorrent-pair-code">${pairCode}</div>
+            </div>
+            <div class="easytorrent-qr-status">⏳ Ожидание конфигурации...</div>
+        `);
+        
+        modal.append(content);
+        $('body').append(modal);
+        
+        // Генерируем QR-код
+        setTimeout(() => {
+            const qrContainer = document.getElementById('qrCodeContainer');
+            if (qrContainer && window.Lampa && Lampa.Utils && Lampa.Utils.qrcode) {
+                try {
+                    Lampa.Utils.qrcode(qrUrl, qrContainer);
+                } catch (e) {
+                    qrContainer.innerHTML = '<p style="color: #f44336;">Ошибка генерации QR-кода</p>';
+                }
+            }
+        }, 100);
+        
+        // Запускаем polling
+        let lastUpdated = null;
+        pollingInterval = setInterval(async () => {
+            const config = await fetchConfigFromSupabase(pairCode);
+            
+            if (config) {
+                // Проверяем, что конфиг обновился (чтобы не применять старый)
+                const configUpdated = config.generated;
+                if (configUpdated !== lastUpdated) {
+                    lastUpdated = configUpdated;
+                    
+                    // Применяем конфиг
+                    saveUserConfig(config);
+                    
+                    // Показываем успех
+                    modal.find('.easytorrent-qr-status')
+                        .html('✅ Конфигурация получена и применена!')
+                        .css('color', '#4CAF50');
+                    
+                    // Закрываем через 2 секунды
+                    setTimeout(() => {
+                        closeQRModal();
+                        Lampa.Noty.show('Конфигурация обновлена!');
+                    }, 2000);
+                }
+            }
+        }, 5000); // Каждые 5 секунд
+        
+        // Закрытие модального окна
+        const closeQRModal = () => {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+            }
+            modal.remove();
+            Lampa.Controller.toggle('settings');
+        };
+        
+        // Обработка закрытия
+        modal.on('click', function(e) {
+            if ($(e.target).hasClass('easytorrent-qr-modal')) {
+                closeQRModal();
+            }
+        });
+        
+        // Контроллер для навигации
+        Lampa.Controller.add('easytorrent_qr', {
+            toggle: () => {
+                Lampa.Controller.collectionSet(content);
+                Lampa.Controller.collectionFocus(content, content);
+            },
+            back: () => {
+                closeQRModal();
+            }
+        });
+        
+        Lampa.Controller.toggle('easytorrent_qr');
     }
 
     // ═══════════════════════════════════════════════════════════════════
