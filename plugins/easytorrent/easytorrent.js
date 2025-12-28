@@ -60,10 +60,16 @@
         recommended_badge: { ru: 'Рекомендуется', en: 'Recommended' },
         config_json: { ru: 'Конфигурация (JSON)', en: 'Configuration (JSON)' },
         config_json_desc: { ru: 'Нажмите для просмотра или изменения настроек', en: 'Click to view or change settings' },
+        config_base64: { ru: 'Конфиг Base64', en: 'Config Base64' },
+        config_base64_desc: { ru: 'Импорт/экспорт конфига в формате Base64', en: 'Import/export config in Base64 format' },
         config_view: { ru: 'Просмотреть параметры', en: 'View parameters' },
         config_edit: { ru: 'Вставить JSON', en: 'Paste JSON' },
+        config_edit_base64: { ru: 'Вставить Base64', en: 'Paste Base64' },
+        config_export_base64: { ru: 'Экспортировать в Base64', en: 'Export to Base64' },
         config_reset: { ru: 'Сбросить к заводским', en: 'Reset to defaults' },
-        config_error: { ru: 'Ошибка: Неверный формат JSON', en: 'Error: Invalid JSON format' }
+        config_error: { ru: 'Ошибка: Неверный формат JSON', en: 'Error: Invalid JSON format' },
+        config_error_base64: { ru: 'Ошибка: Неверный формат Base64', en: 'Error: Invalid Base64 format' },
+        config_copied: { ru: 'Скопировано в буфер обмена!', en: 'Copied to clipboard!' }
     };
 
     function t(key) {
@@ -1543,7 +1549,16 @@ function normalizeTitle(input) {
                                             updateDisplay();
                                             Lampa.Noty.show('OK');
                                         } catch (e) {
-                                            Lampa.Noty.show(t('config_error'));
+                                            // Показываем что получили (первые 15 и последние 15 символов)
+                                            let preview;
+                                            if (new_value.length <= 30) {
+                                                preview = new_value;
+                                            } else {
+                                                const first = new_value.substring(0, 15);
+                                                const last = new_value.substring(new_value.length - 15);
+                                                preview = first + '...' + last;
+                                            }
+                                            Lampa.Noty.show(t('config_error') + '\n\nПолучено (' + new_value.length + ' символов):\n' + preview + '\n\nОшибка: ' + e.message);
                                         }
                                     }
                                     Lampa.Controller.toggle('settings');
@@ -1553,6 +1568,114 @@ function normalizeTitle(input) {
                                 updateDisplay();
                                 Lampa.Noty.show('OK');
                                 Lampa.Controller.toggle('settings');
+                            }
+                        },
+                        onBack: () => {
+                            Lampa.Controller.toggle('settings');
+                        }
+                    });
+                });
+            }
+        });
+
+        // Параметр для Base64
+        Lampa.SettingsApi.addParam({
+            component: 'easytorrent',
+            param: {
+                name: 'easytorrent_config_base64',
+                type: 'static'
+            },
+            field: {
+                name: t('config_base64'),
+                description: t('config_base64_desc')
+            },
+            onRender: (item) => {
+                item.find('.settings-param__value').text('📦');
+
+                item.on('hover:enter', () => {
+                    Lampa.Select.show({
+                        title: t('config_base64'),
+                        items: [
+                            { title: t('config_export_base64'), action: 'export' },
+                            { title: t('config_edit_base64'), action: 'import' }
+                        ],
+                        onSelect: (a) => {
+                            if (a.action === 'export') {
+                                // Экспорт в Base64
+                                const minifiedConfig = JSON.stringify(USER_CONFIG);
+                                const base64Config = btoa(unescape(encodeURIComponent(minifiedConfig)));
+                                
+                                // Копируем в буфер обмена (если есть API)
+                                if (navigator.clipboard && navigator.clipboard.writeText) {
+                                    navigator.clipboard.writeText(base64Config).then(() => {
+                                        Lampa.Noty.show(t('config_copied'));
+                                    }).catch(() => {
+                                        // Показываем для копирования вручную
+                                        Lampa.Input.edit({
+                                            value: base64Config,
+                                            free: true
+                                        }, () => {
+                                            Lampa.Controller.toggle('settings');
+                                        });
+                                    });
+                                } else {
+                                    // Показываем для копирования вручную
+                                    Lampa.Input.edit({
+                                        value: base64Config,
+                                        free: true
+                                    }, () => {
+                                        Lampa.Controller.toggle('settings');
+                                    });
+                                }
+                            } else if (a.action === 'import') {
+                                // Импорт из Base64
+                                Lampa.Input.edit({
+                                    value: '',
+                                    free: true,
+                                    placeholder: 'Вставьте Base64'
+                                }, (base64Value) => {
+                                    if (base64Value) {
+                                        try {
+                                            const jsonString = decodeURIComponent(escape(atob(base64Value)));
+                                            const parsed = JSON.parse(jsonString);
+                                            
+                                            if (parsed && (parsed.version === "2.0" || parsed.version === 2.0)) {
+                                                saveUserConfig(parsed);
+                                                Lampa.Noty.show('OK');
+                                            } else {
+                                                // Показываем версию конфига
+                                                Lampa.Noty.show(t('config_error') + '\n\nВерсия: ' + (parsed.version || 'неизвестна') + '\nОжидается: 2.0');
+                                            }
+                                        } catch (e) {
+                                            // Показываем что получили (первые 15 и последние 15 символов)
+                                            let preview;
+                                            if (base64Value.length <= 30) {
+                                                preview = base64Value;
+                                            } else {
+                                                const first = base64Value.substring(0, 15);
+                                                const last = base64Value.substring(base64Value.length - 15);
+                                                preview = first + '...' + last;
+                                            }
+                                            
+                                            let decodedPreview = '';
+                                            try {
+                                                const decoded = decodeURIComponent(escape(atob(base64Value)));
+                                                if (decoded.length <= 30) {
+                                                    decodedPreview = '\n\nДекодировано:\n' + decoded;
+                                                } else {
+                                                    const firstDec = decoded.substring(0, 15);
+                                                    const lastDec = decoded.substring(decoded.length - 15);
+                                                    decodedPreview = '\n\nДекодировано (' + decoded.length + ' символов):\n' + firstDec + '...' + lastDec;
+                                                }
+                                            } catch (decodeError) {
+                                                decodedPreview = '\n\nОшибка декодирования: ' + decodeError.message;
+                                            }
+                                            
+                                            Lampa.Noty.show(t('config_error_base64') + '\n\nПолучено (' + base64Value.length + ' символов):\n' + preview + decodedPreview + '\n\nОшибка: ' + e.message);
+                                        }
+                                    }
+                                    Lampa.Controller.toggle('settings');
+                                });
                             }
                         },
                         onBack: () => {
