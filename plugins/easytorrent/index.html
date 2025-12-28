@@ -704,7 +704,13 @@
                     &nbsp;&nbsp;&nbsp;• Откройте <strong>Настройки Лампы</strong><br>
                     &nbsp;&nbsp;&nbsp;• Раздел <strong>EasyTorrent</strong><br>
                     &nbsp;&nbsp;&nbsp;• Пункт <strong>Конфигурация (JSON)</strong><br>
-                    &nbsp;&nbsp;&nbsp;• Вставьте текст и нажмите OK
+                    &nbsp;&nbsp;&nbsp;• Вставьте текст и нажмите OK<br>
+                    <br>
+                    <small style="opacity: 0.7;">
+                        <strong>⚠️ Если видите ошибку CORS:</strong><br>
+                        В Supabase Dashboard → Settings → API → CORS добавьте:<br>
+                        <code style="background: rgba(0,0,0,0.2); padding: 2px 5px; border-radius: 3px;">https://darkestclouds.github.io</code>
+                    </small>
                 </div>
             </div>
 
@@ -719,8 +725,8 @@
         // ═══════════════════════════════════════════════════════════════════
         // SUPABASE CONFIG
         // ═══════════════════════════════════════════════════════════════════
-        const SUPABASE_URL = 'https://apvhjfnobsabxcyqzxlg.supabase.co';
-        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFwdmhqZm5vYnNhYnhjeXF6eGxnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzU0OTcyMzYsImV4cCI6MjA1MTA3MzIzNn0.zFfEhLGPRz_3iZTnTfQGmFhqJPkZXJqQPYHQYjPD7Wo';
+        const SUPABASE_URL = 'https://wozuelafumpzgvllcjne.supabase.co';
+        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvenVlbGFmdW1wemd2bGxjam5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5Mjg1MDgsImV4cCI6MjA4MjUwNDUwOH0.ODnHlq_P-1wr_D6Jwaba1mLXIVuGBnnUZsrHI8Twdug';
 
         let currentStep = 1;
         const totalSteps = 8;
@@ -1155,6 +1161,12 @@
                 
                 showStatus('⏳ Отправка конфигурации...', 'info');
                 
+                console.log('[EasyTorrent] Sending to Supabase:', {
+                    url: `${SUPABASE_URL}/rest/v1/tv_configs`,
+                    pairCode: pairCode,
+                    payloadSize: JSON.stringify(payload).length
+                });
+                
                 const res = await fetch(`${SUPABASE_URL}/rest/v1/tv_configs`, {
                     method: 'POST',
                     headers: {
@@ -1166,15 +1178,26 @@
                     body: JSON.stringify(payload)
                 });
                 
+                console.log('[EasyTorrent] Response status:', res.status);
+                
                 if (!res.ok) {
                     const text = await res.text();
-                    throw new Error(`${res.status}: ${text}`);
+                    console.error('[EasyTorrent] Response error:', text);
+                    throw new Error(`HTTP ${res.status}: ${text || res.statusText}`);
                 }
                 
+                console.log('[EasyTorrent] Config sent successfully');
                 showStatus('✅ Конфигурация успешно отправлена на ТВ!', 'success');
             } catch (error) {
                 console.error('[EasyTorrent] Send error:', error);
-                showStatus(`❌ Ошибка отправки: ${error.message}`, 'error');
+                
+                // Более детальная информация об ошибке
+                let errorMessage = error.message;
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    errorMessage = 'CORS ошибка или сеть недоступна. Проверьте настройки Supabase.';
+                }
+                
+                showStatus(`❌ Ошибка: ${errorMessage}`, 'error');
             }
         }
 
