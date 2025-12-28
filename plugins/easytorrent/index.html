@@ -694,15 +694,18 @@
                 
                 <div class="result-container">
                     <div class="config-output" id="configOutput"></div>
-                    <button class="copy-button" onclick="copyConfig()">📋 Копировать конфиг</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="copy-button" onclick="copyConfig()" style="flex: 1;">📋 Копировать JSON</button>
+                        <button class="copy-button" onclick="copyConfigBase64()" style="flex: 1; background: #2196F3;">🔐 Копировать Base64</button>
+                    </div>
                 </div>
 
                 <div class="hint">
                     <strong>Как использовать:</strong>
-                    1. Скопируйте конфиг выше<br>
+                    1. Скопируйте конфиг выше (JSON или Base64)<br>
                     2. Откройте <strong>Настройки Лампы</strong><br>
-                    3. Раздел <strong>Рекомендации торрентов</strong><br>
-                    4. Пункт <strong>Конфигурация (JSON)</strong><br>
+                    3. Раздел <strong>EasyTorrent</strong><br>
+                    4. Пункт <strong>Конфигурация (JSON)</strong> или <strong>Конфиг Base64</strong><br>
                     5. Вставьте текст и нажмите OK
                 </div>
             </div>
@@ -1074,6 +1077,24 @@
             
             const textArea = document.createElement('textarea');
             textArea.value = minifiedConfig;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Скопировано!';
+            setTimeout(() => btn.textContent = originalText, 2000);
+        }
+
+        function copyConfigBase64() {
+            // Копируем в base64
+            const minifiedConfig = JSON.stringify(lastGeneratedConfig);
+            const base64Config = btoa(unescape(encodeURIComponent(minifiedConfig)));
+            
+            const textArea = document.createElement('textarea');
+            textArea.value = base64Config;
             document.body.appendChild(textArea);
             textArea.select();
             document.execCommand('copy');
