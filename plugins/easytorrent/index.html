@@ -717,6 +717,7 @@
     <script>
         let currentStep = 1;
         const totalSteps = 8;
+        let lastGeneratedConfig = null; // Сохраняем последний сгенерированный конфиг
 
         const VOICE_KEYS = [
             'Дубляж RU', 'Дубляж UKR', 'Дубляж Пифагор', 'Дубляж Red Head Sound', 
@@ -988,6 +989,10 @@
                 },
                 scoring_rules: generateScoringRules()
             };
+            
+            // Сохраняем конфиг для копирования
+            lastGeneratedConfig = config;
+            
             displayConfig(config);
         }
 
@@ -1064,13 +1069,16 @@
         }
 
         function copyConfig() {
-            const output = document.getElementById('configOutput');
+            // Копируем минифицированный JSON (без пробелов и переносов строк)
+            const minifiedConfig = JSON.stringify(lastGeneratedConfig);
+            
             const textArea = document.createElement('textarea');
-            textArea.value = output.textContent;
+            textArea.value = minifiedConfig;
             document.body.appendChild(textArea);
             textArea.select();
             document.execCommand('copy');
             document.body.removeChild(textArea);
+            
             const btn = event.target;
             const originalText = btn.textContent;
             btn.textContent = '✓ Скопировано!';
