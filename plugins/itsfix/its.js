@@ -70,13 +70,7 @@
       if (!(window.Lampa && Lampa.Modal && typeof Lampa.Modal.open === 'function')) throw new Error('Modal.open not available');
       if (!(window.Lampa && Lampa.Utils && typeof Lampa.Utils.qrcode === 'function')) throw new Error('Utils.qrcode not available');
 
-      var prev = 'content';
-      try {
-        if (Lampa.Controller && typeof Lampa.Controller.enabled === 'function') {
-          var enabled = Lampa.Controller.enabled();
-          if (enabled && enabled.name) prev = enabled.name;
-        }
-      } catch (e) {}
+      
 
       var html = $("\n          <div class=\"about\">\n            <div style=\"text-align: center; margin-bottom: 20px;\">\n              <div id=\"itsQrCodeContainer\" style=\"background: white; padding: 20px; border-radius: 15px; display: inline-block; margin-bottom: 20px; height: 20em; width: 20em;\"></div>\n            </div>\n            <div class=\"about__text\" style=\"text-align: center; margin-bottom: 15px; opacity: 0.85;\">\n              Отсканируйте QR на телефоне, чтобы запустить быструю команду.\n            </div>\n          </div>\n      ");
 
@@ -86,12 +80,8 @@
         size: 'medium',
         mask: true,
         onBack: function onBack() {
-          try {
-            Lampa.Modal.close();
-          } catch (e) {}
-          try {
-            if (Lampa.Controller && typeof Lampa.Controller.toggle === 'function') Lampa.Controller.toggle(prev);
-          } catch (e) {}
+          Lampa.Modal.close();
+          Lampa.Controller.toggle('settings_component');
         }
       });
 
@@ -101,10 +91,33 @@
           if (!container) throw new Error('QR container not found');
 
           // Если строка слишком длинная для QR — генератор обычно кидает исключение.
+          container.innerHTML = '';
           Lampa.Utils.qrcode(deeplink, container);
+
+          // Иногда генератор "молча" ничего не рисует. Проверим, что что-то появилось.
+          setTimeout(function () {
+            try {
+              var hasQr = !!container.querySelector('canvas, img, svg');
+              if (!hasQr) throw new Error('QR render empty');
+            } catch (e) {
+              try {
+                Lampa.Modal.close();
+                Lampa.Controller.toggle('settings_component');
+              } catch (e) {}
+
+              try {
+                if (Lampa.Noty && typeof Lampa.Noty.show === 'function') {
+                  Lampa.Noty.show('Не получилось создать QR-код: ссылка слишком длинная');
+                } else {
+                  console.error('ITS QR empty:', e);
+                }
+              } catch (e2) {}
+            }
+          }, 0);
         } catch (e) {
           try {
             Lampa.Modal.close();
+            Lampa.Controller.toggle('settings_component');
           } catch (e) {}
 
           try {
