@@ -62,12 +62,10 @@
     }
   }
 
-  function renameUrl(url, it, movie, index) {
-    if (!url) return url;
-    
-    // Fix common URL issues
-    url = url.replace('&preload', '&play').replace(/\s/g, '%20');
-
+  /**
+   * Генерация имени файла (Логика из InfuseSync)
+   */
+  function generateFilename(it, movie, index) {
     var tmdb_id = movie ? movie.id : '';
     var s_num = parseInt(it.season !== undefined ? it.season : it.season_number);
     var e_num = parseInt(it.episode !== undefined ? it.episode : it.episode_number);
@@ -82,7 +80,6 @@
       } else {
         var rawName = it.path_human || it.path || it.title || '';
         rawName = rawName.replace(/\.[a-z0-9]{1,6}$/i, '');
-
         if (movie.first_air_date || movie.name) {
           filename = '{tmdb-' + tmdb_id + '} ' + (rawName || movie.original_name || movie.name);
         } else {
@@ -92,28 +89,33 @@
         }
       }
     } else {
-      var u_base = url.split('?')[0];
-      var lastSegment = u_base.split('/').pop();
-      var nameFromUrl = decodeURIComponent(lastSegment).replace(/\.[a-z0-9]{1,6}$/i, '');
+      var u_base = (it.url || '').split('?')[0];
+      var nameFromUrl = decodeURIComponent(u_base.split('/').pop() || '').replace(/\.[a-z0-9]{1,6}$/i, '');
       filename = nameFromUrl || it.path_human || it.path || it.title || 'link_' + (index + 1);
     }
 
     filename = String(filename || '').replace(/<[^>]*>?/gm, '').trim();
-    filename = filename.replace(/[<>:"/\\|?*\x00-\x1F]/g, '').trim() || 'link';
+    return filename.replace(/[<>:"/\\|?*\x00-\x1F]/g, '').trim() || 'link';
+  }
 
-    // Extract extension from original URL path
-    var extension = '';
+  /**
+   * Возвращает новый URL с измененным именем файла
+   */
+  function getRenamedUrl(it, movie, index) {
+    var url = String(it.url || '').replace('&preload', '&play').replace(/\s/g, '%20');
+    var filename = generateFilename(it, movie, index);
+    
     var parts = url.split('?');
     var path = parts[0];
-    var lastPart = path.split('/').pop();
+    var query = parts[1] || '';
+    
+    var pathParts = path.split('/');
+    var lastPart = pathParts[pathParts.length - 1];
+    var extension = '';
     var m = lastPart.match(/\.[a-z0-9]{1,6}$/i);
     if (m) extension = m[0];
 
-    // Reconstruct URL with renamed file
-    var query = parts[1] || '';
-    var pathParts = path.split('/');
     pathParts[pathParts.length - 1] = encodeURIComponent(filename) + extension;
-    
     return pathParts.join('/') + (query ? '?' + query : '');
   }
 
@@ -123,63 +125,53 @@
       if (data.type === 'onlong') {
         var movie = data.params ? data.params.movie : null;
         var links_array = data.items || [];
-        var formatted_urls = '';
         
-        // Rename current element
-        data.element.url = renameUrl(data.element.url, data.element, movie, links_array.indexOf(data.element));
+        // Ссылка для одного элемента (не мутируем оригинал!)
+        var current_url = getRenamedUrl(data.element, movie, links_array.indexOf(data.element));
+        
+        console.log("ITS", 'infuse://x-callback-url/save?url=' + encodeURIComponent(current_url));
 
-        var _iterator = _createForOfIteratorHelper(links_array),
-          _step;
-        try {
-          for (_iterator.s(); !(_step = _iterator.n()).done;) {
-            var item = _step.value;
-            // Rename each item in list for "Save all"
-            item.url = renameUrl(item.url, item, movie, links_array.indexOf(item));
-            formatted_urls += encodeURIComponent(item.url + '\n');
-          }
-        } catch (err) {
-          _iterator.e(err);
-        } finally {
-          _iterator.f();
-        }
-        
-        console.log("Infuse saver", encodeURIComponent(data.element.url));
-        
         data.menu.push({
           title: 'Save to Infuse',
-          onSelect: function onSelect(a) {
-            window.location.assign('infuse://x-callback-url/save?url=' + encodeURIComponent(data.element.url));
+          onSelect: function onSelect() {
+            window.location.assign('infuse://x-callback-url/save?url=' + encodeURIComponent(current_url));
           }
         });
+
+        // Подготовка данных для массового сохранения
+        var formatted_urls = '';
+        var trim_playlist = [];
+
+        links_array.forEach(function (item, idx) {
+          var r_url = getRenamedUrl(item, movie, idx);
+          formatted_urls += encodeURIComponent(r_url + '\n');
+          trim_playlist.push({ url: r_url });
+        });
+
         //Disable list import
         if (Lampa.Platform.is('apple_tv') === false) {
           data.menu.push({
             title: 'Save all to infuse',
-            onSelect: function onSelect(a) {
+            onSelect: function onSelect() {
               window.location.assign('shortcuts://run-shortcut?name=Infuse import links&input=text&text=' + formatted_urls);
             }
           });
+          console.log("ITS Shortcuts", formatted_urls);
         }
+        
         // list import apple tv
         if (Lampa.Platform.is('apple_tv') === true) {
           data.menu.push({
             title: 'Save all to infuse',
-            onSelect: function onSelect(a) {
-              var trim_playlist = [];
-              links_array.forEach(function (elem) {
-                trim_playlist.push({
-                  url: elem.url
-                });
-              });
-              var playlistURL = links_array.length > 0 ? encodeURIComponent(JSON.stringify(trim_playlist)) : '';
-              console.log('Infuse ATV', playlistURL);
+            onSelect: function onSelect() {
+              var playlistURL = trim_playlist.length > 0 ? encodeURIComponent(JSON.stringify(trim_playlist)) : '';
               window.location.assign("lampa://saveAllToInfuse?playlist=" + playlistURL);
             }
           });
         }
       }
     });
-    
+
     //showadvancedmenu
     var icon = Lampa.Head.addIcon('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6"><path stroke-linecap="round" stroke-linejoin="round" d="m18.375 12.739-7.693 7.693a4.5 4.5 0 0 1-6.364-6.364l10.94-10.94A3 3 0 1 1 19.5 7.372L8.552 18.32m.009-.01-.01.01m5.699-9.941-7.81 7.81a1.5 1.5 0 0 0 2.112 2.13" /></svg>', function () {
       window.open('lampa://showadvancedmenu');
