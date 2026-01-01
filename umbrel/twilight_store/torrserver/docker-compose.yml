@@ -1,0 +1,19 @@
+services:
+  server:
+    image: ghcr.io/yourok/torrserver:latest
+    container_name: torrserver
+    environment:
+      - TS_PORT=8090
+      - TS_DONTKILL=1
+      - TS_HTTPAUTH=0
+      - TS_CONF_PATH=/opt/ts/config
+      - TS_TORR_DIR=/opt/ts/torrents
+      - TS_LOG_PATH=/opt/ts/log
+    volumes:
+      - ${APP_DATA_DIR}/data/config:/opt/ts/config
+      - ${APP_DATA_DIR}/data/torrents:/opt/ts/torrents
+      - ${APP_DATA_DIR}/data/log:/opt/ts/log
+      - ${UMBREL_ROOT}/home/Downloads:/downloads
+    ports:
+      - '8090:8090'
+    restart: unless-stopped
