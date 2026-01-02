@@ -584,8 +584,38 @@
                 </div>
             </div>
 
-            <!-- Шаг 4: Выбор озвучек -->
+            <!-- Шаг 4: Языки аудио -->
             <div class="step" data-step="4">
+                <h2 class="step-title"><span class="emoji">🗣️</span>Языки озвучки</h2>
+                <p class="step-description">Выберите языки аудио, которые вы хотите учитывать при рекомендациях</p>
+
+                <div class="question">
+                    <label class="question-label">Какие языки вам нужны?</label>
+                    <div class="checkbox-group">
+                        <label class="option">
+                            <input type="checkbox" name="preferred_languages" value="rus" checked>
+                            <div class="option-content">
+                                <div class="option-title">🇷🇺 Русский</div>
+                            </div>
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" name="preferred_languages" value="ukr">
+                            <div class="option-content">
+                                <div class="option-title">🇺🇦 Украинский</div>
+                            </div>
+                        </label>
+                        <label class="option">
+                            <input type="checkbox" name="preferred_languages" value="eng" checked>
+                            <div class="option-content">
+                                <div class="option-title">🇬🇧 Английский</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Шаг 5: Выбор озвучек -->
+            <div class="step" data-step="5">
                 <h2 class="step-title"><span class="emoji">🎧</span>Ваши озвучки</h2>
                 <p class="step-description">Отметьте озвучки, которые вы знаете или предпочитаете. Только они попадут в список настройки приоритетов.</p>
                 
@@ -603,8 +633,8 @@
                 </div>
             </div>
 
-            <!-- Шаг 5: Приоритет озвучек -->
-            <div class="step" data-step="5">
+            <!-- Шаг 6: Приоритет озвучек -->
+            <div class="step" data-step="6">
                 <h2 class="step-title"><span class="emoji">🎙️</span>Приоритет озвучек</h2>
                 <p class="step-description">Перетащите выбранные озвучки в порядке предпочтения (сверху - самая любимая)</p>
                 
@@ -613,12 +643,12 @@
                 </div>
 
                 <div class="priority-list" id="audioTrackPriority">
-                    <!-- Будет заполнено скриптом на основе Шага 4 -->
+                    <!-- Будет заполнено скриптом на основе Шага 5 -->
                 </div>
             </div>
 
-            <!-- Шаг 6: Приоритет параметров -->
-            <div class="step" data-step="6">
+            <!-- Шаг 7: Приоритет параметров -->
+            <div class="step" data-step="7">
                 <h2 class="step-title"><span class="emoji">⚖️</span>Приоритет параметров</h2>
                 <p class="step-description">Перетащите параметры в порядке важности (сверху - наиболее важный)</p>
                 
@@ -661,8 +691,8 @@
                 </div>
             </div>
 
-            <!-- Шаг 7: Дополнительно -->
-            <div class="step" data-step="7">
+            <!-- Шаг 8: Дополнительно -->
+            <div class="step" data-step="8">
                 <h2 class="step-title"><span class="emoji">⚙️</span>Дополнительные настройки</h2>
                 <p class="step-description">Финальные настройки системы</p>
                 
@@ -682,7 +712,7 @@
             </div>
 
             <!-- Результат -->
-            <div class="step" data-step="8">
+            <div class="step" data-step="9">
                 <h2 class="step-title"><span class="emoji">✅</span>Ваш конфигурационный файл готов!</h2>
                 <p class="step-description">Скопируйте конфиг и вставьте его в настройки Лампы</p>
                 
@@ -717,47 +747,67 @@
         const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvenVlbGFmdW1wemd2bGxjam5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5Mjg1MDgsImV4cCI6MjA4MjUwNDUwOH0.ODnHlq_P-1wr_D6Jwaba1mLXIVuGBnnUZsrHI8Twdug';
 
         let currentStep = 1;
-        const totalSteps = 8;
+        const totalSteps = 9;
         let pairCode = null;
 
-        const VOICE_KEYS = [
-            'Дубляж RU', 'Дубляж UKR', 'Дубляж Пифагор', 'Дубляж Red Head Sound', 
-            'Дубляж Videofilm', 'Дубляж MovieDalen', 'Дубляж LeDoyen', 'Дубляж Whiskey Sound', 
-            'Дубляж IRON VOICE', 'Дубляж AlexFilm', 'Дубляж Amedia', 'MVO HDRezka', 
-            'MVO LostFilm', 'MVO TVShows', 'MVO Jaskier', 'MVO RuDub', 'MVO LE-Production', 
-            'MVO Кубик в Кубе', 'MVO NewStudio', 'MVO Good People', 'MVO IdeaFilm', 
-            'MVO AMS', 'MVO Baibako', 'MVO Profix Media', 'MVO NewComers', 'MVO GoLTFilm', 
-            'MVO JimmyJ', 'MVO Kerob', 'MVO LakeFilms', 'MVO Novamedia', 'MVO Twister', 
-            'MVO Voice Project', 'MVO Dragon Money Studio', 'MVO Syncmer', 'MVO ColdFilm', 
-            'MVO SunshineStudio', 'MVO Ultradox', 'MVO Octopus', 'MVO OMSKBIRD', 
-            'AVO Володарский', 'AVO Яроцкий', 'AVO Сербин', 'PRO Gears Media', 
-            'PRO Hamsterstudio', 'PRO P.S.Energy', 'UKR НеЗупиняйПродакшн', 'Original'
+        // Озвучки в виде числовых id (должны совпадать с EasyTorrent плагином)
+        const AUDIO_TRACKS = [
+            { id: 0,  name: 'Дубляж RU', languages: ['rus'] },
+            { id: 1,  name: 'Дубляж UKR', languages: ['ukr'] },
+            { id: 2,  name: 'Дубляж Пифагор', languages: ['rus'] },
+            { id: 3,  name: 'Дубляж Red Head Sound', languages: ['rus'] },
+            { id: 4,  name: 'Дубляж Videofilm', languages: ['rus'] },
+            { id: 5,  name: 'Дубляж MovieDalen', languages: ['rus'] },
+            { id: 6,  name: 'Дубляж LeDoyen', languages: ['rus'] },
+            { id: 7,  name: 'Дубляж Whiskey Sound', languages: ['rus'] },
+            { id: 8,  name: 'Дубляж IRON VOICE', languages: ['rus'] },
+            { id: 9,  name: 'Дубляж AlexFilm', languages: ['rus'] },
+            { id: 10, name: 'Дубляж Amedia', languages: ['rus'] },
+            { id: 11, name: 'MVO HDRezka', languages: ['rus', 'ukr'] }, // двуязычная студия
+            { id: 12, name: 'MVO LostFilm', languages: ['rus'] },
+            { id: 13, name: 'MVO TVShows', languages: ['rus'] },
+            { id: 14, name: 'MVO Jaskier', languages: ['rus'] },
+            { id: 15, name: 'MVO RuDub', languages: ['rus'] },
+            { id: 16, name: 'MVO LE-Production', languages: ['rus'] },
+            { id: 17, name: 'MVO Кубик в Кубе', languages: ['rus'] },
+            { id: 18, name: 'MVO NewStudio', languages: ['rus'] },
+            { id: 19, name: 'MVO Good People', languages: ['rus'] },
+            { id: 20, name: 'MVO IdeaFilm', languages: ['rus'] },
+            { id: 21, name: 'MVO AMS', languages: ['rus'] },
+            { id: 22, name: 'MVO Baibako', languages: ['rus'] },
+            { id: 23, name: 'MVO Profix Media', languages: ['rus'] },
+            { id: 24, name: 'MVO NewComers', languages: ['rus'] },
+            { id: 25, name: 'MVO GoLTFilm', languages: ['rus'] },
+            { id: 26, name: 'MVO JimmyJ', languages: ['rus'] },
+            { id: 27, name: 'MVO Kerob', languages: ['rus'] },
+            { id: 28, name: 'MVO LakeFilms', languages: ['rus'] },
+            { id: 29, name: 'MVO Twister', languages: ['rus'] },
+            { id: 30, name: 'MVO Voice Project', languages: ['rus'] },
+            { id: 31, name: 'MVO Dragon Money Studio', languages: ['rus'] },
+            { id: 32, name: 'MVO Syncmer', languages: ['rus'] },
+            { id: 33, name: 'MVO ColdFilm', languages: ['rus'] },
+            { id: 34, name: 'MVO SunshineStudio', languages: ['rus'] },
+            { id: 35, name: 'MVO Ultradox', languages: ['rus'] },
+            { id: 36, name: 'MVO Octopus', languages: ['rus'] },
+            { id: 37, name: 'MVO OMSKBIRD', languages: ['rus'] },
+            { id: 38, name: 'AVO Володарский', languages: ['rus'] },
+            { id: 39, name: 'AVO Яроцкий', languages: ['rus'] },
+            { id: 40, name: 'AVO Сербин', languages: ['rus'] },
+            { id: 41, name: 'PRO Gears Media', languages: ['rus'] },
+            { id: 42, name: 'PRO Hamsterstudio', languages: ['rus'] },
+            { id: 43, name: 'PRO P.S.Energy', languages: ['rus'] },
+            { id: 44, name: 'UKR НеЗупиняйПродакшн', languages: ['ukr'] },
+            { id: 45, name: 'Original', languages: ['eng'] }
         ];
 
-        const DEFAULT_SELECTED_VOICES = [
-            'Дубляж Пифагор',
-            'Дубляж MovieDalen',
-            'Дубляж LeDoyen',
-            'Дубляж Red Head Sound',
-            'Дубляж Videofilm',
-            'Дубляж RU',
-            'Дубляж UKR',
-            'MVO HDRezka',
-            'MVO LostFilm',
-            'MVO TVShows',
-            'MVO Jaskier',
-            'MVO RuDub',
-            'MVO LE-Production',
-            'MVO Кубик в Кубе',
-            'MVO NewStudio',
-            'MVO Dragon Money Studio',
-            'MVO Syncmer',
-            'Original'
-        ];
+        const AUDIO_TRACK_BY_ID = new Map(AUDIO_TRACKS.map(t => [t.id, t]));
+        const DEFAULT_SELECTED_VOICE_IDS = [2, 5, 6, 3, 4, 0, 11, 12, 13, 14, 15, 16, 17, 18, 31, 32, 45];
+        let selectedVoiceIds = new Set(DEFAULT_SELECTED_VOICE_IDS);
 
         // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
             checkPairCode();
+            bindLanguageSelection();
             renderVoiceSelection();
             updateProgress();
             initSortableParameters();
@@ -897,19 +947,49 @@
             }
         }
 
+        function getSelectedLanguages() {
+            return new Set(getCheckboxValues('preferred_languages'));
+        }
+
+        function bindLanguageSelection() {
+            document.querySelectorAll('input[name="preferred_languages"]').forEach(cb => {
+                cb.addEventListener('change', () => {
+                    // Если пользователь уже на шаге выбора озвучек — перерисуем список
+                    if (currentStep === 5) {
+                        renderVoiceSelection(true);
+                    }
+                });
+            });
+        }
+
         function renderVoiceSelection() {
             const group = document.getElementById('voiceSelectionGroup');
-            VOICE_KEYS.forEach(key => {
-                const checked = DEFAULT_SELECTED_VOICES.includes(key) ? 'checked' : '';
+            const allowed = getSelectedLanguages();
+            group.innerHTML = '';
+
+            AUDIO_TRACKS
+                .filter(v => v.languages.some(l => allowed.has(l)))
+                .forEach(v => {
+                const checked = selectedVoiceIds.has(v.id) ? 'checked' : '';
                 const label = document.createElement('label');
                 label.className = 'option';
                 label.innerHTML = `
-                    <input type="checkbox" name="selected_voices" value="${key}" ${checked}>
+                    <input type="checkbox" name="selected_voices" value="${v.id}" ${checked}>
                     <div class="option-content">
-                        <div class="option-title" style="font-size: 0.9em;">${key}</div>
+                        <div class="option-title" style="font-size: 0.9em;">${v.name}</div>
                     </div>
                 `;
                 group.appendChild(label);
+            });
+
+            // синхроним Set при кликах
+            document.querySelectorAll('input[name="selected_voices"]').forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const id = parseInt(cb.value, 10);
+                    if (!Number.isFinite(id)) return;
+                    if (cb.checked) selectedVoiceIds.add(id);
+                    else selectedVoiceIds.delete(id);
+                });
             });
         }
 
@@ -920,6 +1000,11 @@
                 // Применяем только к видимым элементам
                 if (!searchValue || label.style.display !== 'none') {
                     cb.checked = state;
+                    const id = parseInt(cb.value, 10);
+                    if (Number.isFinite(id)) {
+                        if (state) selectedVoiceIds.add(id);
+                        else selectedVoiceIds.delete(id);
+                    }
                 }
             });
         }
@@ -944,35 +1029,37 @@
             
             // Получаем все выбранные озвучки
             const selectedSet = new Set(
-                Array.from(document.querySelectorAll('input[name="selected_voices"]:checked')).map(cb => cb.value)
+                Array.from(document.querySelectorAll('input[name="selected_voices"]:checked'))
+                    .map(cb => parseInt(cb.value, 10))
+                    .filter(n => Number.isFinite(n))
             );
             
             // Формируем список в правильном порядке:
-            // 1. Сначала берем озвучки из DEFAULT_SELECTED_VOICES (в том порядке)
-            // 2. Потом добавляем остальные выбранные озвучки (которых нет в DEFAULT_SELECTED_VOICES)
+            // 1. Сначала берем озвучки из DEFAULT_SELECTED_VOICE_IDS (в том порядке)
+            // 2. Потом добавляем остальные выбранные озвучки
             const ordered = [];
             
-            // Добавляем озвучки из DEFAULT_SELECTED_VOICES, если они выбраны
-            DEFAULT_SELECTED_VOICES.forEach(key => {
-                if (selectedSet.has(key)) {
-                    ordered.push(key);
-                    selectedSet.delete(key);
+            DEFAULT_SELECTED_VOICE_IDS.forEach(id => {
+                if (selectedSet.has(id)) {
+                    ordered.push(id);
+                    selectedSet.delete(id);
                 }
             });
             
             // Добавляем остальные выбранные озвучки
-            selectedSet.forEach(key => {
-                ordered.push(key);
+            selectedSet.forEach(id => {
+                ordered.push(id);
             });
             
             // Рендерим список
-            ordered.forEach((key, index) => {
+            ordered.forEach((id, index) => {
+                const itemName = AUDIO_TRACK_BY_ID.get(id) ? AUDIO_TRACK_BY_ID.get(id).name : String(id);
                 const item = document.createElement('div');
                 item.className = 'priority-item';
-                item.dataset.value = key;
+                item.dataset.value = String(id);
                 item.innerHTML = `
                     <div class="priority-number">${index + 1}</div>
-                    <div class="priority-name">${key}</div>
+                    <div class="priority-name">${itemName}</div>
                     <div class="drag-handle">⋮⋮</div>
                 `;
                 container.appendChild(item);
@@ -1021,7 +1108,19 @@
 
         // Навигация
         function nextStep() {
+            // Шаг 4: языки
             if (currentStep === 4) {
+                const langs = getCheckboxValues('preferred_languages');
+                if (langs.length === 0) {
+                    alert('Выберите хотя бы один язык');
+                    return;
+                }
+                // Перед шагом выбора озвучек перерисуем список с фильтрацией
+                renderVoiceSelection(true);
+            }
+
+            // Шаг 5: выбор озвучек
+            if (currentStep === 5) {
                 const selected = document.querySelectorAll('input[name="selected_voices"]:checked');
                 if (selected.length === 0) {
                     alert('Выберите хотя бы одну озвучку');
@@ -1100,7 +1199,9 @@
 
         function getAudioTrackPriority() {
             const items = document.querySelectorAll('#audioTrackPriority .priority-item');
-            return Array.from(items).map(item => item.dataset.value);
+            return Array.from(items)
+                .map(item => parseInt(item.dataset.value, 10))
+                .filter(n => Number.isFinite(n));
         }
 
         // Генерация конфига
@@ -1122,7 +1223,8 @@
                 audio_track_priority: getAudioTrackPriority(),
                 preferences: {
                     min_seeds: parseInt(document.getElementById('min_seeds').value),
-                    recommendation_count: parseInt(document.getElementById('recommendation_count').value)
+                    recommendation_count: parseInt(document.getElementById('recommendation_count').value),
+                    languages: getCheckboxValues('preferred_languages')
                 },
                 scoring_rules: generateScoringRules()
             };

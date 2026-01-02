@@ -6,46 +6,54 @@
     // ═══════════════════════════════════════════════════════════════════
 
     const PLUGIN_NAME = 'EasyTorrent';
-    const VERSION = '1.0.0 Beta';
+    const VERSION = '1.1.0 Beta';
     const PLUGIN_ICON = '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" fill="currentColor"/></svg>';
 
     // Supabase config
     const SUPABASE_URL = 'https://wozuelafumpzgvllcjne.supabase.co';
     const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvenVlbGFmdW1wemd2bGxjam5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5Mjg1MDgsImV4cCI6MjA4MjUwNDUwOH0.ODnHlq_P-1wr_D6Jwaba1mLXIVuGBnnUZsrHI8Twdug';
-    const WIZARD_URL = 'https://darkestclouds.github.io/plugins/easytorrent/';
+    const WIZARD_URL = 'https://darkestclouds.github.io/plugins/easytorrent/test/';
 
-    // Глобальное хранилище топовых рекомендаций
-    let topRecommendations = [];
     let pollingInterval = null;
 
     // Конфигурация по умолчанию (используется, если не задана пользовательская)
+    // Требование v1.1.0 Beta:
+    // - FHD (1080p)
+    // - Без HDR (считаем SDR)
+    // - Без 5.1/7.1/Atmos (стерео)
+    // - Приоритеты параметров: как в визарде
+    // - Озвучки: как в визарде, но без украинского
     const DEFAULT_CONFIG = {
         "version": "2.1",
         "generated": "2025-12-27T13:43:12.099Z",
         "device": {
-            "type": "tv_4k",
-            "supported_hdr": ["hdr10", "hdr10plus"],
-            "supported_audio": ["stereo", "surround_51"]
+            "type": "tv_fhd",
+            "supported_hdr": [],
+            "supported_audio": ["stereo"]
         },
         "network": {
             "speed": "very_fast",
             "stability": "stable"
         },
         "parameter_priority": ["audio_track", "resolution", "availability", "bitrate", "hdr", "audio_quality"],
-        "audio_track_priority": ["Дубляж RU", "MVO HDRezka", "MVO LostFilm", "MVO Кубик в Кубе", "MVO NewStudio", "Original"],
-        "preferences": { "min_seeds": 3, "recommendation_count": 3 },
+        "audio_track_priority": [2, 5, 6, 3, 4, 0, 11, 12, 13, 14, 15, 16, 17, 18, 31, 32, 45],
+        "preferences": {
+            "min_seeds": 3,
+            "recommendation_count": 3,
+            "languages": ["rus"]
+        },
         "scoring_rules": {
             "schema": "2.1",
             "base_score": 100,
             "weights": { "audio_track": 100, "resolution": 85, "availability": 70, "bitrate": 55, "hdr": 40, "audio_quality": 25 },
-            "resolution": { "480": -60, "720": -30, "1080": 17, "1440": 42.5, "2160": 85 },
-            "hdr": { "dolby_vision": 24, "hdr10plus": 32, "hdr10": 32, "sdr": -16 },
+            "resolution": { "2160": 34, "1440": 42.5, "1080": 85, "720": 8.5, "480": -34 },
+            "hdr": { "dolby_vision": -8, "hdr10plus": -6, "hdr10": -6, "sdr": 0 },
             "bitrate_bonus": {
                 "thresholds": [
-                    { "min": 0, "max": 15, "bonus": 0 },
+                    { "min": 0, "max": 5, "bonus": 2.75 },
+                    { "min": 5, "max": 15, "bonus": 11 },
                     { "min": 15, "max": 30, "bonus": 8.25 },
-                    { "min": 30, "max": 60, "bonus": 16.5 },
-                    { "min": 60, "max": 999, "bonus": 19.25 }
+                    { "min": 30, "max": 999, "bonus": 0 }
                 ],
                 "missing_penalty": -8.25
             },
@@ -59,17 +67,23 @@
                 "max_points": 100
             },
             "audio_quality": {
-                // Стерео считаем дефолтом — очков не даём
-                "points": { "dolby_atmos": 20, "surround_71": 15, "surround_51": 10, "stereo": 0, "unknown": 0 }
+                // По умолчанию считаем: устройство без 5.1/7.1/Atmos — очков не даём
+                "points": { "dolby_atmos": 0, "surround_71": 0, "surround_51": 0, "stereo": 0, "unknown": 0 }
             },
-            "special_rules": [
-                { "key": "4k_bonus_2160_bitrate", "if": { "resolution": 2160, "bitrate_min": 1 }, "bonus": 80 },
-                { "key": "4k_bonus_2160", "if": { "resolution": 2160 }, "bonus": 30 }
-            ]
+            "special_rules": []
         }
     };
 
     let USER_CONFIG = DEFAULT_CONFIG;
+    const STORAGE_MODAL_UPDATE_V110 = 'easytorrent_modal_update_v110_shown';
+    const STORAGE_MODAL_WELCOME = 'easytorrent_modal_welcome_shown';
+    const STORAGE_CONFIG_KEY = 'easytorrent_config_json';
+    let shouldShowUpdateModalV110 = false;
+    let shouldShowWelcomeModal = false;
+    let startupModalScheduler = null;
+    const EXT_META_NAME = 'EasyTorrent';
+    const EXT_META_AUTHOR = '@darkestclouds';
+    const EXT_META_URL_HINTS = ['easytorrent'];
 
     // Переводы
     const translations = {
@@ -93,151 +107,445 @@
         return translations[key] && translations[key][lang] || translations[key].ru || key;
     }
 
-    /**
-     * Нормализация/миграция конфига.
-     * Цель: чтобы вся математика задавалась визардом в scoring_rules, а плагин "исполнял" правила
-     * без скрытых домножений и эвристик, которые расходятся с визардом.
-     */
-    function normalizeConfig(cfg) {
-        const out = cfg && typeof cfg === 'object' ? cfg : {};
-        out.version = String(out.version || DEFAULT_CONFIG.version);
-        out.device = out.device || {};
-        out.network = out.network || {};
-        out.preferences = out.preferences || {};
-        out.parameter_priority = Array.isArray(out.parameter_priority) ? out.parameter_priority : DEFAULT_CONFIG.parameter_priority.slice();
-        out.audio_track_priority = Array.isArray(out.audio_track_priority) ? out.audio_track_priority : DEFAULT_CONFIG.audio_track_priority.slice();
+    function deepClone(obj) {
+        return JSON.parse(JSON.stringify(obj));
+    }
 
-        // Единственный смысловой источник min_seeds: приводим в консистентный вид
-        if (typeof out.preferences.min_seeds !== 'number') out.preferences.min_seeds = DEFAULT_CONFIG.preferences.min_seeds;
-        if (typeof out.preferences.recommendation_count !== 'number') out.preferences.recommendation_count = DEFAULT_CONFIG.preferences.recommendation_count;
+    function applyDefaultConfigAndPersist() {
+        USER_CONFIG = deepClone(DEFAULT_CONFIG);
+        try {
+            Lampa.Storage.set(STORAGE_CONFIG_KEY, JSON.stringify(USER_CONFIG));
+        } catch (e) {}
+    }
 
-        out.scoring_rules = out.scoring_rules && typeof out.scoring_rules === 'object' ? out.scoring_rules : {};
+    function isExtensionsScreen() {
+        try {
+            if (document && document.querySelector && document.querySelector('.extensions')) return true;
+        } catch (e) {}
 
-        const rules = out.scoring_rules;
-        const isNew = rules.schema && String(rules.schema).startsWith('2.1');
+        try {
+            const enabled = (Lampa.Controller && typeof Lampa.Controller.enabled === 'function') ? Lampa.Controller.enabled() : null;
+            if (enabled && enabled.name === 'extensions') return true;
+        } catch (e) {}
 
-        // База
-        if (typeof rules.base_score !== 'number') rules.base_score = 100;
+        return false;
+    }
 
-        // weights оставляем как "инфо" (визард использует для генерации чисел); плагин не домножает ими таблицы.
-        if (!rules.weights || typeof rules.weights !== 'object') {
-            rules.weights = DEFAULT_CONFIG.scoring_rules.weights;
+    function isPluginEnabled() {
+        try {
+            return !!Lampa.Storage.get('easytorrent_enabled', true);
+        } catch (e) {
+            return true;
+        }
+    }
+
+    function ensureSelfPluginMetadataInStorage() {
+        try {
+            const raw = Lampa.Storage.get('plugins', '[]');
+            const list = Array.isArray(raw) ? raw.slice() : (typeof raw === 'string' ? JSON.parse(raw) : []);
+            if (!Array.isArray(list) || !list.length) return;
+
+            let changed = false;
+
+            const isMatch = (u) => {
+                const url = String(u || '').toLowerCase();
+                if (!url) return false;
+                return EXT_META_URL_HINTS.some(h => url.includes(String(h).toLowerCase()));
+            };
+
+            const normalized = list.map(item => (typeof item === 'string' ? { url: item, status: 1 } : item));
+
+            normalized.forEach(item => {
+                if (!item || typeof item !== 'object') return;
+                const url = item.url || item.link;
+                if (!isMatch(url)) return;
+
+                if (!item.name) {
+                    item.name = EXT_META_NAME;
+                    changed = true;
+                }
+                if (!item.author) {
+                    item.author = EXT_META_AUTHOR;
+                    changed = true;
+                }
+                if (!item.descr) {
+                    item.descr = String(url || '').replace(/\n|\t|\r/g, ' ');
+                    changed = true;
+                }
+            });
+
+            if (changed) {
+                Lampa.Storage.set('plugins', normalized);
+            }
+
+            // Если сейчас открыт экран Extensions — обновим DOM сразу (чтобы не ждать перезагрузки)
+            try {
+                const root = document && document.querySelector ? document.querySelector('.extensions') : null;
+                if (root) {
+                    root.querySelectorAll('.extensions__item').forEach(el => {
+                        const descrEl = el.querySelector('.extensions__item-descr');
+                        if (!descrEl) return;
+                        const descr = String(descrEl.textContent || '');
+                        if (!isMatch(descr)) return;
+
+                        const nameEl = el.querySelector('.extensions__item-name');
+                        const authorEl = el.querySelector('.extensions__item-author');
+
+                        if (nameEl && (!nameEl.textContent || nameEl.textContent.trim() === 'Без названия')) {
+                            nameEl.textContent = EXT_META_NAME;
+                        }
+                        if (authorEl && (!authorEl.textContent || authorEl.textContent.trim() === '@lampa')) {
+                            authorEl.textContent = EXT_META_AUTHOR;
+                        }
+                    });
+                }
+            } catch (e) {}
+        } catch (e) {
+            console.warn('[EasyTorrent] ensureSelfPluginMetadataInStorage failed:', e);
+        }
+    }
+
+    function hasPendingStartupModals() {
+        const needUpdate = shouldShowUpdateModalV110 && !Lampa.Storage.get(STORAGE_MODAL_UPDATE_V110, false);
+        const needWelcome = shouldShowWelcomeModal && !Lampa.Storage.get(STORAGE_MODAL_WELCOME, false);
+        return needUpdate || needWelcome;
+    }
+
+    function ensureStartupModalScheduler() {
+        if (startupModalScheduler) return;
+
+        // Периодически проверяем условия (покинули extensions + плагин включён) и показываем модалку.
+        startupModalScheduler = setInterval(() => {
+            try {
+                if (!hasPendingStartupModals()) {
+                    clearInterval(startupModalScheduler);
+                    startupModalScheduler = null;
+                    return;
+                }
+
+                // Если плагин выключен — не показываем. При включении scheduler запустится через onChange.
+                if (!isPluginEnabled()) return;
+
+                // На extensions модалки НЕ показываем (там багованное поведение) — покажем позже.
+                if (isExtensionsScreen()) return;
+
+                showStartupModalIfNeeded();
+            } catch (e) {}
+        }, 1500);
+    }
+
+
+    function isObj(v) {
+        return !!v && typeof v === 'object' && !Array.isArray(v);
+    }
+
+    function isStr(v) {
+        return typeof v === 'string' && v.length > 0;
+    }
+
+    function isNum(v) {
+        return typeof v === 'number' && Number.isFinite(v);
+    }
+
+    function isNumOrInt(v) {
+        return isNum(v);
+    }
+
+    function cfgError(message) {
+        return { ok: false, error: message };
+    }
+
+    function validateConfig(cfg) {
+        if (!isObj(cfg)) return cfgError('Конфиг должен быть объектом JSON');
+
+        const v = String(cfg.version || '');
+        if (v === '2.0' || v.startsWith('2.0')) {
+            return cfgError('Конфиги версии 2.0 больше не поддерживаются. Сгенерируйте новый конфиг (2.1) в визарде.');
+        }
+        if (!v.startsWith('2.1')) {
+            return cfgError(`Неподдерживаемая версия конфига: ${v || 'не указана'}. Ожидается 2.1.`);
         }
 
-        // resolution/hdr таблицы: если их нет — ставим дефолты
-        if (!rules.resolution || typeof rules.resolution !== 'object') rules.resolution = DEFAULT_CONFIG.scoring_rules.resolution;
-        if (!rules.hdr || typeof rules.hdr !== 'object') rules.hdr = DEFAULT_CONFIG.scoring_rules.hdr;
+        if (!isObj(cfg.device)) return cfgError('Поле device отсутствует или неверного типа');
+        if (!isStr(cfg.device.type)) return cfgError('Поле device.type отсутствует или неверного типа');
+        if (!Array.isArray(cfg.device.supported_hdr)) return cfgError('Поле device.supported_hdr должно быть массивом');
+        if (!Array.isArray(cfg.device.supported_audio)) return cfgError('Поле device.supported_audio должно быть массивом');
 
-        // availability: в 2.1 это (min_seeds, below_min_penalty, log10_multiplier)
-        if (!rules.availability || typeof rules.availability !== 'object') rules.availability = {};
-        const avail = rules.availability;
-        if (typeof avail.min_seeds !== 'number') {
-            // поддержка старых конфигов: могли хранить min_seeds в preferences или availability.min_seeds
-            const fromPrefs = typeof out.preferences.min_seeds === 'number' ? out.preferences.min_seeds : null;
-            const fromOld = typeof avail.min_seeds === 'number' ? avail.min_seeds : null;
-            avail.min_seeds = fromOld != null ? fromOld : (fromPrefs != null ? fromPrefs : DEFAULT_CONFIG.preferences.min_seeds);
-        }
-        // синхронизация в обе стороны (чтобы не было "двух правд")
-        out.preferences.min_seeds = avail.min_seeds;
+        if (!isObj(cfg.network)) return cfgError('Поле network отсутствует или неверного типа');
+        if (!isStr(cfg.network.speed)) return cfgError('Поле network.speed отсутствует или неверного типа');
+        if (!isStr(cfg.network.stability)) return cfgError('Поле network.stability отсутствует или неверного типа');
 
-        // Старый формат availability.weight → новый формат
-        if (typeof avail.log10_multiplier !== 'number') {
-            if (typeof avail.weight === 'number') {
-                avail.log10_multiplier = 12 * avail.weight;
-            } else {
-                const w = (rules.weights?.availability || 70) / 100;
-                avail.log10_multiplier = 12 * w;
+        if (!Array.isArray(cfg.parameter_priority) || cfg.parameter_priority.length === 0) return cfgError('Поле parameter_priority должно быть непустым массивом');
+        if (!Array.isArray(cfg.audio_track_priority) || cfg.audio_track_priority.length === 0) return cfgError('Поле audio_track_priority должно быть непустым массивом');
+        // Строго: только числовые id из AUDIO_TRACKS
+        for (const v of cfg.audio_track_priority) {
+            if (!(typeof v === 'number' && Number.isFinite(v))) {
+                return cfgError('Поле audio_track_priority должно содержать только числовые id озвучек (без строковых названий)');
+            }
+            // AUDIO_TRACK_BY_ID инициализируется ниже вместе с AUDIO_TRACKS; здесь используем как справочник валидности id
+            if (!AUDIO_TRACK_BY_ID || (AUDIO_TRACK_BY_ID.has && !AUDIO_TRACK_BY_ID.has(v))) {
+                return cfgError('Поле audio_track_priority содержит неизвестный id озвучки');
             }
         }
-        if (typeof avail.below_min_penalty !== 'number') {
-            // Раньше штраф зависел от приоритета availability. Сохраним это при миграции.
-            const idx = out.parameter_priority.indexOf('availability');
-            const basePenalty = idx === 0 ? -80 : (idx === 1 ? -40 : -20);
-            const w = (typeof avail.weight === 'number' ? avail.weight : ((rules.weights?.availability || 70) / 100));
-            avail.below_min_penalty = basePenalty * w;
+
+        if (!isObj(cfg.preferences)) return cfgError('Поле preferences отсутствует или неверного типа');
+        if (!isNumOrInt(cfg.preferences.min_seeds)) return cfgError('Поле preferences.min_seeds должно быть числом');
+        if (!isNumOrInt(cfg.preferences.recommendation_count)) return cfgError('Поле preferences.recommendation_count должно быть числом');
+        if (!Array.isArray(cfg.preferences.languages) || cfg.preferences.languages.length === 0) {
+            return cfgError('Поле preferences.languages должно быть непустым массивом (например ["rus","eng"])');
         }
-        // убираем старое поле, чтобы не путало
-        if ('weight' in avail) delete avail.weight;
-
-        // bitrate_bonus: в 2.1 бонусы уже финальные (взвешенные), и есть missing_penalty
-        if (!rules.bitrate_bonus || typeof rules.bitrate_bonus !== 'object') rules.bitrate_bonus = {};
-        const br = rules.bitrate_bonus;
-        if (!Array.isArray(br.thresholds)) br.thresholds = DEFAULT_CONFIG.scoring_rules.bitrate_bonus.thresholds;
-
-        // Миграция старого формата: thresholds были "сырые", а вес лежал в bitrate_bonus.weight / weights.bitrate
-        const hasOldWeight = typeof br.weight === 'number' || (rules.weights && typeof rules.weights.bitrate === 'number');
-        const needMigrateThresholds = !isNew && hasOldWeight;
-        if (needMigrateThresholds) {
-            const w = typeof br.weight === 'number' ? br.weight : ((rules.weights?.bitrate || 55) / 100);
-            br.thresholds = br.thresholds.map(t => ({
-                min: t.min,
-                max: t.max,
-                bonus: (typeof t.bonus === 'number' ? t.bonus : 0) * w
-            }));
+        for (const l of cfg.preferences.languages) {
+            if (typeof l !== 'string' || !l.trim()) return cfgError('Поле preferences.languages должно содержать только строки');
         }
-        if (typeof br.missing_penalty !== 'number') {
-            const idx = out.parameter_priority.indexOf('bitrate');
-            const basePenalty = idx === 0 ? -50 : (idx === 1 ? -30 : -15);
-            const w = (typeof br.weight === 'number' ? br.weight : ((rules.weights?.bitrate || 55) / 100));
-            br.missing_penalty = basePenalty * w;
+
+        if (!isObj(cfg.scoring_rules)) return cfgError('Поле scoring_rules отсутствует или неверного типа');
+        const r = cfg.scoring_rules;
+        if (String(r.schema || '') !== '2.1') return cfgError('Поле scoring_rules.schema должно быть "2.1"');
+        if (!isNumOrInt(r.base_score)) return cfgError('Поле scoring_rules.base_score должно быть числом');
+
+        if (!isObj(r.resolution)) return cfgError('Поле scoring_rules.resolution отсутствует или неверного типа');
+        if (!isObj(r.hdr)) return cfgError('Поле scoring_rules.hdr отсутствует или неверного типа');
+
+        if (!isObj(r.bitrate_bonus)) return cfgError('Поле scoring_rules.bitrate_bonus отсутствует или неверного типа');
+        if (!Array.isArray(r.bitrate_bonus.thresholds)) return cfgError('Поле scoring_rules.bitrate_bonus.thresholds должно быть массивом');
+        if (!isNumOrInt(r.bitrate_bonus.missing_penalty)) return cfgError('Поле scoring_rules.bitrate_bonus.missing_penalty должно быть числом');
+        for (const t of r.bitrate_bonus.thresholds) {
+            if (!isObj(t)) return cfgError('Элементы scoring_rules.bitrate_bonus.thresholds должны быть объектами');
+            if (!isNumOrInt(t.min) || !isNumOrInt(t.max) || !isNumOrInt(t.bonus)) {
+                return cfgError('thresholds: каждый элемент должен содержать числовые поля min/max/bonus');
+            }
         }
-        if ('weight' in br) delete br.weight;
 
-        // audio_track: в 2.1 используем нормализованный скоринг (не зависит от длины списка)
-        if (!rules.audio_track || typeof rules.audio_track !== 'object') rules.audio_track = {};
-        const at = rules.audio_track;
-        if (typeof at.curve !== 'string') at.curve = 'linear';
-        if (typeof at.max_points !== 'number') {
-            const w = (rules.weights?.audio_track || 100) / 100;
-            at.max_points = 100 * w;
+        if (!isObj(r.availability)) return cfgError('Поле scoring_rules.availability отсутствует или неверного типа');
+        if (!isNumOrInt(r.availability.min_seeds)) return cfgError('Поле scoring_rules.availability.min_seeds должно быть числом');
+        if (!isNumOrInt(r.availability.below_min_penalty)) return cfgError('Поле scoring_rules.availability.below_min_penalty должно быть числом');
+        if (!isNumOrInt(r.availability.log10_multiplier)) return cfgError('Поле scoring_rules.availability.log10_multiplier должно быть числом');
+
+        if (!isObj(r.audio_track)) return cfgError('Поле scoring_rules.audio_track отсутствует или неверного типа');
+        if (!isStr(r.audio_track.curve)) return cfgError('Поле scoring_rules.audio_track.curve должно быть строкой');
+        if (!isNumOrInt(r.audio_track.max_points)) return cfgError('Поле scoring_rules.audio_track.max_points должно быть числом');
+
+        if (!isObj(r.audio_quality)) return cfgError('Поле scoring_rules.audio_quality отсутствует или неверного типа');
+        if (!isObj(r.audio_quality.points)) return cfgError('Поле scoring_rules.audio_quality.points отсутствует или неверного типа');
+
+        if (r.special_rules !== undefined && !Array.isArray(r.special_rules)) {
+            return cfgError('Поле scoring_rules.special_rules должно быть массивом (или отсутствовать)');
         }
-        if ('weight' in at) delete at.weight;
 
-        // audio_quality: раньше была только weight. Теперь явная таблица.
-        if (!rules.audio_quality || typeof rules.audio_quality !== 'object') rules.audio_quality = {};
-        const aq = rules.audio_quality;
-        if (!aq.points || typeof aq.points !== 'object') {
-            const w = (rules.weights?.audio_quality || 25) / 100;
-            aq.points = {
-                dolby_atmos: 80 * w,
-                surround_71: 60 * w,
-                surround_51: 40 * w,
-                // стерео считаем базовым — 0 очков
-                stereo: 0,
-                unknown: 0
-            };
+        return { ok: true };
+    }
+
+    function openEasyTorrentSettingsFromModal(prevController) {
+        try {
+            Lampa.Modal.close();
+        } catch (e) {}
+
+        // Возвращаемся в настройки и открываем компонент
+        Lampa.Controller.toggle('settings');
+        setTimeout(() => {
+            if (Lampa.Settings && typeof Lampa.Settings.create === 'function') {
+                Lampa.Settings.create('easytorrent', {
+                    onBack: () => {
+                        Lampa.Controller.toggle('settings');
+                    }
+                });
+            }
+        }, 50);
+    }
+
+    function showStartupModalIfNeeded() {
+        // На странице Extensions модалки не показываем вообще (покажем позже scheduler'ом)
+        if (isExtensionsScreen()) return false;
+
+        const prev = (Lampa.Controller && typeof Lampa.Controller.enabled === 'function' && Lampa.Controller.enabled())
+            ? Lampa.Controller.enabled().name
+            : 'content';
+
+        // Если окружение ещё не готово (контроллер/Modal/$), не ставим флаги — просто попробуем позже
+        const canOpen =
+            !!(window.Lampa && Lampa.Modal && typeof Lampa.Modal.open === 'function') &&
+            !!(window.Lampa && Lampa.Controller && typeof Lampa.Controller.toggle === 'function') &&
+            (typeof $ === 'function');
+
+        if (!canOpen) return false;
+
+        // 1) Обновление (если конфиг есть, но отклонён/не поддерживается)
+        if (shouldShowUpdateModalV110 && !Lampa.Storage.get(STORAGE_MODAL_UPDATE_V110, false)) {
+            const html = $(`
+                <div class="about">
+                    <div class="about__text">
+                        <div><strong>Что изменилось:</strong></div>
+                        <ol>
+                            <li>Исправлены баги рассчета рейтинга </li>
+                            <li>Добавлены баллы за качество звука (Atmos / 7.1 / 5.1)</li>
+                            <li>Улучшены расчёты битрейта и работа с сериалами.</li>
+                        </ol>
+                        <p style="padding: 0.75em 0.9em; border-radius: 0.6em; background: rgba(255,193,7,0.14); border: 1px solid rgba(255,193,7,0.35);">
+                            <strong style="color: #ffc107;">⚠️ ВАЖНО:</strong>
+                            Конфиг сброшен на дефолтную конфигурацию из-за несовместимости. Нужно настроить заново.
+                        </p>
+                        <p><strong>Текущая конфигурация:</strong></p>
+                        <ul>
+                            <li>Устройство: <strong>FHD (1080p)</strong></li>
+                            <li>HDR: <strong>выключен (SDR)</strong></li>
+                            <li>Звук: <strong>стерео</strong> (без 5.1/7.1/Atmos)</li>
+                            <li>Приоритеты: <strong>Озвучка → Разрешение → Сиды → Битрейт</strong></li>
+                            <li>Мин. сидов: <strong>${DEFAULT_CONFIG.preferences.min_seeds}</strong>, рекомендаций: <strong>${DEFAULT_CONFIG.preferences.recommendation_count}</strong></li>
+                        </ul>
+                        <p>
+                            Для нормальной работы рекомендуеться заново настроить приоритеты:
+                            <br><strong>Настройки → EasyTorrent → “Расставить приоритеты”</strong>
+                        </p>
+                    </div>
+                </div>
+            `);
+
+            try {
+                Lampa.Modal.open({
+                    title: `Обновление EasyTorrent v${VERSION}`,
+                    size: 'large',
+                    html: html,
+                    mask: true,
+                    buttons_position: 'outside',
+                    buttons: [
+                        {
+                            name: 'Открыть настройки',
+                            onSelect: () => openEasyTorrentSettingsFromModal(prev)
+                        },
+                        {
+                            name: 'Закрыть',
+                            onSelect: () => {
+                                Lampa.Modal.close();
+                                Lampa.Controller.toggle(prev);
+                            }
+                        }
+                    ],
+                    onBack: () => {
+                        Lampa.Modal.close();
+                        Lampa.Controller.toggle(prev);
+                    }
+                });
+
+                // Ставим флаг ТОЛЬКО после успешного открытия
+                Lampa.Storage.set(STORAGE_MODAL_UPDATE_V110, true);
+                return true;
+            } catch (e) {
+                console.error('[EasyTorrent] Modal.open failed:', e);
+                return false;
+            }
         }
-        if ('weight' in aq) delete aq.weight;
 
-        // special_rules: если нет — просто не применяем
-        if (!Array.isArray(rules.special_rules)) rules.special_rules = [];
+        // 2) Первый запуск (нет сохраненного конфига)
+        if (shouldShowWelcomeModal && !Lampa.Storage.get(STORAGE_MODAL_WELCOME, false)) {
+            const html = $(`
+                <div class="about">
+                    <div class="about__text">
+                        <div>
+                            Для нормальной работы нужно настроить приоритеты (озвучки/качество/сиды и т.д.).
+                        </div>
+                        <p>
+                            Сейчас установлена конфигурация по умолчанию:
+                        </p>
+                        <ul>
+                            <li>Устройство: <strong>FHD (1080p)</strong></li>
+                            <li>HDR: <strong>выключен (SDR)</strong></li>
+                            <li>Звук: <strong>стерео</strong> (без 5.1/7.1/Atmos)</li>
+                            <li>Приоритеты: <strong>Озвучка → Разрешение → Сиды → Битрейт</strong></li>
+                            <li>Мин. сидов: <strong>${DEFAULT_CONFIG.preferences.min_seeds}</strong>, рекомендаций: <strong>${DEFAULT_CONFIG.preferences.recommendation_count}</strong></li>
+                        </ul>
+                        <p>
+                            Перейдите:
+                            <br><strong>Настройки → EasyTorrent → “Расставить приоритеты”</strong>
+                            <br>и пройдите настройку на своем телефоне через QR.
+                        </p>
+                    </div>
+                </div>
+            `);
 
-        // Подписываем схему (чтобы понимать, что уже нормализовано)
-        rules.schema = '2.1';
-        return out;
+            try {
+                Lampa.Modal.open({
+                    title: `EasyTorrent установлен (v${VERSION})`,
+                    size: 'large',
+                    html: html,
+                    mask: true,
+                    buttons_position: 'outside',
+                    buttons: [
+                        {
+                            name: 'Открыть настройки',
+                            onSelect: () => openEasyTorrentSettingsFromModal(prev)
+                        },
+                        {
+                            name: 'Закрыть',
+                            onSelect: () => {
+                                Lampa.Modal.close();
+                                Lampa.Controller.toggle(prev);
+                            }
+                        }
+                    ],
+                    onBack: () => {
+                        Lampa.Modal.close();
+                        Lampa.Controller.toggle(prev);
+                    }
+                });
+
+                // Ставим флаг ТОЛЬКО после успешного открытия
+                Lampa.Storage.set(STORAGE_MODAL_WELCOME, true);
+                return true;
+            } catch (e) {
+                console.error('[EasyTorrent] Modal.open failed:', e);
+                return false;
+            }
+        }
+
+        return false;
     }
 
     function loadUserConfig() {
-        const savedConfig = Lampa.Storage.get('easytorrent_config_json');
+        const savedConfig = Lampa.Storage.get(STORAGE_CONFIG_KEY);
         if (savedConfig) {
             try {
                 const parsed = typeof savedConfig === 'string' ? JSON.parse(savedConfig) : savedConfig;
-                if (parsed && String(parsed.version || '').startsWith('2')) {
-                    USER_CONFIG = normalizeConfig(parsed);
+                const check = validateConfig(parsed);
+                if (check.ok) {
+                    USER_CONFIG = parsed;
                     return;
                 }
-            } catch (e) {}
+
+                // Конфиг есть, но неправильный — не трогаем его, просто сообщаем и работаем на дефолте.
+                shouldShowUpdateModalV110 = true;
+                // По факту: чтобы не зацикливать "приветственную" и не держать битый конфиг, кладём дефолт в storage.
+                applyDefaultConfigAndPersist();
+                console.warn('[EasyTorrent] Конфиг отклонён:', check.error);
+                return; // важно: не показываем welcome, т.к. конфиг "был", но отклонён
+            } catch (e) {
+                // Конфиг есть, но не парсится (битый JSON) — это не "первый запуск"
+                shouldShowUpdateModalV110 = true;
+                applyDefaultConfigAndPersist();
+                console.warn('[EasyTorrent] Конфиг повреждён и не может быть прочитан:', e);
+                return;
+            }
         }
-        USER_CONFIG = normalizeConfig(JSON.parse(JSON.stringify(DEFAULT_CONFIG)));
+        // Первый запуск: ставим дефолт и показываем подсказку (1 раз)
+        shouldShowWelcomeModal = true;
+        applyDefaultConfigAndPersist();
     }
 
     function saveUserConfig(config) {
         const stringConfig = typeof config === 'string' ? config : JSON.stringify(config);
-        Lampa.Storage.set('easytorrent_config_json', stringConfig);
+        // Сначала валидируем. Ничего "за пользователя" не исправляем.
         try {
-            USER_CONFIG = normalizeConfig(JSON.parse(stringConfig));
+            const parsed = JSON.parse(stringConfig);
+            const check = validateConfig(parsed);
+            if (!check.ok) {
+                Lampa.Noty && Lampa.Noty.show ? Lampa.Noty.show(check.error) : alert(check.error);
+                // Не сохраняем и не применяем.
+                return;
+            }
+
+            Lampa.Storage.set(STORAGE_CONFIG_KEY, stringConfig);
+            USER_CONFIG = parsed;
         } catch (e) {
-            USER_CONFIG = normalizeConfig(JSON.parse(JSON.stringify(DEFAULT_CONFIG)));
+            USER_CONFIG = deepClone(DEFAULT_CONFIG);
         }
     }
 
@@ -248,6 +556,7 @@
             { title: 'Тип устройства', subtitle: cfg.device.type.toUpperCase(), noselect: true },
             { title: 'Поддержка HDR', subtitle: cfg.device.supported_hdr.join(', ') || 'нет', noselect: true },
             { title: 'Поддержка звука', subtitle: cfg.device.supported_audio.join(', ') || 'стерео', noselect: true },
+            { title: 'Языки аудио', subtitle: (cfg.preferences && Array.isArray(cfg.preferences.languages) ? cfg.preferences.languages.join(', ') : 'не задано'), noselect: true },
             { title: 'Приоритет параметров', subtitle: cfg.parameter_priority.join(' > '), noselect: true },
             { title: 'Приоритет озвучек', subtitle: `${cfg.audio_track_priority.length} шт. • Нажмите для просмотра`, action: 'show_voices' },
             { title: 'Минимально сидов', subtitle: cfg.preferences.min_seeds, noselect: true },
@@ -270,14 +579,24 @@
 
     function showVoicePriority() {
         const cfg = USER_CONFIG;
-        const items = cfg.audio_track_priority.map((voice, index) => ({
-            title: `${index + 1}. ${voice}`,
+        const items = cfg.audio_track_priority.map((voice, index) => {
+            const id = normalizeAudioTrackIdOrNull(voice);
+            const name = (typeof id === 'number' && AUDIO_TRACK_BY_ID.get(id))
+                ? AUDIO_TRACK_BY_ID.get(id).name
+                : String(voice);
+            return {
+                title: `${index + 1}. ${name}`,
+                noselect: true
+            };
+        });
+        const safeItems = items.length ? items : [{
+            title: 'Пусто',
             noselect: true
-        }));
+        }];
 
         Lampa.Select.show({
             title: 'Приоритет озвучек',
-            items: items,
+            items: safeItems,
             onBack: () => {
                 showConfigDetails();
             }
@@ -321,8 +640,33 @@
      * Определение HDR типа (выбирает лучший из найденных)
      */
     function detectHdr(item) {
+        // 0) Если парсер уже определил тип видео — доверяем ему (это надёжнее, чем эвристики по названию)
+        // Примеры: info.videotype = 'sdr' | 'hdr10' | 'hdr10plus' | 'dolby_vision'
+        const vi = item && item.info && (item.info.videotype || item.info.video_type || item.info.hdr);
+        if (typeof vi === 'string' && vi) {
+            const v = vi.toLowerCase();
+            if (v === 'sdr') return 'sdr';
+            if (v === 'hdr10') return 'hdr10';
+            if (v === 'hdr10plus' || v === 'hdr10+') return 'hdr10plus';
+            if (v === 'dolby_vision' || v === 'dovi' || v === 'dv') return 'dolby_vision';
+            if (v === 'hdr') return 'hdr10'; // общий маркер без уточнения
+        }
+
         const title = (item.Title || item.title || '').toLowerCase();
         const foundTypes = [];
+
+        // HDR-токены должны быть "отдельными": без букв/цифр слева/справа.
+        // Это защищает от ложных срабатываний типа "HDRezka" (hdr+буква) и подобных.
+        const hasToken = (tokenPattern) => {
+            try {
+                const re = new RegExp(`(?:^|[^\\p{L}\\p{N}])(?:${tokenPattern})(?=$|[^\\p{L}\\p{N}])`, 'iu');
+                return re.test(title);
+            } catch (e) {
+                // fallback без \p{L}\p{N}
+                const re = new RegExp(`(?:^|[^a-z0-9_])(?:${tokenPattern})(?=$|[^a-z0-9_])`, 'i');
+                return re.test(title);
+            }
+        };
         
         // Из ffprobe
         if (item.ffprobe && Array.isArray(item.ffprobe)) {
@@ -337,19 +681,22 @@
         }
         
         // Из названия - собираем ВСЕ найденные типы (от специфичного к общему)
-        if (title.includes('hdr10+') || title.includes('hdr10plus') || title.includes('hdr10 plus')) {
+        // HDR10+ / HDR10PLUS
+        if (hasToken('hdr10\\+') || hasToken('hdr10plus') || hasToken('hdr10\\s*plus')) {
             if (!foundTypes.includes('hdr10plus')) foundTypes.push('hdr10plus');
         }
-        if (title.includes('hdr10') || /hdr-?10/.test(title)) {
+        // HDR10 (важно: не матчится внутри HDR10PLUS из-за token-границ)
+        if (hasToken('hdr-?10') || hasToken('hdr10')) {
             if (!foundTypes.includes('hdr10')) foundTypes.push('hdr10');
         }
         if (title.includes('dolby vision') || title.includes('dovi') || /\sp8\s/.test(title) || /\(dv\)/.test(title) || /\[dv\]/.test(title) || /\sdv\s/.test(title) || /,\s*dv\s/.test(title)) {
             if (!foundTypes.includes('dolby_vision')) foundTypes.push('dolby_vision');
         }
-        if ((/\bhdr\b/.test(title) || title.includes('[hdr]') || title.includes('(hdr)') || title.includes(', hdr')) && !foundTypes.includes('hdr10plus') && !foundTypes.includes('hdr10')) {
+        // Общий HDR-маркер (только как отдельный токен: /HDR/, |HDR|, [HDR], (HDR), " HDR ")
+        if (hasToken('hdr') && !foundTypes.includes('hdr10plus') && !foundTypes.includes('hdr10')) {
             foundTypes.push('hdr10');
         }
-        if (title.includes('sdr') || title.includes('[sdr]') || title.includes('(sdr)')) {
+        if (hasToken('sdr')) {
             if (!foundTypes.includes('sdr')) foundTypes.push('sdr');
         }
         
@@ -357,12 +704,7 @@
         if (foundTypes.length === 0) return 'sdr';
         
         // Выбираем ЛУЧШИЙ тип по значению из конфига
-        const hdrScores = USER_CONFIG.scoring_rules?.hdr || {
-            'dolby_vision': 24,
-            'hdr10plus': 40,
-            'hdr10': 32,
-            'sdr': -14
-        };
+        const hdrScores = USER_CONFIG.scoring_rules.hdr;
         
         let bestType = foundTypes[0];
         let bestScore = hdrScores[bestType] || 0;
@@ -973,21 +1315,16 @@ function normalizeTitle(input) {
         }
 
         // 2. Дополняем озвучками из названия
-        for (const type in AUDIO_TRACK_ALIASES) {
-            if (foundAudio.includes(type)) continue;
-            
-            const aliases = AUDIO_TRACK_ALIASES[type];
-            const match = aliases.some(alias => {
-                const aliasLower = alias.toLowerCase();
-                if (aliasLower.length <= 3) {
-                    const reg = new RegExp('\\b' + aliasLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
-                    return reg.test(title);
-                }
-                return title.includes(aliasLower);
-            });
+        AUDIO_TRACKS.forEach(tr => {
+            if (foundAudio.includes(tr.id)) return;
 
-            if (match) foundAudio.push(type);
-        }
+            // Для общего "Дубляж" из названия не пытаемся угадать язык/студию (слишком много ложных срабатываний)
+            if (tr.id === 0 || tr.id === 1) return;
+
+            const aliases = Array.isArray(tr.aliases) ? tr.aliases : [];
+            const match = aliases.some(alias => matchAliasInText(title, alias));
+            if (match) foundAudio.push(tr.id);
+        });
 
         return {
             resolution: detectResolution(item),
@@ -1002,75 +1339,183 @@ function normalizeTitle(input) {
     // РАЗДЕЛ 3: МАГИЯ СКОРИНГА И РЕКОМЕНДАЦИЙ
     // ═══════════════════════════════════════════════════════════════════
 
-    // Алиасы для озвучек (используем в коде для сопоставления)
-    const AUDIO_TRACK_ALIASES = {
-        'Дубляж RU': ['дубляж', 'дб', 'd', 'dub'],
-        'Дубляж UKR': ['ukr'],
-        'Дубляж Пифагор': ['пифагор'],
-        'Дубляж Red Head Sound': ['red head sound', 'rhs'],
-        'Дубляж Videofilm': ['videofilm'],
-        'Дубляж MovieDalen': ['moviedalen'],
-        'Дубляж LeDoyen': ['ledoyen'],
-        'Дубляж Whiskey Sound': ['whiskey sound'],
-        'Дубляж IRON VOICE': ['iron voice'],
-        'Дубляж AlexFilm': ['alexfilm'],
-        'Дубляж Amedia': ['amedia'],
-        'MVO HDRezka': ['hdrezka', 'hdrezka studio'],
-        'MVO LostFilm': ['lostfilm'],
-        'MVO TVShows': ['tvshows', 'tv shows'],
-        'MVO Jaskier': ['jaskier'],
-        'MVO RuDub': ['rudub'],
-        'MVO LE-Production': ['le-production'],
-        'MVO Кубик в Кубе': ['кубик в кубе'],
-        'MVO NewStudio': ['newstudio'],
-        'MVO Good People': ['good people'],
-        'MVO IdeaFilm': ['ideafilm'],
-        'MVO AMS': ['ams'],
-        'MVO Baibako': ['baibako'],
-        'MVO Profix Media': ['profix media'],
-        'MVO NewComers': ['newcomers'],
-        'MVO GoLTFilm': ['goltfilm'],
-        'MVO JimmyJ': ['jimmyj'],
-        'MVO Kerob': ['kerob'],
-        'MVO LakeFilms': ['lakefilms'],
-        'MVO Novamedia': ['novamedia'],
-        'MVO Twister': ['twister'],
-        'MVO Voice Project': ['voice project'],
-        'MVO Dragon Money Studio': ['dragon money', 'dms'],
-        'MVO Syncmer': ['syncmer'],
-        'MVO ColdFilm': ['coldfilm'],
-        'MVO SunshineStudio': ['sunshinestudio'],
-        'MVO Ultradox': ['ultradox'],
-        'MVO Octopus': ['octopus'],
-        'MVO OMSKBIRD': ['omskbird records', 'omskbird'],
-        'AVO Володарский': ['володарский'],
-        'AVO Яроцкий': ['яроцкий', 'м. яроцкий'],
-        'AVO Сербин': ['сербин', 'ю. сербин'],
-        'PRO Gears Media': ['gears media'],
-        'PRO Hamsterstudio': ['hamsterstudio', 'hamster'],
-        'PRO P.S.Energy': ['p.s.energy'],
-        'UKR НеЗупиняйПродакшн': ['незупиняйпродакшн'],
-        'Original': ['original']
+    const AUDIO_LANGUAGES = {
+        'rus': ['rus', 'ru', 'russian'],
+        'ukr': ['ukr', 'ua', 'ukrainian'],
+        'eng': ['eng', 'en', 'english', 'und']
     };
+
+    // Быстрый маппинг "любой код языка" -> канонический ключ (rus/ukr/eng)
+    const AUDIO_LANG_CANON_BY_CODE = (() => {
+        const map = Object.create(null);
+        Object.keys(AUDIO_LANGUAGES).forEach(k => {
+            (AUDIO_LANGUAGES[k] || []).forEach(code => {
+                map[String(code).toLowerCase()] = k;
+            });
+        });
+        // канонические ключи тоже считаем валидными
+        Object.keys(AUDIO_LANGUAGES).forEach(k => (map[k] = k));
+        return map;
+    })();
+
+    function canonicalizeAudioLanguage(lang) {
+        if (!lang) return null;
+        const s = String(lang).toLowerCase();
+        return AUDIO_LANG_CANON_BY_CODE[s] || s;
+    }
+
+    function getAllowedAudioLanguagesSet() {
+        const arr = USER_CONFIG && USER_CONFIG.preferences && Array.isArray(USER_CONFIG.preferences.languages)
+            ? USER_CONFIG.preferences.languages
+            : [];
+        const set = new Set();
+        arr.forEach(l => {
+            const c = canonicalizeAudioLanguage(l);
+            if (c) set.add(c);
+        });
+        return set;
+    }
+
+    /**
+     * Единая модель "озвучек" (аудио-треков).
+     * Важно: одна и та же студия может встречаться в разных языках.
+     *
+     * - id: стабильный ключ (используется внутри features)
+     * - type: DVO/MVO/AVO/PRO/ORIG и т.п.
+     * - name: отображаемое имя
+     * - aliases: алиасы/маркерные строки (для распознавания из ffprobe/title)
+     * - languages: список языков (ISO-639-2/коды)
+     */
+    const AUDIO_TRACKS = [
+        { id: 0, type: 'DVO', name: 'Дубляж RU', aliases: ['дб', 'дубляж', 'dub'], languages: ['rus'] },
+        { id: 1, type: 'DVO', name: 'Дубляж UKR', aliases: ['ukr', 'ua', 'укр', 'укра', 'дубляж'], languages: ['ukr'] },
+
+        { id: 2, type: 'DVO', name: 'Дубляж Пифагор', aliases: ['пифагор'], languages: ['rus'] },
+        { id: 3, type: 'DVO', name: 'Дубляж Red Head Sound', aliases: ['red head sound', 'rhs'], languages: ['rus'] },
+        { id: 4, type: 'DVO', name: 'Дубляж Videofilm', aliases: ['videofilm'], languages: ['rus'] },
+        { id: 5, type: 'DVO', name: 'Дубляж MovieDalen', aliases: ['moviedalen'], languages: ['rus'] },
+        { id: 6, type: 'DVO', name: 'Дубляж LeDoyen', aliases: ['ledoyen'], languages: ['rus'] },
+        { id: 7, type: 'DVO', name: 'Дубляж Whiskey Sound', aliases: ['whiskey sound'], languages: ['rus'] },
+        { id: 8, type: 'DVO', name: 'Дубляж IRON VOICE', aliases: ['iron voice'], languages: ['rus'] },
+        { id: 9, type: 'DVO', name: 'Дубляж AlexFilm', aliases: ['alexfilm'], languages: ['rus'] },
+        { id: 10, type: 'DVO', name: 'Дубляж Amedia', aliases: ['amedia'], languages: ['rus'] },
+
+        { id: 11, type: 'MVO', name: 'MVO HDRezka', aliases: ['hdrezka', 'rezka', 'hdrezka studio', 'rezka studio'], languages: ['rus', 'ukr'] },
+        { id: 12, type: 'MVO', name: 'MVO LostFilm', aliases: ['lostfilm', 'lf'], languages: ['rus'] },
+        { id: 13, type: 'MVO', name: 'MVO TVShows', aliases: ['tvshows', 'tv shows'], languages: ['rus'] },
+        { id: 14, type: 'MVO', name: 'MVO Jaskier', aliases: ['jaskier', 'жаскир'], languages: ['rus'] },
+        { id: 15, type: 'MVO', name: 'MVO RuDub', aliases: ['rudub'], languages: ['rus'] },
+        { id: 16, type: 'MVO', name: 'MVO LE-Production', aliases: ['le-production', 'le production'], languages: ['rus'] },
+        { id: 17, type: 'MVO', name: 'MVO Кубик в Кубе', aliases: ['кубик в кубе'], languages: ['rus'] },
+        { id: 18, type: 'MVO', name: 'MVO NewStudio', aliases: ['newstudio', 'new studio', 'нью студио'], languages: ['rus'] },
+        { id: 19, type: 'MVO', name: 'MVO Good People', aliases: ['good people'], languages: ['rus'] },
+        { id: 20, type: 'MVO', name: 'MVO IdeaFilm', aliases: ['ideafilm', 'idea film'], languages: ['rus'] },
+        { id: 21, type: 'MVO', name: 'MVO AMS', aliases: ['ams'], languages: ['rus'] },
+        { id: 22, type: 'MVO', name: 'MVO Baibako', aliases: ['baibako'], languages: ['rus'] },
+        { id: 23, type: 'MVO', name: 'MVO Profix Media', aliases: ['profix media', 'profix'], languages: ['rus'] },
+        { id: 24, type: 'MVO', name: 'MVO NewComers', aliases: ['newcomers', 'new comers'], languages: ['rus'] },
+        { id: 25, type: 'MVO', name: 'MVO GoLTFilm', aliases: ['goltfilm', 'golt film'], languages: ['rus'] },
+        { id: 26, type: 'MVO', name: 'MVO JimmyJ', aliases: ['jimmyj', 'jimmy j'], languages: ['rus'] },
+        { id: 27, type: 'MVO', name: 'MVO Kerob', aliases: ['kerob'], languages: ['rus'] },
+        { id: 28, type: 'MVO', name: 'MVO LakeFilms', aliases: ['lakefilms', 'lake films'], languages: ['rus'] },
+       
+        { id: 29, type: 'MVO', name: 'MVO Twister', aliases: ['twister'], languages: ['rus'] },
+        { id: 30, type: 'MVO', name: 'MVO Voice Project', aliases: ['voice project'], languages: ['rus'] },
+        { id: 31, type: 'MVO', name: 'MVO Dragon Money Studio', aliases: ['dragon money', 'dms'], languages: ['rus'] },
+        { id: 32, type: 'MVO', name: 'MVO Syncmer', aliases: ['syncmer'], languages: ['rus'] },
+        { id: 33, type: 'MVO', name: 'MVO ColdFilm', aliases: ['coldfilm', 'cold film'], languages: ['rus'] },
+        { id: 34, type: 'MVO', name: 'MVO SunshineStudio', aliases: ['sunshinestudio', 'sunshine studio'], languages: ['rus'] },
+        { id: 35, type: 'MVO', name: 'MVO Ultradox', aliases: ['ultradox'], languages: ['rus'] },
+        { id: 36, type: 'MVO', name: 'MVO Octopus', aliases: ['octopus'], languages: ['rus'] },
+        { id: 37, type: 'MVO', name: 'MVO OMSKBIRD', aliases: ['omskbird records', 'omskbird'], languages: ['rus'] },
+
+        { id: 38, type: 'AVO', name: 'AVO Володарский', aliases: ['володарский'], languages: ['rus'] },
+        { id: 39, type: 'AVO', name: 'AVO Яроцкий', aliases: ['яроцкий', 'м. яроцкий'], languages: ['rus'] },
+        { id: 40, type: 'AVO', name: 'AVO Сербин', aliases: ['сербин', 'ю. сербин'], languages: ['rus'] },
+
+        { id: 41, type: 'PRO', name: 'PRO Gears Media', aliases: ['gears media'], languages: ['rus'] },
+        { id: 42, type: 'PRO', name: 'PRO Hamsterstudio', aliases: ['hamsterstudio', 'hamster'], languages: ['rus'] },
+        { id: 43, type: 'PRO', name: 'PRO P.S.Energy', aliases: ['p.s.energy', 'ps energy', 'p s energy'], languages: ['rus'] },
+
+        { id: 44, type: 'UKR', name: 'UKR НеЗупиняйПродакшн', aliases: ['незупиняйпродакшн', 'незупиняй', 'nezupyniai'], languages: ['ukr'] },
+
+        { id: 45, type: 'ORIG', name: 'Original', aliases: ['original', 'eng', 'english'], languages: ['eng'] }
+    ];
+
+    // Оптимизация: используем Map под числовые id и быстрый поиск по name
+    const AUDIO_TRACK_BY_ID = new Map();              // id:number -> track
+    const AUDIO_TRACK_ID_BY_NAME = new Map();         // nameLower:string -> id:number
+    const AUDIO_TRACK_NAMES = new Set();              // name:string
+
+    AUDIO_TRACKS.forEach(t => {
+        AUDIO_TRACK_BY_ID.set(t.id, t);
+        AUDIO_TRACK_ID_BY_NAME.set(String(t.name || '').toLowerCase(), t.id);
+        AUDIO_TRACK_NAMES.add(t.name);
+    });
+
+    function normalizeAudioTrackIdOrNull(key) {
+        if (key === null || key === undefined) return null;
+
+        // Уже числовой id
+        if (typeof key === 'number' && Number.isFinite(key)) {
+            return AUDIO_TRACK_BY_ID.has(key) ? key : null;
+        }
+
+        const s = String(key).trim();
+        if (!s) return null;
+
+        // Строковый числовой id
+        if (/^\d+$/.test(s)) {
+            const n = parseInt(s, 10);
+            return AUDIO_TRACK_BY_ID.has(n) ? n : null;
+        }
+
+        // Имя трека из конфига
+        const byName = AUDIO_TRACK_ID_BY_NAME.get(s.toLowerCase());
+        return (typeof byName === 'number') ? byName : null;
+    }
+
+    function matchAliasInText(text, alias) {
+        if (!text || !alias) return false;
+        const t = String(text).toLowerCase();
+        const a = String(alias).toLowerCase();
+        if (!a) return false;
+
+        // Короткие алиасы — только как отдельное слово
+        if (a.length <= 3) {
+            const escaped = a.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            try {
+                const re = new RegExp(`(?:^|[^\\p{L}\\p{N}])${escaped}(?=$|[^\\p{L}\\p{N}])`, 'iu');
+                return re.test(t);
+            } catch (e) {
+                const re = new RegExp(`(?:^|[^a-z0-9_])${escaped}(?=$|[^a-z0-9_])`, 'i');
+                return re.test(t);
+            }
+        }
+        return t.includes(a);
+    }
 
     /**
      * Сопоставление аудио-дорожки с типом из приоритета
      */
     function matchesAudioType(audioTrack, type) {
-        const trackLower = audioTrack.toLowerCase();
-        const aliases = AUDIO_TRACK_ALIASES[type] || [];
-        
-        // 1. Полнотекстовое совпадение с границами слов для коротких алиасов (типа 'd', 'db', 'ukr')
-        return aliases.some(alias => {
-            const aliasLower = alias.toLowerCase();
-            if (aliasLower.length <= 3) {
-                // Если алиас короткий, ищем его как отдельное слово
-                // Это предотвратит ложное срабатывание 'd' в слове 'ares'
-                const reg = new RegExp('\\b' + aliasLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
-                return reg.test(trackLower);
-            }
-            return trackLower.includes(aliasLower);
-        });
+        if (!audioTrack || !type) return false;
+
+        const trackId = normalizeAudioTrackIdOrNull(audioTrack);
+        const wantedId = normalizeAudioTrackIdOrNull(type);
+
+        // 1) Если оба значения нормализовались в id — сравниваем по id
+        if (trackId !== null && wantedId !== null) return trackId === wantedId;
+
+        // 2) Если приоритет не распознан — совпадение невозможно
+        if (wantedId === null) return false;
+
+        // 3) Backward-compat: если пришла "сырая" строка (не id/не name), пробуем сматчить по алиасам нужного трека
+        const wanted = AUDIO_TRACK_BY_ID.get(wantedId);
+        if (!wanted) return false;
+
+        const raw = String(audioTrack).toLowerCase();
+        return (wanted.aliases || []).some(alias => matchAliasInText(raw, alias));
     }
 
     /**
@@ -1079,37 +1524,38 @@ function normalizeTitle(input) {
     function analyzeAudioTrack(track) {
         const tags = track.tags || {};
         const title = (tags.title || tags.handler_name || '').toLowerCase();
-        const lang = (tags.language || '').toLowerCase();
+        const langRaw = (tags.language || '').toLowerCase();
+        const lang = canonicalizeAudioLanguage(langRaw);
         const foundTypes = [];
+        const allowedLangs = getAllowedAudioLanguagesSet();
 
-        // Проверяем каждую группу из нашего списка
-        for (const type in AUDIO_TRACK_ALIASES) {
-            const aliases = AUDIO_TRACK_ALIASES[type];
-            
-            // Спец-проверка для "Дубляж RU" через ffprobe теги
-            if (type === 'Дубляж RU' && (lang === 'rus' || lang === 'russian')) {
-                if (title.includes('dub') || title.includes('дубляж')) {
-                    foundTypes.push(type);
-                    continue;
-                }
+        // Если язык трека известен и он НЕ входит в разрешённые — не учитываем этот трек для скоринга озвучек.
+        if (lang && allowedLangs.size && !allowedLangs.has(lang)) {
+            return foundTypes;
+        }
+
+        AUDIO_TRACKS.forEach(tr => {
+            const aliases = Array.isArray(tr.aliases) ? tr.aliases : [];
+            const langs = Array.isArray(tr.languages) ? tr.languages : [];
+
+            // Если язык известен — требуем совместимость по языку
+            if (lang && langs.length) {
+                const okLang = langs.some(l => String(l).toLowerCase() === lang);
+                if (!okLang) return;
             }
 
-            // Обычная проверка по алиасам в названии дорожки или языке
-            const match = aliases.some(alias => {
-                const aliasLower = alias.toLowerCase();
-                // Если алиас совпадает с языком
-                if (aliasLower === lang) return true;
-                
-                // Если алиас есть в названии дорожки
-                if (aliasLower.length <= 3) {
-                    const reg = new RegExp('\\b' + aliasLower.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'i');
-                    return reg.test(title);
-                }
-                return title.includes(aliasLower);
-            });
+            // Сначала: алиас == lang (например 'ukr'), допускаем и raw-синонимы
+            const langMatch = lang
+                ? aliases.some(a => {
+                    const al = String(a).toLowerCase();
+                    return al === lang || (langRaw && al === langRaw);
+                })
+                : false;
+            // Потом: алиасы в названии/handler
+            const textMatch = aliases.some(a => matchAliasInText(title, a));
 
-            if (match) foundTypes.push(type);
-        }
+            if (langMatch || textMatch) foundTypes.push(tr.id);
+        });
         
         return foundTypes;
     }
@@ -1168,14 +1614,19 @@ function normalizeTitle(input) {
             score += bitrateScore;
             
             // 4) ОЗВУЧКА (нормализованный вклад, не зависит от длины списка)
-            const audioPriority = cfg.audio_track_priority || [];
-            const audioTracks = features.audio_tracks || [];
+            // Важно: здесь ожидаются ТОЛЬКО числовые id (и в cfg.audio_track_priority, и в features.audio_tracks).
+            const audioPriority = Array.isArray(cfg.audio_track_priority) ? cfg.audio_track_priority : [];
+            const audioTracks = Array.isArray(features.audio_tracks) ? features.audio_tracks : [];
             let audioScore = 0;
-            
-            for (let i = 0; i < audioPriority.length; i++) {
-                const priorityType = audioPriority[i];
-                const found = audioTracks.some(track => matchesAudioType(track, priorityType));
-                if (found) {
+
+            if (audioPriority.length && audioTracks.length) {
+                const trackSet = new Set(audioTracks.filter(v => typeof v === 'number' && Number.isFinite(v)));
+
+                for (let i = 0; i < audioPriority.length; i++) {
+                    const id = audioPriority[i];
+                    if (!(typeof id === 'number' && Number.isFinite(id))) continue;
+                    if (!trackSet.has(id)) continue;
+
                     const maxPoints = rules.audio_track && typeof rules.audio_track.max_points === 'number'
                         ? rules.audio_track.max_points
                         : 0;
@@ -1361,14 +1812,7 @@ function normalizeTitle(input) {
             return seeds >= minSeeds;
         });
         
-        // Сохраняем топ-N для внутреннего использования
-        topRecommendations = eligible.slice(0, recommendCount).map((t, rank) => ({
-            element: t.element,
-            rank: rank,
-            score: t.score,
-            features: t.features,
-            isIdeal: rank === 0 && t.score >= 150
-        }));
+        
 
         // Добавляем оценку ко ВСЕМ элементам для будущего использования в фильтрах
         scored.forEach(t => {
@@ -1696,6 +2140,12 @@ function normalizeTitle(input) {
             field: {
                 name: t('easytorrent_title'),
                 description: t('easytorrent_desc')
+            },
+            onChange: (value) => {
+                // value приходит строкой 'true'/'false'
+                if (String(value) === 'true') {
+                    ensureStartupModalScheduler();
+                }
             }
         });
 
@@ -1750,17 +2200,21 @@ function normalizeTitle(input) {
                                 }, (new_value) => {
                                     if (new_value) {
                                         try {
-                                            JSON.parse(new_value);
+                                            const parsed = JSON.parse(new_value);
+                                            const check = validateConfig(parsed);
+                                            if (!check.ok) throw new Error(check.error);
+
                                             saveUserConfig(new_value);
                                             updateDisplay();
                                             Lampa.Noty.show('OK');
                                         } catch (e) {
-                                            Lampa.Noty.show(t('config_error'));
+                                            Lampa.Noty.show((e && e.message) ? e.message : t('config_error'));
                                         }
                                     }
                                     Lampa.Controller.toggle('settings');
                                 });
                             } else if (a.action === 'reset') {
+                                // Сброс — это явное действие пользователя, применяем дефолтный валидный конфиг
                                 saveUserConfig(DEFAULT_CONFIG);
                                 updateDisplay();
                                 Lampa.Noty.show('OK');
@@ -2056,7 +2510,6 @@ function normalizeTitle(input) {
         Lampa.Listener.follow('activity', (data) => {
             if (data.type === 'start' && data.component === 'torrents') {
                 console.log('[EasyTorrent] Новая страница торрентов');
-                topRecommendations = [];
             }
         });
     }
@@ -2068,9 +2521,17 @@ function normalizeTitle(input) {
     function init() {
         console.log('[EasyTorrent]', VERSION);
         
+        // Заполняем метаданные плагина в Extensions (name/author), если пользователь добавил только URL
+        ensureSelfPluginMetadataInStorage();
+
         loadUserConfig();
         addStyles();
         addSettings();
+        // Модалки не показываем на экране Extensions и когда плагин выключен.
+        // Scheduler сам дождётся нормального экрана и покажет позже.
+        setTimeout(() => {
+            ensureStartupModalScheduler();
+        }, 1200);
 
         if (window.Lampa && window.Lampa.Parser) {
             patchParser();
