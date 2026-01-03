@@ -12,7 +12,7 @@
     // Supabase config
     const SUPABASE_URL = 'https://wozuelafumpzgvllcjne.supabase.co';
     const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6IndvenVlbGFmdW1wemd2bGxjam5lIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY5Mjg1MDgsImV4cCI6MjA4MjUwNDUwOH0.ODnHlq_P-1wr_D6Jwaba1mLXIVuGBnnUZsrHI8Twdug';
-    const WIZARD_URL = 'https://darkestclouds.github.io/plugins/easytorrent/test/';
+    const WIZARD_URL = 'https://darkestclouds.github.io/plugins/easytorrent/';
 
     let pollingInterval = null;
 
@@ -586,7 +586,7 @@
                 : String(voice);
             return {
                 title: `${index + 1}. ${name}`,
-                noselect: true
+            noselect: true
             };
         });
         const safeItems = items.length ? items : [{
@@ -616,6 +616,11 @@
         if (item.ffprobe && Array.isArray(item.ffprobe)) {
             const video = item.ffprobe.find(s => s.codec_type === 'video');
             if (video && video.height) {
+                item._et_resolution_debug = {
+                    source: 'ffprobe',
+                    width: video.width || null,
+                    height: video.height || null
+                };
                 // 4K: высота >= 2160 ИЛИ ширина >= 3800 (учитываем кроп)
                 if (video.height >= 2160 || (video.width && video.width >= 3800)) return 2160;
                 // 2K: высота >= 1440 ИЛИ ширина >= 2500
@@ -627,7 +632,7 @@
                 return 480;
             }
         }
-        
+        item._et_resolution_debug = { source: 'title' };
         if (/\b2160p\b/.test(title) || /\b4k\b/.test(title)) return 2160;
         if (/\b1440p\b/.test(title) || /\b2k\b/.test(title)) return 1440;
         if (/\b1080p\b/.test(title)) return 1080;
@@ -639,17 +644,21 @@
     /**
      * Определение HDR типа (выбирает лучший из найденных)
      */
-    function detectHdr(item) {
-        // 0) Если парсер уже определил тип видео — доверяем ему (это надёжнее, чем эвристики по названию)
-        // Примеры: info.videotype = 'sdr' | 'hdr10' | 'hdr10plus' | 'dolby_vision'
-        const vi = item && item.info && (item.info.videotype || item.info.video_type || item.info.hdr);
-        if (typeof vi === 'string' && vi) {
-            const v = vi.toLowerCase();
-            if (v === 'sdr') return 'sdr';
-            if (v === 'hdr10') return 'hdr10';
-            if (v === 'hdr10plus' || v === 'hdr10+') return 'hdr10plus';
-            if (v === 'dolby_vision' || v === 'dovi' || v === 'dv') return 'dolby_vision';
-            if (v === 'hdr') return 'hdr10'; // общий маркер без уточнения
+    function detectHdr(item, useInfoVideotype = false) {
+        // NB: по умолчанию определяем HDR только по названию, т.к. info.videotype может ошибаться.
+        // Если нужно включить доверие к парсеру — передайте useInfoVideotype=true.
+        if (useInfoVideotype) {
+            // 0) Если парсер уже определил тип видео — можно доверять ему (опционально)
+            // Примеры: info.videotype = 'sdr' | 'hdr10' | 'hdr10plus' | 'dolby_vision'
+            const vi = item && item.info && (item.info.videotype || item.info.video_type || item.info.hdr);
+            if (typeof vi === 'string' && vi) {
+                const v = vi.toLowerCase();
+                if (v === 'sdr') return 'sdr';
+                if (v === 'hdr10') return 'hdr10';
+                if (v === 'hdr10plus' || v === 'hdr10+') return 'hdr10plus';
+                if (v === 'dolby_vision' || v === 'dovi' || v === 'dv') return 'dolby_vision';
+                if (v === 'hdr') return 'hdr10'; // общий маркер без уточнения
+            }
         }
 
         const title = (item.Title || item.title || '').toLowerCase();
@@ -701,7 +710,10 @@
         }
         
         // Если ничего не найдено, вероятно SDR
-        if (foundTypes.length === 0) return 'sdr';
+        if (foundTypes.length === 0) {
+            item._et_hdr_debug = { source: 'title', foundTypes: [], chosen: 'sdr' };
+            return 'sdr';
+        }
         
         // Выбираем ЛУЧШИЙ тип по значению из конфига
         const hdrScores = USER_CONFIG.scoring_rules.hdr;
@@ -717,40 +729,10 @@
             }
         });
         
+        item._et_hdr_debug = { source: 'title', foundTypes: foundTypes.slice(0), chosen: bestType };
         return bestType;
     }
 
-    /**
-     * Извлечение аудио дорожек из ffprobe или названия
-     */
-    function detectAudioTracks(item) {
-        const tracks = [];
-        
-        // Сначала из ffprobe
-        if (item.ffprobe && Array.isArray(item.ffprobe)) {
-            item.ffprobe.forEach(stream => {
-                if (stream.codec_type === 'audio' && stream.tags && stream.tags.title) {
-                    tracks.push(stream.tags.title);
-                }
-            });
-        }
-        
-        // Если нет ffprobe - парсим из названия
-        if (tracks.length === 0) {
-            const title = item.Title || item.title || '';
-            
-            if (/\bДБ\b|\bDub\b|Дубляж/i.test(title)) tracks.push('RUS - Дубляж');
-            if (/\bMVO\b|Многоголос|многоголос/i.test(title)) tracks.push('RUS - MVO');
-            if (/LostFilm|Лостфильм/i.test(title)) tracks.push('RUS - LostFilm');
-            if (/Jaskier|Жаскир/i.test(title)) tracks.push('RUS - Jaskier');
-            if (/NewStudio|Нью студио/i.test(title)) tracks.push('RUS - NewStudio');
-            if (/\bUKR\b|Укр|Український/i.test(title)) tracks.push('UKR - Дубляж');
-            if (/\bENG\b|English|Original/i.test(title)) tracks.push('ENG - Original');
-            if (/\bLine\b|Лайн/i.test(title)) tracks.push('RUS - Line');
-        }
-        
-        return tracks;
-    }
 
     /**
      * Определение качества звука (стерео/5.1/7.1/Atmos).
@@ -1222,26 +1204,40 @@ function normalizeTitle(input) {
     /**
      * Определение битрейта (Мбит/с)
      */
-    function getBitrate(item, movie, isSerial = false, fallbackEpCount = 1) {
+    function getBitrate(item, movie, isSerial = false, fallbackEpCount = 1, useFfprobe = false) {
         const title = item.Title || item.title || '';
         const size = item.Size || item.size_bytes || 0;
+        const dbg = { source: null };
         
-        // 1. Сначала пробуем из ffprobe (самый точный)
-        if (item.ffprobe && Array.isArray(item.ffprobe)) {
+        // 1) FFPROBE (опционально). По умолчанию выключено, чтобы битрейт всегда считался одинаково "как в Лампе"
+        // и не было расхождений между раздачами с ffprobe и без него.
+        if (useFfprobe && item.ffprobe && Array.isArray(item.ffprobe)) {
             const video = item.ffprobe.find(s => s.codec_type === 'video');
             if (video) {
                 if (video.tags && video.tags.BPS) {
                     const bps = parseInt(video.tags.BPS, 10);
-                    if (!isNaN(bps) && bps > 0) return Math.round(bps / 1000000);
+                    if (!isNaN(bps) && bps > 0) {
+                        dbg.source = 'ffprobe.tags.BPS';
+                        dbg.bps = bps;
+                        dbg.mbps = Math.round(bps / 1000000);
+                        item._et_bitrate_debug = dbg;
+                        return dbg.mbps;
+                    }
                 }
                 if (video.bit_rate) {
                     const bitrate = parseInt(video.bit_rate, 10);
-                    if (!isNaN(bitrate) && bitrate > 0) return Math.round(bitrate / 1000000);
+                    if (!isNaN(bitrate) && bitrate > 0) {
+                        dbg.source = 'ffprobe.video.bit_rate';
+                        dbg.bit_rate = bitrate;
+                        dbg.mbps = Math.round(bitrate / 1000000);
+                        item._et_bitrate_debug = dbg;
+                        return dbg.mbps;
+                    }
                 }
             }
         }
         
-        // 2. РАСЧЕТ ИЗ РАЗМЕРА И ДЛИТЕЛЬНОСТИ
+        // 2) РАСЧЕТ ИЗ РАЗМЕРА И ДЛИТЕЛЬНОСТИ (основной путь)
         let runtime = movie?.runtime || movie?.duration || movie?.episode_run_time;
         
         // Если runtime - это массив (часто у сериалов), берем среднее или первое значение
@@ -1272,24 +1268,52 @@ function normalizeTitle(input) {
 
             const totalSeconds = (runtime * 60) * epCount;
             const bitSize = size * 8;
-            const mbps = Math.round((bitSize / Math.pow(1000, 2)) / totalSeconds);
+            const mbpsRaw = (bitSize / Math.pow(1000, 2)) / totalSeconds;
+            const mbps = Math.round(mbpsRaw);
             
             // Сохраняем защиту от аномалий, но делаем кап настраиваемым через конфиг
             const cap = USER_CONFIG?.scoring_rules?.bitrate_bonus?.max_mbps_cap;
             const maxCap = typeof cap === 'number' && cap > 0 ? cap : 150;
-            if (mbps > 0) return Math.min(mbps, maxCap);
+            if (mbps > 0) {
+                dbg.source = 'size+duration';
+                dbg.size_bytes = size;
+                dbg.runtime_min = runtime;
+                dbg.epCount = epCount;
+                dbg.totalSeconds = totalSeconds;
+                dbg.bitSize_bits = bitSize;
+                dbg.mbps_raw = mbpsRaw;
+                dbg.mbps_rounded = mbps;
+                dbg.maxCap = maxCap;
+                dbg.mbps = Math.min(mbps, maxCap);
+                item._et_bitrate_debug = dbg;
+                return dbg.mbps;
+            }
         }
         
         // 3. Из поля bitrate торрента (если есть)
         if (item.bitrate) {
             const match = String(item.bitrate).match(/(\d+\.?\d*)/);
-            if (match) return Math.round(parseFloat(match[1]));
+            if (match) {
+                dbg.source = 'item.bitrate';
+                dbg.raw = item.bitrate;
+                dbg.mbps = Math.round(parseFloat(match[1]));
+                item._et_bitrate_debug = dbg;
+                return dbg.mbps;
+            }
         }
         
         // 4. Из названия торрента
         const bitrateMatch = title.match(/(\d+\.?\d*)\s*(?:Mbps|Мбит)/i);
-        if (bitrateMatch) return Math.round(parseFloat(bitrateMatch[1]));
+        if (bitrateMatch) {
+            dbg.source = 'title';
+            dbg.raw = bitrateMatch[0];
+            dbg.mbps = Math.round(parseFloat(bitrateMatch[1]));
+            item._et_bitrate_debug = dbg;
+            return dbg.mbps;
+        }
         
+        dbg.source = 'unknown';
+        item._et_bitrate_debug = dbg;
         return 0;
     }
 
@@ -1318,8 +1342,18 @@ function normalizeTitle(input) {
         AUDIO_TRACKS.forEach(tr => {
             if (foundAudio.includes(tr.id)) return;
 
-            // Для общего "Дубляж" из названия не пытаемся угадать язык/студию (слишком много ложных срабатываний)
-            if (tr.id === 0 || tr.id === 1) return;
+            // Для общего "Дубляж" не пытаемся угадывать по слову "дубляж" (слишком много ложных срабатываний).
+            // Но короткий токен "ДБ"/"Dub" — это достаточно надёжный маркер дубляжа (RU) и ожидаемое поведение.
+            if (tr.id === 0) {
+                const aliases = Array.isArray(tr.aliases) ? tr.aliases : [];
+                const shortAliases = aliases.filter(a => String(a).trim().length <= 3); // 'дб', 'dub', etc.
+                const match = shortAliases.some(alias => matchAliasInText(title, alias));
+                if (match) foundAudio.push(tr.id);
+                return;
+            }
+
+            // Украинский дубляж по тайтлу не угадываем (нужно явное 'ukr/ua/укр' в тайтле или ffprobe lang)
+            if (tr.id === 1) return;
 
             const aliases = Array.isArray(tr.aliases) ? tr.aliases : [];
             const match = aliases.some(alias => matchAliasInText(title, alias));
@@ -1381,24 +1415,24 @@ function normalizeTitle(input) {
      * Важно: одна и та же студия может встречаться в разных языках.
      *
      * - id: стабильный ключ (используется внутри features)
-     * - type: DVO/MVO/AVO/PRO/ORIG и т.п.
+     * - type: DUB/MVO/AVO/PRO/ORIG и т.п.
      * - name: отображаемое имя
      * - aliases: алиасы/маркерные строки (для распознавания из ffprobe/title)
      * - languages: список языков (ISO-639-2/коды)
      */
     const AUDIO_TRACKS = [
-        { id: 0, type: 'DVO', name: 'Дубляж RU', aliases: ['дб', 'дубляж', 'dub'], languages: ['rus'] },
-        { id: 1, type: 'DVO', name: 'Дубляж UKR', aliases: ['ukr', 'ua', 'укр', 'укра', 'дубляж'], languages: ['ukr'] },
+        { id: 0, type: 'DUB', name: 'Дубляж RU', aliases: ['дб', 'дубляж', 'dub'], languages: ['rus'] },
+        { id: 1, type: 'DUB', name: 'Дубляж UKR', aliases: ['ukr', 'ua', 'укр', 'укра', 'дубляж'], languages: ['ukr'] },
 
-        { id: 2, type: 'DVO', name: 'Дубляж Пифагор', aliases: ['пифагор'], languages: ['rus'] },
-        { id: 3, type: 'DVO', name: 'Дубляж Red Head Sound', aliases: ['red head sound', 'rhs'], languages: ['rus'] },
-        { id: 4, type: 'DVO', name: 'Дубляж Videofilm', aliases: ['videofilm'], languages: ['rus'] },
-        { id: 5, type: 'DVO', name: 'Дубляж MovieDalen', aliases: ['moviedalen'], languages: ['rus'] },
-        { id: 6, type: 'DVO', name: 'Дубляж LeDoyen', aliases: ['ledoyen'], languages: ['rus'] },
-        { id: 7, type: 'DVO', name: 'Дубляж Whiskey Sound', aliases: ['whiskey sound'], languages: ['rus'] },
-        { id: 8, type: 'DVO', name: 'Дубляж IRON VOICE', aliases: ['iron voice'], languages: ['rus'] },
-        { id: 9, type: 'DVO', name: 'Дубляж AlexFilm', aliases: ['alexfilm'], languages: ['rus'] },
-        { id: 10, type: 'DVO', name: 'Дубляж Amedia', aliases: ['amedia'], languages: ['rus'] },
+        { id: 2, type: 'DUB', name: 'Дубляж Пифагор', aliases: ['пифагор'], languages: ['rus'] },
+        { id: 3, type: 'DUB', name: 'Дубляж Red Head Sound', aliases: ['red head sound', 'rhs'], languages: ['rus'] },
+        { id: 4, type: 'DUB', name: 'Дубляж Videofilm', aliases: ['videofilm'], languages: ['rus'] },
+        { id: 5, type: 'DUB', name: 'Дубляж MovieDalen', aliases: ['moviedalen'], languages: ['rus'] },
+        { id: 6, type: 'DUB', name: 'Дубляж LeDoyen', aliases: ['ledoyen'], languages: ['rus'] },
+        { id: 7, type: 'DUB', name: 'Дубляж Whiskey Sound', aliases: ['whiskey sound'], languages: ['rus'] },
+        { id: 8, type: 'DUB', name: 'Дубляж IRON VOICE', aliases: ['iron voice'], languages: ['rus'] },
+        { id: 9, type: 'DUB', name: 'Дубляж AlexFilm', aliases: ['alexfilm'], languages: ['rus'] },
+        { id: 10, type: 'DUB', name: 'Дубляж Amedia', aliases: ['amedia'], languages: ['rus'] },
 
         { id: 11, type: 'MVO', name: 'MVO HDRezka', aliases: ['hdrezka', 'rezka', 'hdrezka studio', 'rezka studio'], languages: ['rus', 'ukr'] },
         { id: 12, type: 'MVO', name: 'MVO LostFilm', aliases: ['lostfilm', 'lf'], languages: ['rus'] },
@@ -1621,8 +1655,8 @@ function normalizeTitle(input) {
 
             if (audioPriority.length && audioTracks.length) {
                 const trackSet = new Set(audioTracks.filter(v => typeof v === 'number' && Number.isFinite(v)));
-
-                for (let i = 0; i < audioPriority.length; i++) {
+            
+            for (let i = 0; i < audioPriority.length; i++) {
                     const id = audioPriority[i];
                     if (!(typeof id === 'number' && Number.isFinite(id))) continue;
                     if (!trackSet.has(id)) continue;
@@ -1731,6 +1765,76 @@ function normalizeTitle(input) {
          */
         const isSerial = !!(movie && (movie.original_name || movie.number_of_seasons > 0 || movie.seasons));
 
+        /**
+         * Для сериалов: учитываем историю просмотра (online_watched_last)
+         * - если история есть: приоритет раздач, содержащих последнюю серию
+         * - ещё выше: если есть и следующая серия
+         * - если истории нет: считаем S01E01
+         * - если подходящих раздач нет: работаем как обычно
+         */
+        const getSerialWatchedTarget = () => {
+            if (!isSerial || !movie) return null;
+
+            const titleKey = movie.number_of_seasons ? movie.original_name : movie.original_title;
+            if (!titleKey) return { season: 1, episode: 1, hasHistory: false };
+
+            // file_id как в ядре: Utils.hash(movie.number_of_seasons ? movie.original_name : movie.original_title)
+            const fileId = (Lampa.Utils && typeof Lampa.Utils.hash === 'function')
+                ? Lampa.Utils.hash(titleKey)
+                : String(titleKey);
+
+            const raw = Lampa.Storage.get('online_watched_last', {});
+            let watchedAll = raw;
+            if (typeof raw === 'string') {
+                try { watchedAll = JSON.parse(raw); } catch (e) { watchedAll = {}; }
+            }
+            const watched = watchedAll && watchedAll[fileId] ? watchedAll[fileId] : null;
+
+            const season = watched && Number.isFinite(parseInt(watched.season, 10)) ? parseInt(watched.season, 10) : 1;
+            const episode = watched && Number.isFinite(parseInt(watched.episode, 10)) ? parseInt(watched.episode, 10) : 1;
+
+            return { season, episode, hasHistory: !!watched };
+        };
+
+        const serialTarget = getSerialWatchedTarget();
+
+        const episodeContains = (epInfo, targetSeason, targetEpisode) => {
+            if (!epInfo) return false;
+
+            // season match
+            let seasonOk = false;
+            if (epInfo.seasonRange) {
+                seasonOk = targetSeason >= epInfo.seasonRange.start && targetSeason <= epInfo.seasonRange.end;
+            } else if (Number.isInteger(epInfo.season)) {
+                seasonOk = epInfo.season === targetSeason;
+            } else {
+                // если сезон не указан (часто у одно-сезонных релизов) — допускаем только для S01
+                seasonOk = targetSeason === 1;
+            }
+            if (!seasonOk) return false;
+
+            // episode match
+            if (epInfo.episodeRange) {
+                return targetEpisode >= epInfo.episodeRange.start && targetEpisode <= epInfo.episodeRange.end;
+            }
+            if (Number.isInteger(epInfo.episode)) return epInfo.episode === targetEpisode;
+
+            // Если сезон указан, но эпизодов нет — вероятно "полный сезон/пак"
+            return true;
+        };
+
+        const getEpisodePriority = (torrentTitle, targetSeason, targetEpisode) => {
+            if (!isSerial || !serialTarget) return 0;
+            if (typeof extractSeasonEpisode !== 'function') return 0;
+
+            const epInfo = extractSeasonEpisode(torrentTitle || '');
+            const hasLast = episodeContains(epInfo, targetSeason, targetEpisode);
+            if (!hasLast) return 0;
+
+            const hasNext = episodeContains(epInfo, targetSeason, targetEpisode + 1);
+            return hasNext ? 2 : 1;
+        };
+
         // ПРЕ-СКАН: Умный поиск количества серий (ТОЛЬКО ДЛЯ СЕРИАЛОВ)
         let maxEpisodesInSet = 1;
         
@@ -1745,8 +1849,8 @@ function normalizeTitle(input) {
 
             maxEpisodesInSet = maxCountFound;
 
-            if (maxEpisodesInSet > 1) {
-                console.log(`[EasyTorrent] Режим сериала. Анализ: Макс-диапазон серий в паке=${maxCountFound}. Используем=${maxEpisodesInSet}`);
+            if (maxEpisodesInSet > 1 && Lampa.Storage.get('easytorrent_debug', false)) {
+                console.log(`[EasyTorrent][Debug] Режим сериала. Анализ: Макс-диапазон серий в паке=${maxCountFound}. Используем=${maxEpisodesInSet}`);
             }
         }
 
@@ -1820,6 +1924,14 @@ function normalizeTitle(input) {
             t.element._recommendBreakdown = t.breakdown;
             // сохраняем фичи, чтобы красиво отрисовывать в UI (резолюшн/HDR/битрейт)
             t.element._recommendFeatures = t.features;
+
+            // Для сериалов: маркер приоритета эпизодов (0/1/2)
+            if (isSerial && serialTarget) {
+                const title = t.element.Title || t.element.title || '';
+                t.element._recommendEpisodePriority = getEpisodePriority(title, serialTarget.season, serialTarget.episode);
+            } else {
+                t.element._recommendEpisodePriority = 0;
+            }
         });
 
         console.log('[EasyTorrent] Все торренты промаркированы баллами');
@@ -1874,6 +1986,7 @@ function normalizeTitle(input) {
 
         const { element, item } = data;
         const showScores = Lampa.Storage.get('easytorrent_show_scores', true);
+        const debug = Lampa.Storage.get('easytorrent_debug', false);
 
         if (typeof element._recommendRank === 'undefined') return;
 
@@ -1886,7 +1999,7 @@ function normalizeTitle(input) {
         const recommendCount = USER_CONFIG.preferences.recommendation_count || 3;
 
         // Показываем панель: всегда для топ-N, и (опционально) для остальных если включены оценки
-        const shouldShowPanel = element._recommendIsIdeal || rank < recommendCount || showScores;
+        const shouldShowPanel = element._recommendIsIdeal || rank < recommendCount || showScores || debug;
         if (!shouldShowPanel) return;
 
         const features = element._recommendFeatures || {};
@@ -1937,6 +2050,81 @@ function normalizeTitle(input) {
 
         // Приклеиваем к низу карточки, как "родной" футер
         item.append(panel);
+
+        // Отладка: подробности вычислений (без повторения конфиг-значений и без повторения уже показанных оценок)
+        if (debug) {
+            const lines = [];
+
+            // Resolution
+            const rdbg = element._et_resolution_debug;
+            if (rdbg && features.resolution) {
+                if (rdbg.source === 'ffprobe') {
+                    lines.push(`Resolution: ${features.resolution}p (ffprobe ${rdbg.width || '?'}x${rdbg.height || '?'})`);
+                } else {
+                    lines.push(`Resolution: ${features.resolution}p (title)`);
+                }
+            } else if (features.resolution) {
+                lines.push(`Resolution: ${features.resolution}p`);
+            }
+
+            // HDR
+            const hdbg = element._et_hdr_debug;
+            if (features.hdr_type) {
+                if (hdbg && hdbg.source === 'title') {
+                    const f = Array.isArray(hdbg.foundTypes) ? hdbg.foundTypes.join(',') : '';
+                    lines.push(`HDR: ${features.hdr_type} (title tokens: ${f || 'none'} → ${hdbg.chosen || features.hdr_type})`);
+                } else {
+                    lines.push(`HDR: ${features.hdr_type}`);
+                }
+            }
+
+            // Bitrate
+            const bdbg = element._et_bitrate_debug;
+            if (typeof features.bitrate === 'number') {
+                lines.push(`Bitrate: ${features.bitrate} Mbps`);
+                if (bdbg && bdbg.source) {
+                    lines.push(`Bitrate source: ${bdbg.source}`);
+                    if (bdbg.source === 'size+duration') {
+                        // Формула (для сериалов тоже): mbps = round(((sizeBytes*8)/1e6) / (runtimeMin*60*epCount))
+                        lines.push(
+                            `Bitrate formula: round(((sizeBytes*8)/1e6) / (runtimeMin*60*epCount))`
+                        );
+                        lines.push(
+                            `  sizeBytes=${bdbg.size_bytes}  runtimeMin=${bdbg.runtime_min}  epCount=${bdbg.epCount}  totalSeconds=${bdbg.totalSeconds}`
+                        );
+                        lines.push(
+                            `  mbpsRaw=${Number.isFinite(bdbg.mbps_raw) ? bdbg.mbps_raw.toFixed(4) : bdbg.mbps_raw}  mbpsRounded=${bdbg.mbps_rounded}  cap=${bdbg.maxCap}  mbpsFinal=${bdbg.mbps}`
+                        );
+                    }
+                }
+            }
+
+            // Audio tracks
+            if (Array.isArray(features.audio_tracks) && features.audio_tracks.length) {
+                const names = features.audio_tracks
+                    .map(id => (AUDIO_TRACK_BY_ID && AUDIO_TRACK_BY_ID.get && AUDIO_TRACK_BY_ID.get(id)) ? AUDIO_TRACK_BY_ID.get(id).name : String(id))
+                    .join(', ');
+                lines.push(`Audio tracks: ${names}`);
+            }
+
+            // Episode priority (serial logic)
+            if (typeof element._recommendEpisodePriority !== 'undefined' && (element._recommendEpisodePriority || 0) > 0) {
+                lines.push(`Episode priority: ${element._recommendEpisodePriority}`);
+            } else if (typeof element._recommendEpisodePriority !== 'undefined') {
+                lines.push(`Episode priority: 0`);
+            }
+
+            const pre = $('<div class="torrent-recommend-panel__debug"></div>');
+            pre.css({
+                'white-space': 'pre-wrap',
+                'font-size': '0.85em',
+                'line-height': '1.25',
+                'opacity': '0.9',
+                'margin-top': '0.4em'
+            });
+            pre.text(lines.join('\n'));
+            panel.append(pre);
+        }
     }
 
     /**
@@ -2103,6 +2291,9 @@ function normalizeTitle(input) {
         if (Lampa.Storage.get('easytorrent_show_scores') === undefined) {
             Lampa.Storage.set('easytorrent_show_scores', true);
         }
+        if (Lampa.Storage.get('easytorrent_debug') === undefined) {
+            Lampa.Storage.set('easytorrent_debug', false);
+        }
 
         Lampa.SettingsApi.addComponent({
             component: 'easytorrent',
@@ -2159,6 +2350,19 @@ function normalizeTitle(input) {
             field: {
                 name: t('show_scores'),
                 description: t('show_scores_desc')
+            }
+        });
+
+        Lampa.SettingsApi.addParam({
+            component: 'easytorrent',
+            param: {
+                name: 'easytorrent_debug',
+                type: 'trigger',
+                default: false
+            },
+            field: {
+                name: 'Отладка',
+                description: 'Показывать в карточке торрента подробности расчётов (HDR/серии/битрейт и т.п.)'
             }
         });
 
@@ -2407,12 +2611,26 @@ function normalizeTitle(input) {
                         const minSeeds = USER_CONFIG.preferences.min_seeds || 0;
                         
                         // СНАЧАЛА фильтруем по сидам, ПОТОМ сортируем и выбираем топ-N
-                        const tops = [...items]
+                        let candidates = [...items]
                             .filter(i => {
                                 const seeds = i.Seeds || i.seeds || i.Seeders || i.seeders || 0;
                                 return (i._recommendScore || 0) > 0 && seeds >= minSeeds;
+                            });
+
+                        // Для сериалов: если есть хотя бы одна раздача с последней серией — берём топы только из них
+                        // (а ещё выше — если есть и следующая серия)
+                        const maxEpPriority = candidates.reduce((m, it) => Math.max(m, it._recommendEpisodePriority || 0), 0);
+                        if (maxEpPriority >= 1) {
+                            candidates = candidates.filter(i => (i._recommendEpisodePriority || 0) >= 1);
+                        }
+
+                        const tops = candidates
+                            .sort((a, b) => {
+                                const ea = a._recommendEpisodePriority || 0;
+                                const eb = b._recommendEpisodePriority || 0;
+                                if (eb !== ea) return eb - ea;
+                                return (b._recommendScore || 0) - (a._recommendScore || 0);
                             })
-                            .sort((a, b) => (b._recommendScore || 0) - (a._recommendScore || 0))
                             .slice(0, recommendCount);
                         
                         if (tops.length === 0) {
@@ -2523,7 +2741,7 @@ function normalizeTitle(input) {
         
         // Заполняем метаданные плагина в Extensions (name/author), если пользователь добавил только URL
         ensureSelfPluginMetadataInStorage();
-
+        
         loadUserConfig();
         addStyles();
         addSettings();
