@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    const APPLECATION_VERSION = '1.1.2';
+    const APPLECATION_VERSION = '1.1.3';
 
     // Иконка плагина
     const PLUGIN_ICON = '<svg viewBox="110 90 180 210"xmlns=http://www.w3.org/2000/svg><g id=sphere><circle cx=200 cy=140 fill="hsl(200, 80%, 40%)"opacity=0.3 r=1.2 /><circle cx=230 cy=150 fill="hsl(200, 80%, 45%)"opacity=0.35 r=1.3 /><circle cx=170 cy=155 fill="hsl(200, 80%, 42%)"opacity=0.32 r=1.2 /><circle cx=245 cy=175 fill="hsl(200, 80%, 48%)"opacity=0.38 r=1.4 /><circle cx=155 cy=180 fill="hsl(200, 80%, 44%)"opacity=0.34 r=1.3 /><circle cx=215 cy=165 fill="hsl(200, 80%, 46%)"opacity=0.36 r=1.2 /><circle cx=185 cy=170 fill="hsl(200, 80%, 43%)"opacity=0.33 r=1.3 /><circle cx=260 cy=200 fill="hsl(200, 80%, 50%)"opacity=0.4 r=1.5 /><circle cx=140 cy=200 fill="hsl(200, 80%, 50%)"opacity=0.4 r=1.5 /><circle cx=250 cy=220 fill="hsl(200, 80%, 48%)"opacity=0.38 r=1.4 /><circle cx=150 cy=225 fill="hsl(200, 80%, 47%)"opacity=0.37 r=1.4 /><circle cx=235 cy=240 fill="hsl(200, 80%, 45%)"opacity=0.35 r=1.3 /><circle cx=165 cy=245 fill="hsl(200, 80%, 44%)"opacity=0.34 r=1.3 /><circle cx=220 cy=255 fill="hsl(200, 80%, 42%)"opacity=0.32 r=1.2 /><circle cx=180 cy=258 fill="hsl(200, 80%, 41%)"opacity=0.31 r=1.2 /><circle cx=200 cy=120 fill="hsl(200, 80%, 60%)"opacity=0.5 r=1.8 /><circle cx=240 cy=135 fill="hsl(200, 80%, 65%)"opacity=0.55 r=2 /><circle cx=160 cy=140 fill="hsl(200, 80%, 62%)"opacity=0.52 r=1.9 /><circle cx=270 cy=165 fill="hsl(200, 80%, 70%)"opacity=0.6 r=2.2 /><circle cx=130 cy=170 fill="hsl(200, 80%, 67%)"opacity=0.57 r=2.1 /><circle cx=255 cy=190 fill="hsl(200, 80%, 72%)"opacity=0.62 r=2.3 /><circle cx=145 cy=195 fill="hsl(200, 80%, 69%)"opacity=0.59 r=2.2 /><circle cx=280 cy=200 fill="hsl(200, 80%, 75%)"opacity=0.65 r=2.5 /><circle cx=120 cy=200 fill="hsl(200, 80%, 75%)"opacity=0.65 r=2.5 /><circle cx=275 cy=215 fill="hsl(200, 80%, 73%)"opacity=0.63 r=2.4 /><circle cx=125 cy=220 fill="hsl(200, 80%, 71%)"opacity=0.61 r=2.3 /><circle cx=260 cy=235 fill="hsl(200, 80%, 68%)"opacity=0.58 r=2.2 /><circle cx=140 cy=240 fill="hsl(200, 80%, 66%)"opacity=0.56 r=2.1 /><circle cx=245 cy=255 fill="hsl(200, 80%, 63%)"opacity=0.53 r=2 /><circle cx=155 cy=260 fill="hsl(200, 80%, 61%)"opacity=0.51 r=1.9 /><circle cx=225 cy=270 fill="hsl(200, 80%, 58%)"opacity=0.48 r=1.8 /><circle cx=175 cy=272 fill="hsl(200, 80%, 56%)"opacity=0.46 r=1.7 /><circle cx=200 cy=100 fill="hsl(200, 80%, 85%)"opacity=0.8 r=2.8 /><circle cx=230 cy=115 fill="hsl(200, 80%, 90%)"opacity=0.85 r=3 /><circle cx=170 cy=120 fill="hsl(200, 80%, 87%)"opacity=0.82 r=2.9 /><circle cx=250 cy=140 fill="hsl(200, 80%, 92%)"opacity=0.88 r=3.2 /><circle cx=150 cy=145 fill="hsl(200, 80%, 89%)"opacity=0.84 r=3.1 /><circle cx=265 cy=170 fill="hsl(200, 80%, 95%)"opacity=0.9 r=3.4 /><circle cx=135 cy=175 fill="hsl(200, 80%, 93%)"opacity=0.87 r=3.3 /><circle cx=275 cy=200 fill="hsl(200, 80%, 98%)"opacity=0.95 r=3.5 /><circle cx=125 cy=200 fill="hsl(200, 80%, 98%)"opacity=0.95 r=3.5 /><circle cx=200 cy=200 fill="hsl(200, 80%, 100%)"opacity=1 r=4 /><circle cx=220 cy=195 fill="hsl(200, 80%, 98%)"opacity=0.95 r=3.8 /><circle cx=180 cy=205 fill="hsl(200, 80%, 97%)"opacity=0.93 r=3.7 /><circle cx=240 cy=210 fill="hsl(200, 80%, 96%)"opacity=0.92 r=3.6 /><circle cx=160 cy=215 fill="hsl(200, 80%, 95%)"opacity=0.9 r=3.5 /><circle cx=270 cy=230 fill="hsl(200, 80%, 94%)"opacity=0.88 r=3.4 /><circle cx=130 cy=235 fill="hsl(200, 80%, 92%)"opacity=0.86 r=3.3 /><circle cx=255 cy=250 fill="hsl(200, 80%, 90%)"opacity=0.84 r=3.2 /><circle cx=145 cy=255 fill="hsl(200, 80%, 88%)"opacity=0.82 r=3.1 /><circle cx=235 cy=265 fill="hsl(200, 80%, 86%)"opacity=0.8 r=3 /><circle cx=165 cy=268 fill="hsl(200, 80%, 84%)"opacity=0.78 r=2.9 /><circle cx=215 cy=280 fill="hsl(200, 80%, 82%)"opacity=0.76 r=2.8 /><circle cx=185 cy=282 fill="hsl(200, 80%, 80%)"opacity=0.74 r=2.7 /><circle cx=200 cy=290 fill="hsl(200, 80%, 78%)"opacity=0.72 r=2.6 /><circle cx=210 cy=130 fill="hsl(200, 80%, 88%)"opacity=0.83 r=2.5 /><circle cx=190 cy=135 fill="hsl(200, 80%, 86%)"opacity=0.81 r=2.4 /><circle cx=225 cy=155 fill="hsl(200, 80%, 91%)"opacity=0.86 r=2.8 /><circle cx=175 cy=160 fill="hsl(200, 80%, 89%)"opacity=0.84 r=2.7 /><circle cx=245 cy=185 fill="hsl(200, 80%, 94%)"opacity=0.89 r=3.3 /><circle cx=155 cy=190 fill="hsl(200, 80%, 92%)"opacity=0.87 r=3.2 /><circle cx=260 cy=210 fill="hsl(200, 80%, 95%)"opacity=0.91 r=3.4 /><circle cx=140 cy=215 fill="hsl(200, 80%, 93%)"opacity=0.88 r=3.3 /><circle cx=250 cy=230 fill="hsl(200, 80%, 91%)"opacity=0.85 r=3.2 /><circle cx=150 cy=235 fill="hsl(200, 80%, 89%)"opacity=0.83 r=3.1 /><circle cx=230 cy=245 fill="hsl(200, 80%, 87%)"opacity=0.81 r=3 /><circle cx=170 cy=250 fill="hsl(200, 80%, 85%)"opacity=0.79 r=2.9 /><circle cx=210 cy=260 fill="hsl(200, 80%, 83%)"opacity=0.77 r=2.8 /><circle cx=190 cy=265 fill="hsl(200, 80%, 81%)"opacity=0.75 r=2.7 /></g></svg>';
@@ -293,6 +293,7 @@
         addOverlayTemplate();
         addStyles();
         addSettings();
+        applyLiquidGlassClass();
         attachLogoLoader();
         attachEpisodesCorePatch();
     }
@@ -493,6 +494,28 @@
             pt: 'Exibir bloco de reações no cartão',
             zh: '在卡片上显示反应块'
         },
+        show_foreign_logo: {
+            ru: 'Логотип на английском',
+            en: 'No language logo',
+            uk: 'Логотип англійською',
+            be: 'Лагатып на англійскай',
+            bg: 'Лого на английски',
+            cs: 'Logo v angličtině',
+            he: 'לוגו באנגלית',
+            pt: 'Logotipo em inglês',
+            zh: '英文徽标'
+        },
+        show_foreign_logo_desc: {
+            ru: 'Показывать логотип на английском языке, если нет на русском',
+            en: 'Show no language logo if localized version is missing',
+            uk: 'Показувати логотип на англійській мові, якщо немає на українській',
+            be: 'Паказваць лагатып на англійскай мове, калі няма на беларускай',
+            bg: 'Показване на лого на английски език, ако не е налично на български',
+            cs: 'Zobrazit logo v angličtině, pokud není k dispozici v češtině',
+            he: 'הצג לוגו באנגלית אם הגרסה המקומית חסרה',
+            pt: 'Mostrar logotipo em inglês se a versão localizada estiver ausente',
+            zh: '如果本地化版本缺失，则显示英文徽标'
+        },
         ratings_position: {
             ru: 'Расположение рейтингов',
             en: 'Ratings position',
@@ -647,6 +670,28 @@
             pt: 'Dimensionamento',
             zh: '缩放'
         },
+        show_episode_count: {
+            ru: 'Количество серий',
+            en: 'Episode Count',
+            uk: 'Кількість серій',
+            be: 'Колькасць серый',
+            bg: 'Брой епизоди',
+            cs: 'Počet epizod',
+            he: 'מספר פרקים',
+            pt: 'Número de episódios',
+            zh: '剧集数量'
+        },
+        show_episode_count_desc: {
+            ru: 'Показывать общее количество серий для сериалов',
+            en: 'Show total episode count for TV shows',
+            uk: 'Показувати загальну кількість серій для серіалів',
+            be: 'Паказваць агульную колькасць серый для серыялаў',
+            bg: 'Показване на общия брой епизоди за сериали',
+            cs: 'Zobrazit celkový počet epizod u seriálů',
+            he: 'הצג את סך כל הפרקים עבור סדרות טלוויזיה',
+            pt: 'Mostrar o número total de episódios para séries',
+            zh: '显示电视剧的总剧集数'
+        },
         reverse_episodes: {
             ru: 'Перевернуть список эпизодов',
             en: 'Reverse Episodes List',
@@ -687,15 +732,68 @@
             be: 'Паказваць апісанне ў асобным акне пры націску',
             bg: 'Показване на описанието в отделен прозорец при щракване',
             cs: 'Při kliknutí zobrazit popis v samostatném okně',
-            he: 'הצг תיאور בחлון נפרд בעת לחיצה',
-            pt: 'Mostrar описание em uma janela separada quando clicado',
+            he: 'הצג תיאור בחלון נפרד בעת לחיצה',
+            pt: 'Mostrar descrição em uma janela separada quando clicado',
             zh: '点击时在单独的窗口中显示描述'
+        },
+        liquid_glass: {
+            ru: 'Жидкое стекло',
+            en: 'Liquid Glass',
+            uk: 'Рідке скло',
+            be: 'Вадкае шкло',
+            bg: 'Течно стъкло',
+            cs: 'Tekuté sklo',
+            he: 'זכוכית נוזלית',
+            pt: 'Vidro Líquido',
+            zh: '液体玻璃'
+        },
+        liquid_glass_desc: {
+            ru: 'Эффект «стеклянных» карточек при наведении в эпизодах и актерах',
+            en: '"Glassy" card effect on focus in episodes and cast',
+            uk: 'Ефект «скляних» карток при наведенні в епізодах та акторах',
+            be: 'Эфект «шкляных» картак пры навядзенні ў эпізодах і акцёрах',
+            bg: 'Ефект „стъклени“ карти при фокус в епизодите и актьорите',
+            cs: 'Efekt „skleněných“ karet při zaměření v epizodách a obsazení',
+            he: 'אפקט כрטיסי "זכוכית" במיקוד בפרקים ובשחקנים',
+            pt: 'Efeito de cartões "vítreos" em foco nos episódios e elenco',
+            zh: '剧集和演员表中聚焦时的“玻璃”卡片效果'
+        },
+        about_author: {
+            ru: 'Автор',
+            en: 'Author',
+            uk: 'Автор',
+            be: 'Аўтар',
+            bg: 'Автор',
+            cs: 'Autor',
+            he: 'מחבר',
+            pt: 'Autor',
+            zh: '作者'
+        },
+        about_description: {
+            ru: 'Делает интерфейс в карточке фильма похожим на Apple TV и оптимизирует под 4K',
+            en: 'Makes the movie card interface look like Apple TV and optimizes for 4K',
+            uk: 'Робить інтерфейс у картці фільму схожим на Apple TV та оптимізує під 4K',
+            be: 'Робіць інтэрфейс у картцы фільма падобным на Apple TV і аптымізуе пад 4K',
+            bg: 'Прави интерфейса в картата на филма подобен на Apple TV и оптимизира за 4K',
+            cs: 'Vytváří rozhraní karty filmu podobné Apple TV a optimalizuje pro 4K',
+            he: 'הופך את ממשק כрטיס הסרט לדומה ל-Apple TV ומבצע אופטימיזציה ל-4K',
+            pt: 'Torna a interface do cartão do filme semelhante à Apple TV e otimiza para 4K',
+            zh: '使电影卡片界面看起来像 Apple TV 并针对 4K 进行优化'
         }
     };
 
     function t(key) {
         const lang = Lampa.Storage.get('language', 'ru');
         return translations[key] && translations[key][lang] || translations[key].ru;
+    }
+
+    // Применяем класс для управления эффектом жидкого стекла
+    function applyLiquidGlassClass() {
+        if (Lampa.Storage.get('applecation_liquid_glass', true)) {
+            $('body').removeClass('applecation--no-liquid-glass');
+        } else {
+            $('body').addClass('applecation--no-liquid-glass');
+        }
     }
 
     // Добавляем настройки плагина
@@ -722,6 +820,15 @@
         if (Lampa.Storage.get('applecation_description_overlay') === undefined) {
             Lampa.Storage.set('applecation_description_overlay', true);
         }
+        if (Lampa.Storage.get('applecation_show_foreign_logo') === undefined) {
+            Lampa.Storage.set('applecation_show_foreign_logo', true);
+        }
+        if (Lampa.Storage.get('applecation_liquid_glass') === undefined) {
+            Lampa.Storage.set('applecation_liquid_glass', true);
+        }
+        if (Lampa.Storage.get('applecation_show_episode_count') === undefined) {
+            Lampa.Storage.set('applecation_show_episode_count', false);
+        }
 
         // Создаем раздел настроек
         Lampa.SettingsApi.addComponent({
@@ -746,7 +853,7 @@
                     'font-size': '1.2em',
                     'margin-bottom': '0.3em'
                 });
-                item.append('<div style="font-size: 0.9em; padding: 0 1.2em; line-height: 1.4;">Автор: DarkestClouds<br>Делает интерфейс в карточке фильма похожим на Apple TV и оптимизирует под 4K</div>');
+                item.append('<div style="font-size: 0.9em; padding: 0 1.2em; line-height: 1.4;">' + t('about_author') + ': DarkestClouds<br>' + t('about_description') + '</div>');
             }
         });
 
@@ -824,6 +931,20 @@
             }
         });
 
+        // Показывать логотип на другом языке
+        Lampa.SettingsApi.addParam({
+            component: 'applecation_settings',
+            param: {
+                name: 'applecation_show_foreign_logo',
+                type: 'trigger',
+                default: true
+            },
+            field: {
+                name: t('show_foreign_logo'),
+                description: t('show_foreign_logo_desc')
+            }
+        });
+
         // Перевернуть список эпизодов
         Lampa.SettingsApi.addParam({
             component: 'applecation_settings',
@@ -855,6 +976,38 @@
             },
             onChange: function(value) {
                 Lampa.Storage.set('applecation_description_overlay', value);
+            }
+        });
+
+        // Количество серий
+        Lampa.SettingsApi.addParam({
+            component: 'applecation_settings',
+            param: {
+                name: 'applecation_show_episode_count',
+                type: 'trigger',
+                default: false
+            },
+            field: {
+                name: t('show_episode_count'),
+                description: t('show_episode_count_desc')
+            }
+        });
+
+        // Жидкое стекло
+        Lampa.SettingsApi.addParam({
+            component: 'applecation_settings',
+            param: {
+                name: 'applecation_liquid_glass',
+                type: 'trigger',
+                default: true
+            },
+            field: {
+                name: t('liquid_glass'),
+                description: t('liquid_glass_desc')
+            },
+            onChange: function(value) {
+                Lampa.Storage.set('applecation_liquid_glass', value);
+                applyLiquidGlassClass();
             }
         });
 
@@ -2155,6 +2308,22 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
 .applecation .full-person.focus .full-person__role {
     color: rgb(255, 255, 255) !important;
 }
+
+/* ОТКЛЮЧЕНИЕ ЖИДКОГО СТЕКЛА */
+body.applecation--no-liquid-glass .applecation .full-episode.focus .full-episode__img,
+body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__photo {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(255,255,255,0.05) !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3) !important;
+}
+
+body.applecation--no-liquid-glass .applecation .full-episode.focus .full-episode__img::before,
+body.applecation--no-liquid-glass .applecation .full-episode.focus .full-episode__img::after,
+body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__photo::before,
+body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__photo::after {
+    display: none !important;
+}
 </style>`;
         
         Lampa.Template.add('applecation_css', styles);
@@ -2164,6 +2333,27 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
     // Патчим внутренние методы Лампы для корректной работы эпизодов и качества
     function patchApiImg() {
         const tmdbSource = Lampa.Api.sources.tmdb;
+
+        if (!tmdbSource) return;
+
+        // 0. Патчим формирование URL для TMDB, чтобы добавить логотипы в основной запрос (append_to_response)
+        if (window.Lampa && Lampa.TMDB && Lampa.TMDB.api) {
+            const originalTmdbApi = Lampa.TMDB.api;
+            Lampa.TMDB.api = function(url) {
+                let newUrl = url;
+                if (typeof newUrl === 'string' && newUrl.indexOf('append_to_response=') !== -1 && newUrl.indexOf('images') === -1) {
+                    // Добавляем images в список append_to_response
+                    newUrl = newUrl.replace('append_to_response=', 'append_to_response=images,');
+                    
+                    // Добавляем языки для картинок, если они еще не указаны
+                    if (newUrl.indexOf('include_image_language=') === -1) {
+                        const lang = Lampa.Storage.field('tmdb_lang') || Lampa.Storage.get('language') || 'ru';
+                        newUrl += (newUrl.indexOf('?') === -1 ? '?' : '&') + 'include_image_language=en,null,' + lang;
+                    }
+                }
+                return originalTmdbApi.call(Lampa.TMDB, newUrl);
+            };
+        }
         
         // 1. Патчим шаблонизатор, чтобы принудительно изменить формат даты и времени в карточках
         const originalTemplateJs = Lampa.Template.js;
@@ -2491,6 +2681,59 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
         return count === 1 ? `${count} ${seasonWord}` : `${count} ${seasonWord}s`;
     }
 
+    // Склонение серий с локализацией
+    function formatEpisodes(count) {
+        const lang = Lampa.Storage.get('language', 'ru');
+        
+        // Славянские языки (ru, uk, be, bg) - сложное склонение
+        if (['ru', 'uk', 'be', 'bg'].includes(lang)) {
+            const cases = [2, 0, 1, 1, 1, 2];
+            const titles = {
+                ru: ['серия', 'серии', 'серий'],
+                uk: ['серія', 'серії', 'серій'],
+                be: ['серыя', 'серыі', 'серый'],
+                bg: ['епизод', 'епизода', 'епизода']
+            };
+            
+            const langTitles = titles[lang] || titles['ru'];
+            const caseIndex = (count % 100 > 4 && count % 100 < 20) ? 2 : cases[Math.min(count % 10, 5)];
+            
+            return `${count} ${langTitles[caseIndex]}`;
+        }
+        
+        // Английский
+        if (lang === 'en') {
+            return count === 1 ? `${count} Episode` : `${count} Episodes`;
+        }
+        
+        // Чешский
+        if (lang === 'cs') {
+            if (count === 1) return `${count} epizoda`;
+            if (count >= 2 && count <= 4) return `${count} epizody`;
+            return `${count} epizod`;
+        }
+        
+        // Португальский
+        if (lang === 'pt') {
+            return count === 1 ? `${count} Episódio` : `${count} Episódios`;
+        }
+        
+        // Иврит
+        if (lang === 'he') {
+            if (count === 1) return `פרק ${count}`;
+            return `${count} פרקים`;
+        }
+        
+        // Китайский (без склонения)
+        if (lang === 'zh') {
+            return `${count} 集`;
+        }
+        
+        // Остальные языки - базовое склонение
+        const episodeWord = Lampa.Lang.translate('full_episode');
+        return count === 1 ? `${count} ${episodeWord}` : `${count} ${episodeWord}s`;
+    }
+
     // Заполняем дополнительную информацию (Год/длительность)
     function fillAdditionalInfo(activity, data) {
         const infoContainer = activity.render().find('.applecation__info');
@@ -2516,6 +2759,14 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
             const seasons = Lampa.Utils.countSeasons(data);
             if (seasons) {
                 infoParts.push(formatSeasons(seasons));
+            }
+
+            // Показываем количество серий, если включено в настройках
+            if (Lampa.Storage.get('applecation_show_episode_count', false)) {
+                const episodes = data.number_of_episodes;
+                if (episodes) {
+                    infoParts.push(formatEpisodes(episodes));
+                }
             }
         } else {
             // Фильм - общая продолжительность
@@ -2630,7 +2881,49 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
             activity.render().find('.applecation__ratings').addClass('show');
         });
 
-        // Загружаем логотип
+        const logoContainer = activity.render().find('.applecation__logo');
+        const titleElement = activity.render().find('.full-start-new__title');
+
+        // Функция для отрисовки найденного логотипа
+        const renderLogo = (logoPath) => {
+            const quality = getLogoQuality();
+            const logoUrl = Lampa.TMDB.image(`/t/p/${quality}${logoPath}`);
+
+            const img = new Image();
+            img.onload = () => {
+                if (!isAlive(activity)) return;
+
+                logoContainer.html(`<img src="${logoUrl}" alt="" />`);
+                waitForBackgroundLoad(activity, () => {
+                    if (!isAlive(activity)) return;
+                    logoContainer.addClass('loaded');
+                });
+                
+                // Обновляем логотип в оверлее
+                updateOverlayLogo(logoUrl);
+            };
+            img.src = logoUrl;
+        };
+
+        // 1. Пытаемся взять логотип из уже загруженных данных (благодаря патчу append_to_response)
+        if (data.images && data.images.logos && data.images.logos.length > 0) {
+            // Находим логотип на текущем языке или английский/нейтральный
+            const lang = Lampa.Storage.field('tmdb_lang') || Lampa.Storage.get('language') || 'ru';
+            let logo = data.images.logos.find(l => l.iso_639_1 === lang);
+            
+            // Если логотипа на текущем языке нет, ищем на английском или нейтральном
+            if (!logo && Lampa.Storage.get('applecation_show_foreign_logo', true)) {
+                logo = data.images.logos.find(l => l.iso_639_1 === 'en');
+                if (!logo) logo = data.images.logos.find(l => !l.iso_639_1); // null
+                if (!logo) logo = data.images.logos[0];
+            }
+
+            if (logo && logo.file_path) {
+                return renderLogo(logo.file_path);
+            }
+        }
+
+        // 2. Если логотипа нет в данных (например, другой источник или ошибка патча), делаем старый запрос
         const mediaType = data.name ? 'tv' : 'movie';
         const apiUrl = Lampa.TMDB.api(
             `${mediaType}/${data.id}/images?api_key=${Lampa.TMDB.key()}&language=${Lampa.Storage.get('language')}`
@@ -2639,41 +2932,29 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
         $.get(apiUrl, (imagesData) => {
             if (!isAlive(activity)) return;
 
-            const logoContainer = activity.render().find('.applecation__logo');
-            const titleElement = activity.render().find('.full-start-new__title');
+            if (imagesData.logos && imagesData.logos.length > 0) {
+                const lang = Lampa.Storage.field('tmdb_lang') || Lampa.Storage.get('language') || 'ru';
+                let logo = imagesData.logos.find(l => l.iso_639_1 === lang);
 
-            if (imagesData.logos && imagesData.logos[0]) {
-                const logoPath = imagesData.logos[0].file_path;
-                const quality = getLogoQuality();
-                const logoUrl = Lampa.TMDB.image(`/t/p/${quality}${logoPath}`);
+                if (!logo && Lampa.Storage.get('applecation_show_foreign_logo', true)) {
+                    logo = imagesData.logos.find(l => l.iso_639_1 === 'en') || imagesData.logos.find(l => !l.iso_639_1) || imagesData.logos[0];
+                }
 
-                const img = new Image();
-                img.onload = () => {
-                    if (!isAlive(activity)) return;
-
-                    logoContainer.html(`<img src="${logoUrl}" alt="" />`);
-                    waitForBackgroundLoad(activity, () => {
-                        if (!isAlive(activity)) return;
-                        
-                        logoContainer.addClass('loaded');
-                    });
-                    
-                    // Обновляем логотип в оверлее
-                    updateOverlayLogo(logoUrl);
-                };
-                img.src = logoUrl;
-            } else {
-                // Нет логотипа - показываем текстовое название
-                titleElement.show();
-                waitForBackgroundLoad(activity, () => {
-                    logoContainer.addClass('loaded');
-                });
+                if (logo && logo.file_path) {
+                    return renderLogo(logo.file_path);
+                }
             }
+            
+            // Нет подходящего логотипа - показываем текстовое название
+            titleElement.show();
+            waitForBackgroundLoad(activity, () => {
+                logoContainer.addClass('loaded');
+            });
         }).fail(() => {
             // При ошибке показываем текстовое название
-            activity.render().find('.full-start-new__title').show();
+            titleElement.show();
             waitForBackgroundLoad(activity, () => {
-                activity.render().find('.applecation__logo').addClass('loaded');
+                logoContainer.addClass('loaded');
             });
         });
     }
