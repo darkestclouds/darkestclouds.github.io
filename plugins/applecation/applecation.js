@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    const APPLECATION_VERSION = '1.2.1';
+    const APPLECATION_VERSION = '1.3.0';
 
     // Иконка плагина
     const PLUGIN_ICON = '<svg viewBox="110 90 180 210"xmlns=http://www.w3.org/2000/svg><g id=sphere><circle cx=200 cy=140 fill="hsl(200, 80%, 40%)"opacity=0.3 r=1.2 /><circle cx=230 cy=150 fill="hsl(200, 80%, 45%)"opacity=0.35 r=1.3 /><circle cx=170 cy=155 fill="hsl(200, 80%, 42%)"opacity=0.32 r=1.2 /><circle cx=245 cy=175 fill="hsl(200, 80%, 48%)"opacity=0.38 r=1.4 /><circle cx=155 cy=180 fill="hsl(200, 80%, 44%)"opacity=0.34 r=1.3 /><circle cx=215 cy=165 fill="hsl(200, 80%, 46%)"opacity=0.36 r=1.2 /><circle cx=185 cy=170 fill="hsl(200, 80%, 43%)"opacity=0.33 r=1.3 /><circle cx=260 cy=200 fill="hsl(200, 80%, 50%)"opacity=0.4 r=1.5 /><circle cx=140 cy=200 fill="hsl(200, 80%, 50%)"opacity=0.4 r=1.5 /><circle cx=250 cy=220 fill="hsl(200, 80%, 48%)"opacity=0.38 r=1.4 /><circle cx=150 cy=225 fill="hsl(200, 80%, 47%)"opacity=0.37 r=1.4 /><circle cx=235 cy=240 fill="hsl(200, 80%, 45%)"opacity=0.35 r=1.3 /><circle cx=165 cy=245 fill="hsl(200, 80%, 44%)"opacity=0.34 r=1.3 /><circle cx=220 cy=255 fill="hsl(200, 80%, 42%)"opacity=0.32 r=1.2 /><circle cx=180 cy=258 fill="hsl(200, 80%, 41%)"opacity=0.31 r=1.2 /><circle cx=200 cy=120 fill="hsl(200, 80%, 60%)"opacity=0.5 r=1.8 /><circle cx=240 cy=135 fill="hsl(200, 80%, 65%)"opacity=0.55 r=2 /><circle cx=160 cy=140 fill="hsl(200, 80%, 62%)"opacity=0.52 r=1.9 /><circle cx=270 cy=165 fill="hsl(200, 80%, 70%)"opacity=0.6 r=2.2 /><circle cx=130 cy=170 fill="hsl(200, 80%, 67%)"opacity=0.57 r=2.1 /><circle cx=255 cy=190 fill="hsl(200, 80%, 72%)"opacity=0.62 r=2.3 /><circle cx=145 cy=195 fill="hsl(200, 80%, 69%)"opacity=0.59 r=2.2 /><circle cx=280 cy=200 fill="hsl(200, 80%, 75%)"opacity=0.65 r=2.5 /><circle cx=120 cy=200 fill="hsl(200, 80%, 75%)"opacity=0.65 r=2.5 /><circle cx=275 cy=215 fill="hsl(200, 80%, 73%)"opacity=0.63 r=2.4 /><circle cx=125 cy=220 fill="hsl(200, 80%, 71%)"opacity=0.61 r=2.3 /><circle cx=260 cy=235 fill="hsl(200, 80%, 68%)"opacity=0.58 r=2.2 /><circle cx=140 cy=240 fill="hsl(200, 80%, 66%)"opacity=0.56 r=2.1 /><circle cx=245 cy=255 fill="hsl(200, 80%, 63%)"opacity=0.53 r=2 /><circle cx=155 cy=260 fill="hsl(200, 80%, 61%)"opacity=0.51 r=1.9 /><circle cx=225 cy=270 fill="hsl(200, 80%, 58%)"opacity=0.48 r=1.8 /><circle cx=175 cy=272 fill="hsl(200, 80%, 56%)"opacity=0.46 r=1.7 /><circle cx=200 cy=100 fill="hsl(200, 80%, 85%)"opacity=0.8 r=2.8 /><circle cx=230 cy=115 fill="hsl(200, 80%, 90%)"opacity=0.85 r=3 /><circle cx=170 cy=120 fill="hsl(200, 80%, 87%)"opacity=0.82 r=2.9 /><circle cx=250 cy=140 fill="hsl(200, 80%, 92%)"opacity=0.88 r=3.2 /><circle cx=150 cy=145 fill="hsl(200, 80%, 89%)"opacity=0.84 r=3.1 /><circle cx=265 cy=170 fill="hsl(200, 80%, 95%)"opacity=0.9 r=3.4 /><circle cx=135 cy=175 fill="hsl(200, 80%, 93%)"opacity=0.87 r=3.3 /><circle cx=275 cy=200 fill="hsl(200, 80%, 98%)"opacity=0.95 r=3.5 /><circle cx=125 cy=200 fill="hsl(200, 80%, 98%)"opacity=0.95 r=3.5 /><circle cx=200 cy=200 fill="hsl(200, 80%, 100%)"opacity=1 r=4 /><circle cx=220 cy=195 fill="hsl(200, 80%, 98%)"opacity=0.95 r=3.8 /><circle cx=180 cy=205 fill="hsl(200, 80%, 97%)"opacity=0.93 r=3.7 /><circle cx=240 cy=210 fill="hsl(200, 80%, 96%)"opacity=0.92 r=3.6 /><circle cx=160 cy=215 fill="hsl(200, 80%, 95%)"opacity=0.9 r=3.5 /><circle cx=270 cy=230 fill="hsl(200, 80%, 94%)"opacity=0.88 r=3.4 /><circle cx=130 cy=235 fill="hsl(200, 80%, 92%)"opacity=0.86 r=3.3 /><circle cx=255 cy=250 fill="hsl(200, 80%, 90%)"opacity=0.84 r=3.2 /><circle cx=145 cy=255 fill="hsl(200, 80%, 88%)"opacity=0.82 r=3.1 /><circle cx=235 cy=265 fill="hsl(200, 80%, 86%)"opacity=0.8 r=3 /><circle cx=165 cy=268 fill="hsl(200, 80%, 84%)"opacity=0.78 r=2.9 /><circle cx=215 cy=280 fill="hsl(200, 80%, 82%)"opacity=0.76 r=2.8 /><circle cx=185 cy=282 fill="hsl(200, 80%, 80%)"opacity=0.74 r=2.7 /><circle cx=200 cy=290 fill="hsl(200, 80%, 78%)"opacity=0.72 r=2.6 /><circle cx=210 cy=130 fill="hsl(200, 80%, 88%)"opacity=0.83 r=2.5 /><circle cx=190 cy=135 fill="hsl(200, 80%, 86%)"opacity=0.81 r=2.4 /><circle cx=225 cy=155 fill="hsl(200, 80%, 91%)"opacity=0.86 r=2.8 /><circle cx=175 cy=160 fill="hsl(200, 80%, 89%)"opacity=0.84 r=2.7 /><circle cx=245 cy=185 fill="hsl(200, 80%, 94%)"opacity=0.89 r=3.3 /><circle cx=155 cy=190 fill="hsl(200, 80%, 92%)"opacity=0.87 r=3.2 /><circle cx=260 cy=210 fill="hsl(200, 80%, 95%)"opacity=0.91 r=3.4 /><circle cx=140 cy=215 fill="hsl(200, 80%, 93%)"opacity=0.88 r=3.3 /><circle cx=250 cy=230 fill="hsl(200, 80%, 91%)"opacity=0.85 r=3.2 /><circle cx=150 cy=235 fill="hsl(200, 80%, 89%)"opacity=0.83 r=3.1 /><circle cx=230 cy=245 fill="hsl(200, 80%, 87%)"opacity=0.81 r=3 /><circle cx=170 cy=250 fill="hsl(200, 80%, 85%)"opacity=0.79 r=2.9 /><circle cx=210 cy=260 fill="hsl(200, 80%, 83%)"opacity=0.77 r=2.8 /><circle cx=190 cy=265 fill="hsl(200, 80%, 81%)"opacity=0.75 r=2.7 /></g></svg>';
@@ -71,15 +71,15 @@
         }
 
         static equal(title1, title2) {
-            return typeof title1 === 'string' && 
-                   typeof title2 === 'string' && 
-                   this.normalize(title1) === this.normalize(title2);
+            return typeof title1 === 'string' &&
+                typeof title2 === 'string' &&
+                this.normalize(title1) === this.normalize(title2);
         }
 
         static contains(str, title) {
-            return typeof str === 'string' && 
-                   typeof title === 'string' && 
-                   this.normalize(str).indexOf(this.normalize(title)) !== -1;
+            return typeof str === 'string' &&
+                typeof title === 'string' &&
+                this.normalize(str).indexOf(this.normalize(title)) !== -1;
         }
     }
 
@@ -96,7 +96,7 @@
 
             const cache = this._getCache();
             const entry = cache[id];
-            
+
             if (!entry) return null;
 
             const isExpired = (Date.now() - entry.timestamp) > RATINGS_CONFIG.cacheLifetime;
@@ -127,7 +127,7 @@
     class MDBListProvider {
         static fetch(movie, callback) {
             const apiKey = Lampa.Storage.get('applecation_mdblist_api_key', '');
-            
+
             if (!apiKey) {
                 return callback({});
             }
@@ -174,7 +174,7 @@
     class KinopoiskProvider {
         static fetch(movie, callback) {
             const apiKey = Lampa.Storage.get('applecation_kp_api_key', '');
-            
+
             if (!apiKey) {
                 return callback(null);
             }
@@ -185,7 +185,7 @@
         static _searchFilm(movie, callback, apiKey) {
             const title = movie.title || movie.name;
             const cleanTitle = TitleUtils.cleanForKP(title || '');
-            
+
             const { url, method } = this._buildSearchUrl(movie, cleanTitle);
 
             RatingsRequestClient.getJson(
@@ -225,7 +225,7 @@
         static _selectBestMatch(movie, items, callback, apiKey) {
             const searchYear = this._extractYear(movie.release_date || movie.first_air_date);
             const originalTitle = movie.original_title || movie.original_name;
-            
+
             let candidates = items.map(item => {
                 const year = item.start_date || item.year || '0000';
                 return {
@@ -236,7 +236,7 @@
 
             // Фильтр по IMDb ID
             if (movie.imdb_id) {
-                const imdbMatches = candidates.filter(item => 
+                const imdbMatches = candidates.filter(item =>
                     (item.imdb_id || item.imdbId) === movie.imdb_id
                 );
                 if (imdbMatches.length > 0) {
@@ -338,7 +338,7 @@
             try {
                 const xml = $($.parseXML(xmlString));
                 const kpRating = xml.find('kp_rating');
-                
+
                 if (kpRating.length) {
                     const value = parseFloat(kpRating.text());
                     return (value > 0 && value <= 10) ? value : null;
@@ -388,10 +388,10 @@
                 if (pendingRequests <= 0) {
                     result.ready = true;
                     this.cacheManager.set(movie.id, result);
-                    
+
                     const callbacks = this.pendingRequests.get(movie.id) || [];
                     this.pendingRequests.delete(movie.id);
-                    
+
                     callbacks.forEach(cb => {
                         try {
                             cb(result);
@@ -481,7 +481,7 @@
             // Разрешение
             if (video.width && video.height) {
                 quality.resolution = `${video.width}x${video.height}`;
-                
+
                 // Определяем метки качества
                 // Проверяем и ширину для широкоформатного контента (2.35:1, 2.39:1 и т.д.)
                 if (video.height >= 2160 || video.width >= 3840) {
@@ -497,13 +497,13 @@
 
             // HDR определяется через side_data_list или color_transfer
             if (video.side_data_list) {
-                const hasMasteringDisplay = video.side_data_list.some(data => 
+                const hasMasteringDisplay = video.side_data_list.some(data =>
                     data.side_data_type === 'Mastering display metadata'
                 );
-                const hasContentLight = video.side_data_list.some(data => 
+                const hasContentLight = video.side_data_list.some(data =>
                     data.side_data_type === 'Content light level metadata'
                 );
-                const hasDolbyVision = video.side_data_list.some(data => 
+                const hasDolbyVision = video.side_data_list.some(data =>
                     data.side_data_type === 'DOVI configuration record' ||
                     data.side_data_type === 'Dolby Vision RPU'
                 );
@@ -526,7 +526,7 @@
 
             // Проверка через codec_name для Dolby Vision
             if (!quality.dolbyVision && video.codec_name) {
-                if (video.codec_name.toLowerCase().includes('dovi') || 
+                if (video.codec_name.toLowerCase().includes('dovi') ||
                     video.codec_name.toLowerCase().includes('dolby')) {
                     quality.dolbyVision = true;
                     quality.hdr = true;
@@ -537,7 +537,7 @@
         // Анализ аудио потоков
         const audioStreams = ffprobe.filter(stream => stream.codec_type === 'audio');
         let maxChannels = 0;
-        
+
         audioStreams.forEach(audio => {
             if (audio.channels && audio.channels > maxChannels) {
                 maxChannels = audio.channels;
@@ -570,9 +570,9 @@
         }
 
         const title = movie.title || movie.name || 'Неизвестно';
-        
+
         // Формируем параметры для парсера
-        const year = ((movie.first_air_date || movie.release_date || '0000') + '').slice(0,4);
+        const year = ((movie.first_air_date || movie.release_date || '0000') + '').slice(0, 4);
         const combinations = {
             'df': movie.original_title,
             'df_year': movie.original_title + ' ' + year,
@@ -610,13 +610,13 @@
                 // Анализируем ffprobe если есть
                 if (torrent.ffprobe && Array.isArray(torrent.ffprobe)) {
                     const quality = analyzeContentQuality(torrent.ffprobe);
-                    
+
                     if (quality) {
                         // Разрешение
                         if (quality.resolutionLabel) {
                             availableQualities.resolutions.add(quality.resolutionLabel);
                         }
-                        
+
                         // Аудио
                         if (quality.audio) {
                             availableQualities.audio.add(quality.audio);
@@ -629,11 +629,11 @@
                         audioStreams.forEach(audio => {
                             const lang = (audio.tags.language || '').toLowerCase();
                             const title = (audio.tags.title || audio.tags.handler_name || '').toLowerCase();
-                            
+
                             // Проверяем русский язык
                             if (lang === 'rus' || lang === 'ru' || lang === 'russian') {
                                 // Проверяем что это дубляж
-                                if (title.includes('dub') || title.includes('дубляж') || 
+                                if (title.includes('dub') || title.includes('дубляж') ||
                                     title.includes('дублир') || title === 'd') {
                                     availableQualities.hasDub = true;
                                 }
@@ -644,7 +644,7 @@
 
                 // Анализируем название торрента для HDR/DV
                 const titleLower = torrent.Title.toLowerCase();
-                
+
                 if (titleLower.includes('dolby vision') || titleLower.includes('dovi') || titleLower.match(/\bdv\b/)) {
                     availableQualities.hdr.add('Dolby Vision');
                 }
@@ -681,17 +681,17 @@
                     }
                 }
             }
-            
+
             // Dolby Vision
             if (availableQualities.hdr.has('Dolby Vision')) {
                 qualityInfo.dv = true;
                 qualityInfo.hdr = true;
             }
-            
+
             // HDR - берем максимальный тип
             if (availableQualities.hdr.size > 0) {
                 qualityInfo.hdr = true;
-                
+
                 const hdrOrder = ['HDR10+', 'HDR10', 'HDR'];
                 for (const hdr of hdrOrder) {
                     if (availableQualities.hdr.has(hdr)) {
@@ -700,7 +700,7 @@
                     }
                 }
             }
-            
+
             // Аудио - берем только максимальное
             if (availableQualities.audio.size > 0) {
                 const audioOrder = ['7.1', '5.1', '4.0', '2.0'];
@@ -714,25 +714,49 @@
 
             // Выводим JSON с результатами (опционально, для отладки)
             // console.log('Applecation Quality:', qualityInfo);
-            
+
             // Сохраняем данные в activity для отображения иконок
             if (activity && activity.applecation_quality === undefined) {
                 activity.applecation_quality = qualityInfo;
                 // Обновляем info блок с иконками
                 updateQualityBadges(activity, qualityInfo);
             }
-            
+
         }, (error) => {
             // Ошибка парсера (не выводим в консоль, чтобы не засорять)
         });
     }
 
+    /**
+     * Проверка, является ли устройство планшетом
+     * Использует логику из кода лампы (platform.js)
+     * @returns {boolean}
+     */
+    function isTablet() {
+        if (!Lampa.Utils || !Lampa.Utils.isTouchDevice || !Lampa.Utils.isTouchDevice()) {
+            return false;
+        }
+
+        const ratio = window.devicePixelRatio || 1;
+        const screenWidth = window.screen_width || window.screen.width || window.innerWidth;
+        const screenHeight = window.screen_height || window.screen.height || window.innerHeight;
+        const width = Math.ceil(screenWidth * ratio);
+        const height = Math.ceil(screenHeight * ratio);
+
+        // Планшет: горизонтальная ориентация и ширина >= 1280
+        return width > height && width >= 1280;
+    }
+
     // Главная функция плагина
     function initializePlugin() {
         console.log('Applecation', 'v' + APPLECATION_VERSION);
-        
-        if (!Lampa.Platform.screen('tv')) {
-            console.log('Applecation', 'TV mode only');
+
+        // Проверка на TV/десктоп (как в оригинальном плагине)
+        const isTvOrDesktop = Lampa.Platform.screen('tv');
+
+        // Включаем плагин только для TV, десктопов и планшетов
+        if (!isTvOrDesktop && !isTablet()) {
+            console.log('Applecation', 'TV/Desktop/Tablet mode only');
             return;
         }
 
@@ -753,89 +777,89 @@
      * - кнопка "Еще" (card-more) всегда последняя при ленивой догрузке
      * Без MutationObserver: патчим scroll.append() у нужной линии.
      */
-    function attachEpisodesCorePatch(){
-        try{
-            if(window.applecation_episodes_core_patch) return;
+    function attachEpisodesCorePatch() {
+        try {
+            if (window.applecation_episodes_core_patch) return;
             window.applecation_episodes_core_patch = true;
 
             // если где-то отдельно подключен старый плагин-перестановщик — глушим его флагом
             window.episodes_order_fix = true;
             window.episodes_core_patch = true;
 
-            if(!window.Lampa || !Lampa.Utils || typeof Lampa.Utils.createInstance !== 'function') return;
-            if(Lampa.Utils.__applecation_episodes_core_patch_applied) return;
+            if (!window.Lampa || !Lampa.Utils || typeof Lampa.Utils.createInstance !== 'function') return;
+            if (Lampa.Utils.__applecation_episodes_core_patch_applied) return;
             Lampa.Utils.__applecation_episodes_core_patch_applied = true;
 
-            function looksLikeEpisodesLinePayload(element){
-                try{
-                    if(!element) return false;
-                    if(!element.movie) return false;
-                    if(!Array.isArray(element.results) || !element.results.length) return false;
+            function looksLikeEpisodesLinePayload(element) {
+                try {
+                    if (!element) return false;
+                    if (!element.movie) return false;
+                    if (!Array.isArray(element.results) || !element.results.length) return false;
 
                     var hits = 0;
-                    for(var i = 0; i < element.results.length; i++){
+                    for (var i = 0; i < element.results.length; i++) {
                         var r = element.results[i];
-                        if(!r) continue;
+                        if (!r) continue;
 
-                        if(typeof r.episode_number === 'number') hits++;
-                        if(typeof r.season_number === 'number') hits++;
-                        if(r.comeing) hits++;
-                        if(r.air_date) hits++;
+                        if (typeof r.episode_number === 'number') hits++;
+                        if (typeof r.season_number === 'number') hits++;
+                        if (r.comeing) hits++;
+                        if (r.air_date) hits++;
                     }
 
                     return hits >= 3;
-                }catch(e){
+                } catch (e) {
                     return false;
                 }
             }
 
-            function normalizeEpisodesResults(element){
-                try{
+            function normalizeEpisodesResults(element) {
+                try {
                     var results = element.results || [];
 
                     var next = [];
                     var list = [];
 
-                    for(var i = 0; i < results.length; i++){
+                    for (var i = 0; i < results.length; i++) {
                         var r = results[i];
-                        if(!r) continue;
+                        if (!r) continue;
 
-                        if(r.comeing) next.push(r);
+                        if (r.comeing) next.push(r);
                         else list.push(r);
                     }
 
                     // Сортируем по номеру эпизода
-                    list.sort(function(a,b){
+                    list.sort(function (a, b) {
                         return (a.episode_number || 0) - (b.episode_number || 0);
                     });
 
-                    
+
 
                     element.results = list.concat(next);
-                }catch(e){}
+                } catch (e) { }
             }
 
-            function patchScrollAppendToKeepMoreLast(line){
-                try{
-                    if(!line || !line.scroll || typeof line.scroll.append !== 'function') return;
-                    if(line.__applecation_episodes_scroll_append_patched) return;
+            function patchScrollAppendToKeepMoreLast(line) {
+                try {
+                    if (!line || !line.scroll || typeof line.scroll.append !== 'function') return;
+                    if (line.__applecation_episodes_scroll_append_patched) return;
                     line.__applecation_episodes_scroll_append_patched = true;
 
                     var originalAppend = line.scroll.append.bind(line.scroll);
 
-                    line.scroll.append = function(object){
+                    line.scroll.append = function (object) {
                         var node = object instanceof jQuery ? object[0] : object;
 
                         // "Еще" добавляем как обычно
-                        if(node && node.classList && node.classList.contains('card-more')){
+                        if (node && node.classList && node.classList.contains('card-more')) {
                             return originalAppend(object);
                         }
 
                         // Если "Еще" уже есть — вставляем перед ним
                         var body = typeof line.scroll.body === 'function' ? line.scroll.body(true) : null;
-                        if(body){
+                        if (body) {
                             var more = body.querySelector('.card-more');
-                            if(more && node && node !== more){
+                            if (more && node && node !== more) {
                                 body.insertBefore(node, more);
                                 return;
                             }
@@ -843,57 +867,57 @@
 
                         return originalAppend(object);
                     };
-                }catch(e){}
+                } catch (e) { }
             }
 
-            function patchLineCreate(line){
-                try{
-                    if(!line || typeof line.create !== 'function') return;
-                    if(line.__applecation_episodes_create_patched) return;
+            function patchLineCreate(line) {
+                try {
+                    if (!line || typeof line.create !== 'function') return;
+                    if (line.__applecation_episodes_create_patched) return;
                     line.__applecation_episodes_create_patched = true;
 
                     var originalCreate = line.create.bind(line);
 
-                    line.create = function(){
+                    line.create = function () {
                         // ставим перехват ДО рендера модулей линии
                         patchScrollAppendToKeepMoreLast(line);
 
                         var res = originalCreate();
 
                         // убираем стили "первого" у "Еще" (если MoreFirst навесил)
-                        setTimeout(function(){
-                            try{
+                        setTimeout(function () {
+                            try {
                                 var body = line && line.scroll && typeof line.scroll.body === 'function' ? line.scroll.body(true) : null;
                                 var more = body ? body.querySelector('.card-more') : null;
-                                if(more) more.classList.remove('card-more--first');
-                            }catch(e){}
+                                if (more) more.classList.remove('card-more--first');
+                            } catch (e) { }
                         }, 0);
 
                         return res;
                     };
-                }catch(e){}
+                } catch (e) { }
             }
 
             var original = Lampa.Utils.createInstance;
 
-            Lampa.Utils.createInstance = function(BaseClass, element, add_params, replace){
+            Lampa.Utils.createInstance = function (BaseClass, element, add_params, replace) {
                 var isEpisodesLine = looksLikeEpisodesLinePayload(element);
 
                 var shouldReverse = Lampa.Storage.get('applecation_reverse_episodes', true);
 
-                if(isEpisodesLine && shouldReverse){
+                if (isEpisodesLine && shouldReverse) {
                     normalizeEpisodesResults(element);
                 }
 
                 var instance = original.call(this, BaseClass, element, add_params, replace);
 
-                if(isEpisodesLine && shouldReverse){
+                if (isEpisodesLine && shouldReverse) {
                     patchLineCreate(instance);
                 }
 
                 return instance;
             };
-        }catch(e){}
+        } catch (e) { }
     }
 
     // Переводы для настроек
@@ -1527,7 +1551,7 @@
             name: 'Applecation',
             icon: PLUGIN_ICON
         });
-        
+
         // Добавляем информацию о плагине
         Lampa.SettingsApi.addParam({
             component: 'applecation_settings',
@@ -1538,7 +1562,7 @@
             field: {
                 name: '<div>Applecation v' + APPLECATION_VERSION + '</div>'
             },
-            onRender: function(item) {
+            onRender: function (item) {
                 item.css('opacity', '0.7');
                 item.find('.settings-param__name').css({
                     'font-size': '1.2em',
@@ -1572,7 +1596,7 @@
                 name: t('show_ratings'),
                 description: t('show_ratings_desc')
             },
-            onChange: function(value) {
+            onChange: function (value) {
                 if (value) {
                     $('body').removeClass('applecation--hide-ratings');
                 } else {
@@ -1600,7 +1624,7 @@
                 name: t('ratings_source'),
                 description: t('ratings_source_desc')
             },
-            onChange: function(value) {
+            onChange: function (value) {
                 Lampa.Storage.set('applecation_ratings_source', value);
                 // Переключаем CSS-классы для скрытия/показа нужных рейтингов
                 $('body').removeClass('applecation--ratings-source-external applecation--ratings-source-builtin');
@@ -1608,7 +1632,7 @@
                 // Обновляем видимость зависимых параметров
                 Lampa.Settings.update();
             },
-            onRender: function(item) {
+            onRender: function (item) {
                 const showRatings = Lampa.Storage.get('applecation_show_ratings', false);
                 if (!showRatings) {
                     item.hide();
@@ -1630,15 +1654,15 @@
                 name: t('mdblist_api_key'),
                 description: t('mdblist_api_key_desc')
             },
-            onChange: function() {
+            onChange: function () {
                 const currentKey = Lampa.Storage.get('applecation_mdblist_api_key', '');
-                
+
                 Lampa.Input.edit({
                     title: t('mdblist_api_key'),
                     value: currentKey,
                     free: true,
                     nosave: true
-                }, function(newValue) {
+                }, function (newValue) {
                     if (newValue !== currentKey) {
                         Lampa.Storage.set('applecation_mdblist_api_key', newValue);
                         Lampa.Storage.set(RATINGS_CONFIG.cacheKey, {});
@@ -1646,7 +1670,7 @@
                     }
                 });
             },
-            onRender: function(item) {
+            onRender: function (item) {
                 const showRatings = Lampa.Storage.get('applecation_show_ratings', false);
                 if (!showRatings) {
                     item.hide();
@@ -1674,15 +1698,15 @@
                 name: t('kp_api_key'),
                 description: t('kp_api_key_desc')
             },
-            onChange: function() {
+            onChange: function () {
                 const currentKey = Lampa.Storage.get('applecation_kp_api_key', '');
-                
+
                 Lampa.Input.edit({
                     title: t('kp_api_key'),
                     value: currentKey,
                     free: true,
                     nosave: true
-                }, function(newValue) {
+                }, function (newValue) {
                     if (newValue !== currentKey) {
                         Lampa.Storage.set('applecation_kp_api_key', newValue);
                         Lampa.Storage.set(RATINGS_CONFIG.cacheKey, {});
@@ -1698,7 +1722,7 @@
                     }
                 });
             },
-            onRender: function(item) {
+            onRender: function (item) {
                 const showRatings = Lampa.Storage.get('applecation_show_ratings', false);
                 if (!showRatings) {
                     item.hide();
@@ -1726,7 +1750,7 @@
                 name: t('enabled_ratings'),
                 description: t('enabled_ratings_desc')
             },
-            onChange: function() {
+            onChange: function () {
                 let enabledRatings = Lampa.Storage.get('applecation_enabled_ratings', ['imdb', 'kp']);
                 const hasKpKey = !!Lampa.Storage.get('applecation_kp_api_key', '');
 
@@ -1735,7 +1759,7 @@
                     enabledRatings = enabledRatings.filter(x => x !== 'kp');
                     Lampa.Storage.set('applecation_enabled_ratings', enabledRatings);
                 }
-                
+
                 const items = [
                     {
                         title: t('rating_imdb'),
@@ -1795,15 +1819,15 @@
                         checked: enabledRatings.includes('kp')
                     });
                 }
-                
+
                 Lampa.Select.show({
                     title: t('enabled_ratings'),
                     items: items,
-                    onCheck: function(item) {
+                    onCheck: function (item) {
                         const hasKpKey = !!Lampa.Storage.get('applecation_kp_api_key', '');
                         const currentEnabled = Lampa.Storage.get('applecation_enabled_ratings', ['imdb', 'kp'])
                             .filter(x => hasKpKey ? true : x !== 'kp');
-                        
+
                         if (item.checked) {
                             if (!currentEnabled.includes(item.value)) {
                                 currentEnabled.push(item.value);
@@ -1814,15 +1838,15 @@
                                 currentEnabled.splice(index, 1);
                             }
                         }
-                        
+
                         Lampa.Storage.set('applecation_enabled_ratings', currentEnabled);
                     },
-                    onBack: function() {
+                    onBack: function () {
                         Lampa.Controller.toggle('settings_component');
                     }
                 });
             },
-            onRender: function(item) {
+            onRender: function (item) {
                 const showRatings = Lampa.Storage.get('applecation_show_ratings', false);
                 if (!showRatings) {
                     item.hide();
@@ -1854,10 +1878,10 @@
                 name: t('ratings_position'),
                 description: t('ratings_position_desc')
             },
-            onChange: function(value) {
+            onChange: function (value) {
                 const ratingsSource = Lampa.Storage.get('applecation_ratings_source', 'external');
                 const enabledRatings = Lampa.Storage.get('applecation_enabled_ratings', ['imdb', 'kp']);
-                
+
                 Lampa.Storage.set('applecation_ratings_position', value);
                 $('body').removeClass('applecation--ratings-card applecation--ratings-corner');
                 $('body').addClass('applecation--ratings-' + value);
@@ -1866,7 +1890,7 @@
                 addOverlayTemplate();
                 Lampa.Activity.back();
             },
-            onRender: function(item) {
+            onRender: function (item) {
                 const showRatings = Lampa.Storage.get('applecation_show_ratings', false);
                 if (!showRatings) {
                     item.hide();
@@ -1930,7 +1954,7 @@
                 name: t('reverse_episodes'),
                 description: t('reverse_episodes_desc')
             },
-            onChange: function(value) {
+            onChange: function (value) {
                 Lampa.Storage.set('applecation_reverse_episodes', value);
             }
         });
@@ -1947,7 +1971,7 @@
                 name: t('description_overlay'),
                 description: t('description_overlay_desc')
             },
-            onChange: function(value) {
+            onChange: function (value) {
                 Lampa.Storage.set('applecation_description_overlay', value);
             }
         });
@@ -1978,7 +2002,7 @@
                 name: t('liquid_glass'),
                 description: t('liquid_glass_desc')
             },
-            onChange: function(value) {
+            onChange: function (value) {
                 Lampa.Storage.set('applecation_liquid_glass', value);
                 applyLiquidGlassClass();
             }
@@ -2024,7 +2048,7 @@
                 name: t('logo_scale'),
                 description: t('logo_scale_desc')
             },
-            onChange: function(value) {
+            onChange: function (value) {
                 Lampa.Storage.set('applecation_logo_scale', value);
                 applyScales();
             }
@@ -2058,7 +2082,7 @@
                 name: t('text_scale'),
                 description: t('text_scale_desc')
             },
-            onChange: function(value) {
+            onChange: function (value) {
                 Lampa.Storage.set('applecation_text_scale', value);
                 applyScales();
             }
@@ -2095,7 +2119,7 @@
                 name: t('spacing_scale'),
                 description: t('spacing_scale_desc')
             },
-            onChange: function(value) {
+            onChange: function (value) {
                 Lampa.Storage.set('applecation_spacing_scale', value);
                 applyScales();
             }
@@ -2106,11 +2130,11 @@
             $('body').addClass('applecation--hide-ratings');
         }
         $('body').addClass('applecation--ratings-' + Lampa.Storage.get('applecation_ratings_position', 'card'));
-        
+
         // Применяем класс для источника рейтингов
         const ratingsSource = Lampa.Storage.get('applecation_ratings_source', 'external');
         $('body').addClass('applecation--ratings-source-' + ratingsSource);
-        
+
         applyScales();
     }
 
@@ -2127,7 +2151,7 @@
         const scaleStyles = `
             <style data-id="applecation_scales">
                 /* Масштаб логотипа */
-                
+
                 .applecation .applecation__logo img {
                     max-width: ${35 * logoScale / 100}vw !important;
                     max-height: ${180 * logoScale / 100}px !important;
@@ -2142,20 +2166,20 @@
                 .applecation .full-start-new__title {
                     margin-bottom: ${0.5 * spacingScale / 100}em !important;
                 }
-                
+
                 .applecation .applecation__meta {
                     margin-bottom: ${0.5 * spacingScale / 100}em !important;
                 }
-                
+
                 .applecation .applecation__ratings {
                     margin-bottom: ${0.5 * spacingScale / 100}em !important;
                 }
-                
+
                 .applecation .applecation__description {
                     max-width: ${35 * textScale / 100}vw !important;
                     margin-bottom: ${0.5 * spacingScale / 100}em !important;
                 }
-                
+
                 .applecation .applecation__info {
                     margin-bottom: ${0.5 * spacingScale / 100}em !important;
                 }
@@ -2191,14 +2215,14 @@
                 </div>
             </div>
         `;
-        
+
         Lampa.Template.add('applecation_overlay', overlayTemplate);
     }
 
     // Регистрируем кастомный шаблон страницы full
     function addCustomTemplate() {
         const ratingsPosition = Lampa.Storage.get('applecation_ratings_position', 'card');
-        
+
         // Блок с рейтингами
         const ratingsBlock = `<!-- Рейтинги -->
                     <div class="applecation__ratings">
@@ -2217,7 +2241,7 @@
                         <!-- Контейнер для встроенных рейтингов (чтобы можно было анимировать появление отдельно от общего блока) -->
                         <div class="applecation__ratings-builtin hide"></div>
                     </div>`;
-        
+
         const template = `<div class="full-start-new applecation">
         <div class="full-start-new__body">
             <div class="full-start-new__left hide">
@@ -2229,10 +2253,10 @@
             <div class="full-start-new__right">
                 <div class="applecation__left">
                     <div class="applecation__logo"></div>
-                    
+
                     <div class="applecation__content-wrapper">
                         <div class="full-start-new__title" style="display: none;">{title}</div>
-                        
+
                         <div class="applecation__meta">
                             <div class="applecation__meta-left">
                                 <span class="applecation__network"></span>
@@ -2240,15 +2264,15 @@
                                 <div class="full-start__pg hide"></div>
                             </div>
                         </div>
-                        
+
                         ${ratingsPosition === 'card' ? ratingsBlock : ''}
-                        
+
                         <div class="applecation__description-wrapper">
                             <div class="applecation__description"></div>
                         </div>
                         <div class="applecation__info"></div>
                     </div>
-                    
+
                     <!-- Скрытые оригинальные элементы -->
                     <div class="full-start-new__head" style="display: none;"></div>
                     <div class="full-start-new__details" style="display: none;"></div>
@@ -2299,14 +2323,14 @@
                     <div class="full-start-new__reactions selector">
                         <div>#{reactions_none}</div>
                     </div>
-                    
+
                     ${ratingsPosition === 'corner' ? ratingsBlock : ''}
 
                     <!-- Скрытый элемент для совместимости (предотвращает выход реакций за экран) -->
                     <div class="full-start-new__rate-line">
                         <div class="full-start__status hide"></div>
                     </div>
-                    
+
                     <!-- Пустой маркер для предотвращения вставки элементов от modss.js -->
                     <div class="rating--modss" style="display: none;"></div>
                 </div>
@@ -2346,7 +2370,7 @@
                 <div class="full-episode__date">{date}</div>
             </div>
         </div>`;
-        
+
         Lampa.Template.add('full_episode', episodeTemplate);
     }
 
@@ -2662,7 +2686,7 @@ body.applecation--ratings-corner .applecation__ratings {
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
 
   transform: scale(1.07) translateY(0);
-  
+
   transition-delay: 0s;
 }
 
@@ -3238,7 +3262,7 @@ body.advanced--animation:not(.no--animation) .full-start__background.loaded {
     overflow: hidden !important;
     background: rgba(255, 255, 255, 0.05) !important;
     flex-shrink: 0 !important;
-    transition: 
+    transition:
         box-shadow 0.6s cubic-bezier(0.16, 1, 0.3, 1),
         backdrop-filter 0.6s cubic-bezier(0.16, 1, 0.3, 1),
         -webkit-backdrop-filter 0.6s cubic-bezier(0.16, 1, 0.3, 1),
@@ -3402,8 +3426,234 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
 body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__photo::after {
     display: none !important;
 }
+
+/* =========================================================
+   АДАПТАЦИЯ ДЛЯ ПЛАНШЕТОВ - TABLET
+   ========================================================= */
+
+/* Планшеты (768px - 1024px) */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+    /* Основной контейнер */
+    .applecation .full-start-new__body {
+        height: 75vh !important;
+        padding: 2em 0 !important;
+    }
+
+    /* Заголовок */
+    .applecation .full-start-new__title {
+        font-size: 2.2em !important;
+        margin-bottom: 0.6em !important;
+    }
+
+    /* Логотип */
+    .applecation__logo img {
+        max-width: 50vw !important;
+        max-height: 150px !important;
+    }
+
+    /* Мета информация */
+    .applecation__meta {
+        font-size: 0.95em !important;
+        gap: 0.5em !important;
+    }
+
+    /* Описание */
+    .applecation__description {
+        max-width: 50vw !important;
+        font-size: 1em !important;
+        -webkit-line-clamp: 5 !important;
+        line-height: 1.5 !important;
+    }
+
+    /* Обертка описания - делаем более заметной для touch */
+    .applecation__description-wrapper {
+        cursor: pointer;
+        padding: 0.3em 0.5em !important;
+    }
+
+    .applecation__description-wrapper.focus {
+        padding: 0.4em 0.7em !important;
+    }
+
+    /* Дополнительная информация */
+    .applecation__info {
+        font-size: 0.95em !important;
+    }
+
+    /* Рейтинги */
+    .applecation__ratings {
+        gap: 0.6em !important;
+    }
+
+    .applecation__ratings svg {
+        width: 1.6em !important;
+    }
+
+    /* Эпизоды */
+    .applecation .full-episode--small {
+        width: 17em !important;
+        margin-right: 1.2em !important;
+    }
+
+    .applecation .full-episode__name {
+        font-size: 1.05em !important;
+    }
+
+    .applecation .full-episode__overview {
+        font-size: 0.9em !important;
+        -webkit-line-clamp: 4 !important;
+    }
+
+    /* Персоны */
+    .applecation .full-person {
+        width: 9.5em !important;
+        margin-right: 1em !important;
+    }
+
+    .applecation .full-person__photo {
+        width: 8.5em !important;
+        height: 8.5em !important;
+    }
+
+    .applecation .full-person__name {
+        font-size: 0.95em !important;
+    }
+
+    .applecation .full-person__role {
+        font-size: 0.85em !important;
+    }
+
+    /* Оверлей описания - оптимизация для планшетов */
+    .applecation-description-overlay__content {
+        max-width: 70vw !important;
+        padding: 2em !important;
+    }
+
+    .applecation-description-overlay__title {
+        font-size: 1.8em !important;
+        margin-bottom: 1.2em !important;
+    }
+
+    .applecation-description-overlay__text {
+        font-size: 1.1em !important;
+        line-height: 1.7 !important;
+    }
+
+    .applecation-description-overlay__info-name {
+        font-size: 1em !important;
+    }
+
+    .applecation-description-overlay__info-body {
+        font-size: 1.1em !important;
+    }
+}
+
+/* Портретная ориентация на планшетах */
+@media screen and (min-width: 769px) and (max-width: 1024px) and (orientation: portrait) {
+    .applecation .full-start-new__body {
+        height: 70vh !important;
+        flex-direction: column !important;
+    }
+
+    .applecation .full-start-new__title {
+        font-size: 2em !important;
+    }
+
+    .applecation__description {
+        max-width: 80vw !important;
+        -webkit-line-clamp: 4 !important;
+    }
+
+    .applecation__logo img {
+        max-width: 60vw !important;
+    }
+
+    /* Оверлей в портретной ориентации */
+    .applecation-description-overlay__content {
+        max-width: 85vw !important;
+        max-height: 85vh !important;
+    }
+}
+
+/* Ландшафтная ориентация на планшетах */
+@media screen and (min-width: 769px) and (max-width: 1024px) and (orientation: landscape) and (max-height: 600px) {
+    .applecation .full-start-new__body {
+        height: auto !important;
+        min-height: 50vh;
+        padding: 1.5em 0 !important;
+    }
+
+    .applecation .full-start-new__title {
+        font-size: 1.8em !important;
+    }
+
+    .applecation__description {
+        max-width: 45vw !important;
+        -webkit-line-clamp: 3 !important;
+        font-size: 0.95em !important;
+    }
+
+    /* Оверлей в ландшафтной ориентации */
+    .applecation-description-overlay__content {
+        max-width: 75vw !important;
+        max-height: 80vh !important;
+    }
+}
+
+/* Улучшение для touch-устройств */
+@media (hover: none) and (pointer: coarse) {
+    /* Увеличиваем область нажатия для touch */
+    .applecation .full-episode,
+    .applecation .full-person {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    /* Улучшаем видимость фокуса на touch-устройствах */
+    .applecation .full-episode.focus,
+    .applecation .full-person.focus {
+        transform: scale(1.05) translateY(-4px) !important;
+    }
+
+    /* Улучшаем видимость кнопок */
+    .applecation .full-start__button {
+        min-height: 44px;
+        padding: 0.6em 1em;
+    }
+
+    /* Улучшаем интерактивность описания на touch-устройствах */
+    .applecation__description-wrapper {
+        -webkit-tap-highlight-color: rgba(255, 255, 255, 0.1);
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .applecation__description-wrapper:active {
+        background-color: rgba(255, 255, 255, 0.15) !important;
+        transform: scale(0.98) !important;
+    }
+
+    .applecation__description-wrapper.focus {
+        background-color: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    /* Визуальная подсказка что описание можно открыть */
+    .applecation__description {
+        position: relative;
+    }
+
+    .applecation__description::after {
+        content: '⋯';
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        font-size: 1.2em;
+        color: rgba(255, 255, 255, 0.4);
+        line-height: 1;
+        pointer-events: none;
+    }
+}
 </style>`;
-        
+
         Lampa.Template.add('applecation_css', styles);
         $('body').append(Lampa.Template.get('applecation_css', {}, true));
     }
@@ -3417,12 +3667,12 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
         // 0. Патчим формирование URL для TMDB, чтобы добавить логотипы в основной запрос (append_to_response)
         if (window.Lampa && Lampa.TMDB && Lampa.TMDB.api) {
             const originalTmdbApi = Lampa.TMDB.api;
-            Lampa.TMDB.api = function(url) {
+            Lampa.TMDB.api = function (url) {
                 let newUrl = url;
                 if (typeof newUrl === 'string' && newUrl.indexOf('append_to_response=') !== -1 && newUrl.indexOf('images') === -1) {
                     // Добавляем images в список append_to_response
                     newUrl = newUrl.replace('append_to_response=', 'append_to_response=images,');
-                    
+
                     // Добавляем языки для картинок, если они еще не указаны
                     if (newUrl.indexOf('include_image_language=') === -1) {
                         const lang = Lampa.Storage.field('tmdb_lang') || Lampa.Storage.get('language') || 'ru';
@@ -3432,10 +3682,10 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                 return originalTmdbApi.call(Lampa.TMDB, newUrl);
             };
         }
-        
+
         // 1. Патчим шаблонизатор, чтобы принудительно изменить формат даты и времени в карточках
         const originalTemplateJs = Lampa.Template.js;
-        Lampa.Template.js = function(name, vars) {
+        Lampa.Template.js = function (name, vars) {
             if (name === 'full_episode' && vars) {
                 // Форматируем время (локализовано: 1 ч 10 м или 39 м) - убираем точки
                 if (vars.runtime > 0) {
@@ -3458,7 +3708,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
 
         // 2. Патчим метод изображений для улучшения качества
         const originalImg = tmdbSource.img;
-        tmdbSource.img = function(src, size) {
+        tmdbSource.img = function (src, size) {
             const posterSize = Lampa.Storage.field('poster_size');
 
             if (size === 'w1280') {
@@ -3504,7 +3754,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
     function getMediaType(data) {
         const lang = Lampa.Storage.get('language', 'ru');
         const isTv = !!data.name;
-        
+
         const types = {
             ru: isTv ? 'Сериал' : 'Фильм',
             en: isTv ? 'TV Series' : 'Movie',
@@ -3516,14 +3766,14 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
             pt: isTv ? 'Série' : 'Filme',
             zh: isTv ? '电视剧' : '电影'
         };
-        
+
         return types[lang] || types['en'];
     }
 
     // Загружаем иконку студии/сети
     function loadNetworkIcon(activity, data) {
         const networkContainer = activity.render().find('.applecation__network');
-        
+
         // Для сериалов - телесеть
         if (data.networks && data.networks.length) {
             const network = data.networks[0];
@@ -3533,7 +3783,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                 return;
             }
         }
-        
+
         // Для фильмов - студия
         if (data.production_companies && data.production_companies.length) {
             const company = data.production_companies[0];
@@ -3543,7 +3793,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                 return;
             }
         }
-        
+
         // Если нет иконки - скрываем контейнер
         networkContainer.remove();
     }
@@ -3558,14 +3808,14 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
 
         // Жанры (первые 2-3)
         if (data.genres && data.genres.length) {
-            const genres = data.genres.slice(0, 2).map(g => 
+            const genres = data.genres.slice(0, 2).map(g =>
                 Lampa.Utils.capitalizeFirstLetter(g.name)
             );
             metaParts.push(...genres);
         }
 
         metaTextContainer.html(metaParts.join(' · '));
-        
+
         // Загружаем иконку студии/сети
         loadNetworkIcon(activity, data);
     }
@@ -3576,68 +3826,85 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
         const descWrapper = activity.render().find('.applecation__description-wrapper');
         const description = data.overview || '';
         const useOverlay = Lampa.Storage.get('applecation_description_overlay', true);
-        
+
         descContainer.text(description);
-        
+
         if (useOverlay) {
             // Создаем оверлей заранее
             createDescriptionOverlay(activity, data);
-            
-            // Добавляем обработчик клика для показа полного описания
-            descWrapper.off('hover:enter').on('hover:enter', function() {
+
+            // Добавляем обработчик для показа полного описания
+            // На планшетах используем и hover:enter и touch события
+            descWrapper.off('hover:enter click touchstart');
+
+            // Для TV/десктопов (hover:enter)
+            descWrapper.on('hover:enter', function () {
                 showFullDescription();
             });
+
+            // Для планшетов (touch/click)
+            if (Lampa.Utils && Lampa.Utils.isTouchDevice && Lampa.Utils.isTouchDevice()) {
+                descWrapper.on('click touchstart', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    showFullDescription();
+                });
+
+                // Добавляем визуальную индикацию что описание кликабельно
+                descWrapper.css('cursor', 'pointer');
+                descContainer.css('cursor', 'pointer');
+            }
         } else {
             // Если оверлей отключен, убираем обработчики и удаляем оверлей
             descWrapper.off('hover:enter');
             $('.applecation-description-overlay').remove();
         }
     }
-    
+
     // Обновляем логотип в оверлее
     function updateOverlayLogo(logoUrl) {
         const overlay = $('.applecation-description-overlay');
-        
+
         if (!overlay.length) return;
-        
+
         if (logoUrl) {
             const newLogoImg = $('<img>').attr('src', logoUrl);
             overlay.find('.applecation-description-overlay__logo').html(newLogoImg).css('display', 'block');
             overlay.find('.applecation-description-overlay__title').css('display', 'none');
         }
     }
-    
+
     // Парсим страны с локализацией (как в ядре Lampa)
     function parseCountries(movie) {
         if (!movie.production_countries) return [];
-        
+
         return movie.production_countries.map(country => {
             const isoCode = country.iso_3166_1;
             const langKey = 'country_' + isoCode.toLowerCase();
             const translated = Lampa.Lang.translate(langKey);
-            
+
             // Если перевод найден (не равен ключу), используем его, иначе оригинальное имя
             return translated !== langKey ? translated : country.name;
         });
     }
-    
+
     // Создаем оверлей заранее
     function createDescriptionOverlay(activity, data) {
         const text = data.overview || '';
         const title = data.title || data.name;
-        
+
         if (!text) return;
-        
+
         // Удаляем старый оверлей если есть
         $('.applecation-description-overlay').remove();
-        
+
         // Парсим данные как в Lampa
         const date = (data.release_date || data.first_air_date || '') + '';
         const relise = date.length > 3 ? Lampa.Utils.parseTime(date).full : date.length > 0 ? date : Lampa.Lang.translate('player_unknown');
         const budget = '$ ' + Lampa.Utils.numberWithSpaces(data.budget || 0);
         const countriesArr = parseCountries(data);
         const countries = countriesArr.join(', ');
-        
+
         // Создаем оверлей через шаблон Lampa
         const overlay = $(Lampa.Template.get('applecation_overlay', {
             title: title,
@@ -3646,60 +3913,71 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
             budget: budget,
             countries: countries
         }));
-        
+
         // Скрываем бюджет если 0
         if (!data.budget || data.budget === 0) {
             overlay.find('.applecation--budget').remove();
         }
-        
+
         // Скрываем страны если пусто
         if (!countries) {
             overlay.find('.applecation--countries').remove();
         }
-        
+
         // Добавляем в body но НЕ показываем
         $('body').append(overlay);
-        
+
         // Сохраняем ссылку
         overlay.data('controller-created', false);
     }
-    
+
     // Показываем полное описание в оверлее
     function showFullDescription() {
         const overlay = $('.applecation-description-overlay');
-        
+
         if (!overlay.length) return;
-        
+
         // Анимация появления
         setTimeout(() => overlay.addClass('show'), 10);
-        
+
         // Создаем контроллер только один раз
         if (!overlay.data('controller-created')) {
             const controller = {
-                toggle: function() {
+                toggle: function () {
                     Lampa.Controller.collectionSet(overlay);
                     Lampa.Controller.collectionFocus(overlay.find('.applecation-description-overlay__content'), overlay);
                 },
-                back: function() {
+                back: function () {
                     closeDescriptionOverlay();
                 }
             };
-            
+
             Lampa.Controller.add('applecation_description', controller);
             overlay.data('controller-created', true);
+
+            // Для touch-устройств добавляем закрытие по клику на фон
+            if (Lampa.Utils && Lampa.Utils.isTouchDevice && Lampa.Utils.isTouchDevice()) {
+                overlay.find('.applecation-description-overlay__bg').on('click touchstart', function (e) {
+                    if (e.target === this) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        closeDescriptionOverlay();
+                    }
+                });
+            }
         }
-        
+
         Lampa.Controller.toggle('applecation_description');
     }
-    
+
     // Закрываем оверлей с описанием
     function closeDescriptionOverlay() {
         const overlay = $('.applecation-description-overlay');
-        
+
         if (!overlay.length) return;
-        
+
         overlay.removeClass('show');
-        
+
         setTimeout(() => {
             Lampa.Controller.toggle('content');
         }, 300);
@@ -3708,7 +3986,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
     // Склонение сезонов с локализацией
     function formatSeasons(count) {
         const lang = Lampa.Storage.get('language', 'ru');
-        
+
         // Славянские языки (ru, uk, be, bg) - сложное склонение
         if (['ru', 'uk', 'be', 'bg'].includes(lang)) {
             const cases = [2, 0, 1, 1, 1, 2];
@@ -3718,42 +3996,42 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                 be: ['сезон', 'сезоны', 'сезонаў'],
                 bg: ['сезон', 'сезона', 'сезона']
             };
-            
+
             const langTitles = titles[lang] || titles['ru'];
             const caseIndex = (count % 100 > 4 && count % 100 < 20) ? 2 : cases[Math.min(count % 10, 5)];
-            
+
             return `${count} ${langTitles[caseIndex]}`;
         }
-        
+
         // Английский
         if (lang === 'en') {
             return count === 1 ? `${count} Season` : `${count} Seasons`;
         }
-        
+
         // Чешский
         if (lang === 'cs') {
             if (count === 1) return `${count} série`;
             if (count >= 2 && count <= 4) return `${count} série`;
             return `${count} sérií`;
         }
-        
+
         // Португальский
         if (lang === 'pt') {
             return count === 1 ? `${count} Temporada` : `${count} Temporadas`;
         }
-        
+
         // Иврит
         if (lang === 'he') {
             if (count === 1) return `עונה ${count}`;
             if (count === 2) return `${count} עונות`;
             return `${count} עונות`;
         }
-        
+
         // Китайский (без склонения)
         if (lang === 'zh') {
             return `${count} 季`;
         }
-        
+
         // Остальные языки - базовое склонение
         const seasonWord = Lampa.Lang.translate('full_season');
         return count === 1 ? `${count} ${seasonWord}` : `${count} ${seasonWord}s`;
@@ -3762,7 +4040,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
     // Склонение серий с локализацией
     function formatEpisodes(count) {
         const lang = Lampa.Storage.get('language', 'ru');
-        
+
         // Славянские языки (ru, uk, be, bg) - сложное склонение
         if (['ru', 'uk', 'be', 'bg'].includes(lang)) {
             const cases = [2, 0, 1, 1, 1, 2];
@@ -3772,41 +4050,41 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                 be: ['серыя', 'серыі', 'серый'],
                 bg: ['епизод', 'епизода', 'епизода']
             };
-            
+
             const langTitles = titles[lang] || titles['ru'];
             const caseIndex = (count % 100 > 4 && count % 100 < 20) ? 2 : cases[Math.min(count % 10, 5)];
-            
+
             return `${count} ${langTitles[caseIndex]}`;
         }
-        
+
         // Английский
         if (lang === 'en') {
             return count === 1 ? `${count} Episode` : `${count} Episodes`;
         }
-        
+
         // Чешский
         if (lang === 'cs') {
             if (count === 1) return `${count} epizoda`;
             if (count >= 2 && count <= 4) return `${count} epizody`;
             return `${count} epizod`;
         }
-        
+
         // Португальский
         if (lang === 'pt') {
             return count === 1 ? `${count} Episódio` : `${count} Episódios`;
         }
-        
+
         // Иврит
         if (lang === 'he') {
             if (count === 1) return `פרק ${count}`;
             return `${count} פרקים`;
         }
-        
+
         // Китайский (без склонения)
         if (lang === 'zh') {
             return `${count} 集`;
         }
-        
+
         // Остальные языки - базовое склонение
         const episodeWord = Lampa.Lang.translate('full_episode');
         return count === 1 ? `${count} ${episodeWord}` : `${count} ${episodeWord}s`;
@@ -3832,7 +4110,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                 const timeM = Lampa.Lang.translate('time_m').replace('.', '');
                 infoParts.push(`${avgRuntime} ${timeM}`);
             }
-            
+
             // Всегда показываем количество сезонов для сериалов
             const seasons = Lampa.Utils.countSeasons(data);
             if (seasons) {
@@ -3853,8 +4131,8 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                 const minutes = data.runtime % 60;
                 const timeH = Lampa.Lang.translate('time_h').replace('.', '');
                 const timeM = Lampa.Lang.translate('time_m').replace('.', '');
-                const timeStr = hours > 0 
-                    ? `${hours} ${timeH} ${minutes} ${timeM}` 
+                const timeStr = hours > 0
+                    ? `${hours} ${timeH} ${minutes} ${timeM}`
                     : `${minutes} ${timeM}`;
                 infoParts.push(timeStr);
             }
@@ -3863,16 +4141,16 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
         const textContent = infoParts.length > 0 ? infoParts.join(' · ') : '';
         infoContainer.html(textContent + '<span class="applecation__quality-badges"></span>');
     }
-    
+
     // Обновляем бейджи качества
     function updateQualityBadges(activity, qualityInfo) {
         const badgesContainer = activity.render().find('.applecation__quality-badges');
         if (!badgesContainer.length) return;
-        
+
         const badges = [];
-        
+
         // Порядок: Quality, Dolby Vision, HDR, Sound, DUB
-        
+
         // 1. Quality (4K/2K/FHD/HD)
         if (qualityInfo.quality) {
             let qualitySvg = '';
@@ -3889,17 +4167,17 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                 badges.push(`<div class="quality-badge quality-badge--res">${qualitySvg}</div>`);
             }
         }
-        
+
         // 2. Dolby Vision
         if (qualityInfo.dv) {
             badges.push('<div class="quality-badge quality-badge--dv"><svg viewBox="0 0 1051 393" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0,393) scale(0.1,-0.1)" fill="currentColor"><path d="M50 2905 l0 -1017 223 5 c146 4 244 11 287 21 361 85 638 334 753 677 39 116 50 211 44 366 -7 200 -52 340 -163 511 -130 199 -329 344 -574 419 -79 24 -102 26 -327 31 l-243 4 0 -1017z"/><path d="M2436 3904 c-443 -95 -762 -453 -806 -905 -30 -308 86 -611 320 -832 104 -99 212 -165 345 -213 133 -47 253 -64 468 -64 l177 0 0 1015 0 1015 -217 -1 c-152 0 -239 -5 -287 -15z"/><path d="M3552 2908 l3 -1013 425 0 c309 0 443 4 490 13 213 43 407 148 550 299 119 124 194 255 247 428 25 84 27 103 27 270 1 158 -2 189 -22 259 -72 251 -221 458 -424 590 -97 63 -170 97 -288 134 l-85 26 -463 4 -462 3 2 -1013z m825 701 c165 -22 283 -81 404 -199 227 -223 279 -550 133 -831 -70 -133 -176 -234 -319 -304 -132 -65 -197 -75 -490 -75 l-245 0 0 703 c0 387 3 707 7 710 11 11 425 8 510 -4z"/><path d="M7070 2905 l0 -1015 155 0 155 0 0 1015 0 1015 -155 0 -155 0 0 -1015z"/><path d="M7640 2905 l0 -1015 150 0 150 0 0 60 c0 33 2 60 5 60 2 0 33 -15 67 -34 202 -110 433 -113 648 -9 79 38 108 59 180 132 72 71 95 102 134 181 102 207 102 414 1 625 -120 251 -394 411 -670 391 -115 -8 -225 -42 -307 -93 -21 -13 -42 -23 -48 -23 -7 0 -10 125 -10 370 l0 370 -150 0 -150 0 0 -1015z m832 95 c219 -67 348 -310 280 -527 -62 -198 -268 -328 -466 -295 -96 15 -168 52 -235 119 -131 132 -164 311 -87 478 27 60 101 145 158 181 100 63 234 80 350 44z"/><path d="M6035 3286 c-253 -49 -460 -232 -542 -481 -23 -70 -26 -96 -26 -210 0 -114 3 -140 26 -210 37 -113 90 -198 177 -286 84 -85 170 -138 288 -177 67 -22 94 -26 207 -26 113 0 140 4 207 26 119 39 204 92 288 177 87 89 140 174 177 286 22 67 26 99 27 200 1 137 -14 207 -69 320 -134 277 -457 440 -760 381z m252 -284 c117 -37 206 -114 260 -229 121 -253 -38 -548 -321 -595 -258 -43 -503 183 -483 447 20 271 287 457 544 377z"/><path d="M9059 3258 c10 -24 138 -312 285 -642 l266 -598 -72 -162 c-39 -88 -78 -171 -86 -183 -37 -58 -132 -80 -208 -48 l-35 14 -18 -42 c-10 -23 -37 -84 -60 -135 -23 -52 -39 -97 -36 -102 3 -4 40 -23 83 -41 70 -31 86 -34 177 -34 93 0 105 2 167 33 76 37 149 104 180 166 29 57 799 1777 805 1799 5 16 -6 17 -161 15 l-167 -3 -185 -415 c-102 -228 -192 -431 -200 -450 l-15 -35 -201 453 -201 452 -168 0 -168 0 18 -42z"/><path d="M2650 968 c0 -2 81 -211 179 -463 l179 -460 59 -3 59 -3 178 453 c98 249 180 459 183 466 4 9 -13 12 -65 12 -47 0 -71 -4 -74 -12 -3 -7 -65 -176 -138 -375 -73 -200 -136 -363 -139 -363 -3 0 -67 168 -142 373 l-136 372 -72 3 c-39 2 -71 1 -71 0z"/><path d="M3805 958 c-3 -7 -4 -215 -3 -463 l3 -450 63 -3 62 -3 0 466 0 465 -60 0 c-39 0 -62 -4 -65 -12z"/><path d="M4580 960 c-97 -16 -178 -72 -211 -145 -23 -50 -24 -143 -3 -193 32 -77 91 -117 244 -167 99 -32 146 -64 166 -112 28 -65 -11 -149 -83 -179 -78 -33 -212 -1 -261 61 l-19 24 -48 -43 -48 -42 43 -37 c121 -103 347 -112 462 -17 54 44 88 120 88 194 -1 130 -79 213 -242 256 -24 7 -71 25 -104 41 -48 22 -66 37 -79 65 -32 67 -5 138 65 174 73 37 193 18 244 -39 l20 -22 43 43 c41 40 42 43 25 61 -27 30 -102 64 -167 76 -64 12 -70 12 -135 1z"/><path d="M5320 505 l0 -465 65 0 65 0 0 465 0 465 -65 0 -65 0 0 -465z"/><path d="M6210 960 c-147 -25 -264 -114 -328 -249 -32 -65 -36 -84 -40 -175 -7 -161 33 -271 135 -367 140 -132 360 -164 541 -77 227 108 316 395 198 634 -88 177 -290 271 -506 234z m232 -132 c100 -46 165 -136 188 -261 20 -106 -18 -237 -88 -310 -101 -105 -245 -132 -377 -73 -74 33 -120 79 -157 154 -31 62 -33 74 -33 167 0 87 4 107 26 155 64 137 173 204 320 196 43 -2 85 -12 121 -28z"/><path d="M7135 958 c-3 -7 -4 -215 -3 -463 l3 -450 63 -3 62 -3 0 376 c0 207 3 374 8 371 4 -2 115 -171 247 -375 l240 -371 78 0 77 0 0 465 0 465 -60 0 -60 0 -2 -372 -3 -372 -241 370 -241 369 -82 3 c-59 2 -83 -1 -86 -10z"/></g></svg></div>');
         }
-        
+
         // 3. HDR
         if (qualityInfo.hdr && qualityInfo.hdr_type) {
             badges.push('<div class="quality-badge quality-badge--hdr"><svg viewBox="-1 178 313 136" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="181.5" width="306" height="129" rx="17.5" stroke="currentColor" stroke-width="5" fill="none"/><path d="M27.2784 293V199.909H46.9602V238.318H86.9148V199.909H106.551V293H86.9148V254.545H46.9602V293H27.2784ZM155.778 293H122.778V199.909H156.051C165.415 199.909 173.475 201.773 180.233 205.5C186.991 209.197 192.188 214.515 195.824 221.455C199.491 228.394 201.324 236.697 201.324 246.364C201.324 256.061 199.491 264.394 195.824 271.364C192.188 278.333 186.96 283.682 180.142 287.409C173.354 291.136 165.233 293 155.778 293ZM142.46 276.136H154.96C160.778 276.136 165.672 275.106 169.642 273.045C173.642 270.955 176.642 267.727 178.642 263.364C180.672 258.97 181.688 253.303 181.688 246.364C181.688 239.485 180.672 233.864 178.642 229.5C176.642 225.136 173.657 221.924 169.688 219.864C165.718 217.803 160.824 216.773 155.006 216.773H142.46V276.136ZM215.903 293V199.909H252.631C259.661 199.909 265.661 201.167 270.631 203.682C275.631 206.167 279.434 209.697 282.04 214.273C284.676 218.818 285.994 224.167 285.994 230.318C285.994 236.5 284.661 241.818 281.994 246.273C279.328 250.697 275.464 254.091 270.403 256.455C265.373 258.818 259.282 260 252.131 260H227.54V244.182H248.949C252.706 244.182 255.828 243.667 258.312 242.636C260.797 241.606 262.646 240.061 263.858 238C265.1 235.939 265.722 233.379 265.722 230.318C265.722 227.227 265.1 224.621 263.858 222.5C262.646 220.379 260.782 218.773 258.267 217.682C255.782 216.561 252.646 216 248.858 216H235.585V293H215.903ZM266.176 250.636L289.312 293H267.585L244.949 250.636H266.176Z" fill="currentColor"/></svg></div>');
         }
-        
+
         // 4. Sound (7.1/5.1/2.0)
         if (qualityInfo.sound) {
             let soundSvg = '';
@@ -3914,12 +4192,12 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                 badges.push(`<div class="quality-badge quality-badge--sound">${soundSvg}</div>`);
             }
         }
-        
+
         // 5. DUB
         if (qualityInfo.dub) {
             badges.push('<div class="quality-badge quality-badge--dub"><svg viewBox="-1 558 313 136" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="561.5" width="306" height="129" rx="17.5" stroke="currentColor" stroke-width="5" fill="none"/><path d="M60.5284 673H27.5284V579.909H60.8011C70.1648 579.909 78.2254 581.773 84.983 585.5C91.7405 589.197 96.9375 594.515 100.574 601.455C104.241 608.394 106.074 616.697 106.074 626.364C106.074 636.061 104.241 644.394 100.574 651.364C96.9375 658.333 91.7102 663.682 84.892 667.409C78.1042 671.136 69.983 673 60.5284 673ZM47.2102 656.136H59.7102C65.5284 656.136 70.4223 655.106 74.392 653.045C78.392 650.955 81.392 647.727 83.392 643.364C85.4223 638.97 86.4375 633.303 86.4375 626.364C86.4375 619.485 85.4223 613.864 83.392 609.5C81.392 605.136 78.4072 601.924 74.4375 599.864C70.4678 597.803 65.5739 596.773 59.7557 596.773H47.2102V656.136ZM178.153 579.909H197.835V640.364C197.835 647.152 196.214 653.091 192.972 658.182C189.759 663.273 185.259 667.242 179.472 670.091C173.684 672.909 166.941 674.318 159.244 674.318C151.517 674.318 144.759 672.909 138.972 670.091C133.184 667.242 128.684 663.273 125.472 658.182C122.259 653.091 120.653 647.152 120.653 640.364V579.909H140.335V638.682C140.335 642.227 141.108 645.379 142.653 648.136C144.229 650.894 146.441 653.061 149.29 654.636C152.138 656.212 155.456 657 159.244 657C163.063 657 166.381 656.212 169.199 654.636C172.047 653.061 174.244 650.894 175.79 648.136C177.366 645.379 178.153 642.227 178.153 638.682V579.909ZM214.028 673V579.909H251.301C258.15 579.909 263.862 580.924 268.438 582.955C273.013 584.985 276.453 587.803 278.756 591.409C281.059 594.985 282.21 599.106 282.21 603.773C282.21 607.409 281.483 610.606 280.028 613.364C278.574 616.091 276.574 618.333 274.028 620.091C271.513 621.818 268.634 623.045 265.392 623.773V624.682C268.938 624.833 272.256 625.833 275.347 627.682C278.468 629.53 280.998 632.121 282.938 635.455C284.877 638.758 285.847 642.697 285.847 647.273C285.847 652.212 284.619 656.621 282.165 660.5C279.741 664.348 276.15 667.394 271.392 669.636C266.634 671.879 260.771 673 253.801 673H214.028ZM233.71 656.909H249.756C255.241 656.909 259.241 655.864 261.756 653.773C264.271 651.652 265.528 648.833 265.528 645.318C265.528 642.742 264.907 640.47 263.665 638.5C262.422 636.53 260.65 634.985 258.347 633.864C256.074 632.742 253.362 632.182 250.21 632.182H233.71V656.909ZM233.71 618.864H248.301C250.998 618.864 253.392 618.394 255.483 617.455C257.604 616.485 259.271 615.121 260.483 613.364C261.725 611.606 262.347 609.5 262.347 607.045C262.347 603.682 261.15 600.97 258.756 598.909C256.392 596.848 253.028 595.818 248.665 595.818H233.71V618.864Z" fill="currentColor"/></svg></div>');
         }
-        
+
         if (badges.length > 0) {
             badgesContainer.html(badges.join(''));
             badgesContainer.addClass('show');
@@ -3942,7 +4220,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
             // Встроенные рейтинги
             builtInRatingsManager.fetch(movie, (ratings) => {
                 if (!isAlive(activity)) return;
-                
+
                 displayRatings(activity, ratings, movie);
             });
         } else {
@@ -3990,7 +4268,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                 rotten: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 143.75 108.75"><path d="m96.641 2.9657c28.149 1.101 27.459 97.814 0.825 97.194l-74.45-9.973c-25.51-7.211-25.922-69.313-0.534-76.178z" fill="#07a23b"/><g fill="#fff"><path d="m85.419 8.8789-63.171 8.9751c-4.2681 3.3648-6.9679 8.2192-7.5687 9.3296l65.017-6.963c1.3226-3.3762 4.3015-9.5395 5.7202-11.342z"/><path d="m78.042 28.008-65.329 5.5498c-2.494 4.757-3.169 10.65-3.3147 15.17l66.739-1.5147c0.0074-3.2891 0.55003-13.318 1.9052-19.206z"/><path d="m85.595 94.456-63.251-8.403c-4.2975-3.326-7.0398-8.1557-7.6503-9.2607l65.082 6.3737c1.3522 3.3644 4.3852 9.4999 5.8189 11.29z"/><path d="m78.051 75.394-65.375-4.957c-2.536-4.734-3.2627-10.621-3.4481-15.14l66.749 0.9101c0.03629 3.2889 0.66694 13.312 2.0737 19.188z"/></g><path d="m100.36 10.836c-13.099 0.685-19.878 48.223-11.732 71.195l21.342-4.561c8.39-24.044 1.28-66.986-9.61-66.634z" fill="#03621e"/><g fill="#fdd600"><path d="m99.087 78.942a6.1255 6.1255 0 0 1 -6.1238 6.1255 6.1255 6.1255 0 0 1 -6.1273 -6.122 6.1255 6.1255 0 0 1 6.1202 -6.1291 6.1255 6.1255 0 0 1 6.1309 6.1184"/><path d="m112.96 75.406a5.5952 5.5952 0 0 1 -5.5936 5.5952 5.5952 5.5952 0 0 1 -5.5968 -5.592 5.5952 5.5952 0 0 1 5.5903 -5.5985 5.5952 5.5952 0 0 1 5.6001 5.5887"/><path d="m120.39 74.743a4.9323 4.9323 0 0 1 -4.9309 4.9323 4.9323 4.9323 0 0 1 -4.9337 -4.9294 4.9323 4.9323 0 0 1 4.928 -4.9352 4.9323 4.9323 0 0 1 4.9366 4.9266"/><path d="m124.1 78.942a3.7391 3.7391 0 0 1 -3.738 3.7391 3.7391 3.7391 0 0 1 -3.7402 -3.7369 3.7391 3.7391 0 0 1 3.7358 -3.7412 3.7391 3.7391 0 0 1 3.7423 3.7347"/><path d="m131.08 83.14a5.0207 5.0207 0 0 1 -5.0192 5.0207 5.0207 5.0207 0 0 1 -5.0222 -5.0178 5.0207 5.0207 0 0 1 5.0163 -5.0236 5.0207 5.0207 0 0 1 5.0251 5.0148"/><path d="m135.86 91.67a5.5952 5.5952 0 0 1 -5.5936 5.5952 5.5952 5.5952 0 0 1 -5.5968 -5.592 5.5952 5.5952 0 0 1 5.5903 -5.5985 5.5952 5.5952 0 0 1 5.6001 5.5887"/><path d="m140.36 97.327a3.9158 3.9158 0 0 1 -3.9147 3.9158 3.9158 3.9158 0 0 1 -3.917 -3.9136 3.9158 3.9158 0 0 1 3.9124 -3.9181 3.9158 3.9158 0 0 1 3.9192 3.9113"/><path d="m140.45 99.625a4.181 4.181 0 0 1 -4.1798 4.181 4.181 4.181 0 0 1 -4.1822 -4.1786 4.181 4.181 0 0 1 4.1773 -4.1834 4.181 4.181 0 0 1 4.1846 4.1761"/><path d="m134.44 100.55a4.8439 4.8439 0 0 1 -4.8425 4.8439 4.8439 4.8439 0 0 1 -4.8453 -4.8411 4.8439 4.8439 0 0 1 4.8397 -4.8467 4.8439 4.8439 0 0 1 4.8481 4.8383"/><path d="m126.84 100.24a4.0042 4.0042 0 0 1 -4.0031 4.0042 4.0042 4.0042 0 0 1 -4.0054 -4.0019 4.0042 4.0042 0 0 1 4.0007 -4.0065 4.0042 4.0042 0 0 1 4.0077 3.9996"/><path d="m125.43 97.636a5.1091 5.1091 0 0 1 -5.1076 5.1091 5.1091 5.1091 0 0 1 -5.1106 -5.1061 5.1091 5.1091 0 0 1 5.1046 -5.112 5.1091 5.1091 0 0 1 5.1135 5.1031"/><path d="m117.12 98.078a5.1091 5.1091 0 0 1 -5.1076 5.1091 5.1091 5.1091 0 0 1 -5.1106 -5.1061 5.1091 5.1091 0 0 1 5.1046 -5.112 5.1091 5.1091 0 0 1 5.1135 5.1031"/><path d="m110.49 97.459a3.6065 3.6065 0 0 1 -3.6054 3.6065 3.6065 3.6065 0 0 1 -3.6075 -3.6044 3.6065 3.6065 0 0 1 3.6033 -3.6086 3.6065 3.6065 0 0 1 3.6096 3.6023"/><path d="m105.72 96.929a4.0484 4.0484 0 0 1 -4.0472 4.0484 4.0484 4.0484 0 0 1 -4.0496 -4.0461 4.0484 4.0484 0 0 1 4.0449 -4.0508 4.0484 4.0484 0 0 1 4.052 4.0437"/><path d="m94.71 80.271c2.1568-1.7217 5.4319-2.8842 9.5881-3.6062l11.579 0.61872 15.203 13.612-2.0329 9.6343-27.047-2.5633-4.7288 1.4584-11.183-17.899z"/></g><path d="m85.913 71.627c3.2472 12.036 7.0507 22.57 12.64 28.284l-9.9879-1.591s-5.5685-25.456-4.8614-25.544c0.70711-0.08839 2.2097-1.149 2.2097-1.149z" fill="#09a339"/></svg>'
             }
         };
-        
+
         // SVG иконки для рейтингов
         const svgIcons = {
             imdb: '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none"><path fill="currentColor" d="M4 7c-1.103 0-2 .897-2 2v6.4c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V9c0-1.103-.897-2-2-2H4Zm1.4 2.363h1.275v5.312H5.4V9.362Zm1.962 0H9l.438 2.512.287-2.512h1.75v5.312H10.4v-3l-.563 3h-.8l-.512-3v3H7.362V9.362Zm8.313 0H17v1.2c.16-.16.516-.363.875-.363.36.04.84.283.8.763v3.075c0 .24-.075.404-.275.524-.16.04-.28.075-.6.075-.32 0-.795-.196-.875-.237-.08-.04-.163.275-.163.275h-1.087V9.362Zm-3.513.037H13.6c.88 0 1.084.078 1.325.237.24.16.35.397.35.838v3.2c0 .32-.15.563-.35.762-.2.2-.484.288-1.325.288h-1.438V9.4Zm1.275.8v3.563c.2 0 .488.04.488-.2v-3.126c0-.28-.247-.237-.488-.237Zm3.763.675c-.12 0-.2.08-.2.2v2.688c0 .159.08.237.2.237.12 0 .2-.117.2-.238l-.037-2.687c0-.12-.043-.2-.163-.2Z"/></svg>',
@@ -4003,7 +4281,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
             trakt: '<svg width="800" height="800" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" fill="currentColor"><path d="M16 32c-8.817 0-16-7.183-16-16s7.183-16 16-16c8.817 0 16 7.183 16 16s-7.183 16-16 16zM16 1.615c-7.932 0-14.385 6.453-14.385 14.385s6.453 14.385 14.385 14.385c7.932 0 14.385-6.453 14.385-14.385s-6.453-14.385-14.385-14.385zM6.521 24.708c2.339 2.557 5.724 4.152 9.479 4.152 1.917 0 3.735-0.417 5.369-1.167l-8.932-8.907zM25.573 24.62c2.052-2.281 3.307-5.323 3.307-8.625 0-5.177-3.047-9.62-7.421-11.677l-8.12 8.099 12.219 12.204zM12.401 13.38l-6.765 6.74-0.907-0.907 15.421-15.416c-1.301-0.437-2.692-0.677-4.151-0.677-7.115-0.005-12.885 5.765-12.885 12.88 0 2.896 0.953 5.573 2.588 7.735l6.74-6.74 0.479 0.437 9.663 9.661c0.197-0.109 0.38-0.219 0.556-0.353l-10.703-10.672-6.468 6.473-0.907-0.905 7.38-7.381 0.479 0.443 11.281 11.251c0.177-0.136 0.339-0.292 0.5-0.421l-12.181-12.157-0.109 0.021zM16.464 14.749l-0.901-0.9 6.38-6.385 0.907 0.916-6.385 6.38zM22.521 5.979l-7.36 7.36-0.907-0.907 7.36-7.359 0.907 0.911z"/></svg>',
             myanimelist: '<svg width="512" height="206" viewBox="0 0 512 206" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M176.49 1.28V180.97L131.63 180.91V69.67L88.32 120.96L45.89 68.52L45.46 181.27H0V1.32001H47L86.79 55.61L129.79 1.30002L176.49 1.28ZM360.55 45.42L361.08 180.57H310.63L310.46 119.32H250.73C252.22 129.97 255.21 146.32 259.63 157.32C262.94 165.45 265.99 173.32 272.07 181.38L235.7 205.38C228.25 191.81 222.43 176.86 216.97 160.96C211.505 145.955 207.872 130.346 206.15 114.47C204.34 98.47 204.08 83.09 208.43 67.28C212.708 51.9137 221.305 38.0972 233.2 27.47C239.88 21.22 249.2 16.8 256.67 12.81C264.14 8.82003 272.52 7.18002 280.29 5.15002C288.64 3.16198 297.138 1.85764 305.7 1.25C314.19 0.52 329.32 -0.159976 356.7 0.650024L368.33 37.96H309.55C296.9 38.13 290.82 37.96 280.94 42.42C273.097 46.129 266.415 51.9066 261.611 59.131C256.808 66.3555 254.066 74.7531 253.68 83.42L310.49 84.12L311.3 45.51H360.56L360.55 45.42ZM445.72 0.670013V142.02L512 142.67L502.83 180.54H400.28V0L445.72 0.670013Z" fill="white"/></svg>'
         };
-        
+
         order.forEach(key => {
             if (!enabledRatings.includes(key)) return;
             if (!ratings[key] || ratings[key] === null) return;
@@ -4039,17 +4317,17 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
             } else {
                 value = numeric.toFixed(1);
             }
-            
+
             const ratingHtml = `
                 <div class="${classPrefix}${key}">
                     ${icon}
                     <div>${value}</div>
                 </div>
             `;
-            
+
             builtInContainer.append(ratingHtml);
         });
-        
+
         // Показываем контейнер если есть рейтинги
         if (builtInContainer.children().length > 0) {
             ratingsContainer.removeClass('hide'); // внешний контейнер (анимируется по своему таймингу)
@@ -4061,11 +4339,11 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
     function loadLogo(event) {
         const badgesContainer = activity.render().find('.applecation__quality-badges');
         if (!badgesContainer.length) return;
-        
+
         const badges = [];
-        
+
         // Порядок: Quality, Dolby Vision, HDR, Sound, DUB
-        
+
         // 1. Quality (4K/2K/FHD/HD)
         if (qualityInfo.quality) {
             let qualitySvg = '';
@@ -4082,17 +4360,17 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                 badges.push(`<div class="quality-badge quality-badge--res">${qualitySvg}</div>`);
             }
         }
-        
+
         // 2. Dolby Vision
         if (qualityInfo.dv) {
             badges.push('<div class="quality-badge quality-badge--dv"><svg viewBox="0 0 1051 393" xmlns="http://www.w3.org/2000/svg"><g transform="translate(0,393) scale(0.1,-0.1)" fill="currentColor"><path d="M50 2905 l0 -1017 223 5 c146 4 244 11 287 21 361 85 638 334 753 677 39 116 50 211 44 366 -7 200 -52 340 -163 511 -130 199 -329 344 -574 419 -79 24 -102 26 -327 31 l-243 4 0 -1017z"/><path d="M2436 3904 c-443 -95 -762 -453 -806 -905 -30 -308 86 -611 320 -832 104 -99 212 -165 345 -213 133 -47 253 -64 468 -64 l177 0 0 1015 0 1015 -217 -1 c-152 0 -239 -5 -287 -15z"/><path d="M3552 2908 l3 -1013 425 0 c309 0 443 4 490 13 213 43 407 148 550 299 119 124 194 255 247 428 25 84 27 103 27 270 1 158 -2 189 -22 259 -72 251 -221 458 -424 590 -97 63 -170 97 -288 134 l-85 26 -463 4 -462 3 2 -1013z m825 701 c165 -22 283 -81 404 -199 227 -223 279 -550 133 -831 -70 -133 -176 -234 -319 -304 -132 -65 -197 -75 -490 -75 l-245 0 0 703 c0 387 3 707 7 710 11 11 425 8 510 -4z"/><path d="M7070 2905 l0 -1015 155 0 155 0 0 1015 0 1015 -155 0 -155 0 0 -1015z"/><path d="M7640 2905 l0 -1015 150 0 150 0 0 60 c0 33 2 60 5 60 2 0 33 -15 67 -34 202 -110 433 -113 648 -9 79 38 108 59 180 132 72 71 95 102 134 181 102 207 102 414 1 625 -120 251 -394 411 -670 391 -115 -8 -225 -42 -307 -93 -21 -13 -42 -23 -48 -23 -7 0 -10 125 -10 370 l0 370 -150 0 -150 0 0 -1015z m832 95 c219 -67 348 -310 280 -527 -62 -198 -268 -328 -466 -295 -96 15 -168 52 -235 119 -131 132 -164 311 -87 478 27 60 101 145 158 181 100 63 234 80 350 44z"/><path d="M6035 3286 c-253 -49 -460 -232 -542 -481 -23 -70 -26 -96 -26 -210 0 -114 3 -140 26 -210 37 -113 90 -198 177 -286 84 -85 170 -138 288 -177 67 -22 94 -26 207 -26 113 0 140 4 207 26 119 39 204 92 288 177 87 89 140 174 177 286 22 67 26 99 27 200 1 137 -14 207 -69 320 -134 277 -457 440 -760 381z m252 -284 c117 -37 206 -114 260 -229 121 -253 -38 -548 -321 -595 -258 -43 -503 183 -483 447 20 271 287 457 544 377z"/><path d="M9059 3258 c10 -24 138 -312 285 -642 l266 -598 -72 -162 c-39 -88 -78 -171 -86 -183 -37 -58 -132 -80 -208 -48 l-35 14 -18 -42 c-10 -23 -37 -84 -60 -135 -23 -52 -39 -97 -36 -102 3 -4 40 -23 83 -41 70 -31 86 -34 177 -34 93 0 105 2 167 33 76 37 149 104 180 166 29 57 799 1777 805 1799 5 16 -6 17 -161 15 l-167 -3 -185 -415 c-102 -228 -192 -431 -200 -450 l-15 -35 -201 453 -201 452 -168 0 -168 0 18 -42z"/><path d="M2650 968 c0 -2 81 -211 179 -463 l179 -460 59 -3 59 -3 178 453 c98 249 180 459 183 466 4 9 -13 12 -65 12 -47 0 -71 -4 -74 -12 -3 -7 -65 -176 -138 -375 -73 -200 -136 -363 -139 -363 -3 0 -67 168 -142 373 l-136 372 -72 3 c-39 2 -71 1 -71 0z"/><path d="M3805 958 c-3 -7 -4 -215 -3 -463 l3 -450 63 -3 62 -3 0 466 0 465 -60 0 c-39 0 -62 -4 -65 -12z"/><path d="M4580 960 c-97 -16 -178 -72 -211 -145 -23 -50 -24 -143 -3 -193 32 -77 91 -117 244 -167 99 -32 146 -64 166 -112 28 -65 -11 -149 -83 -179 -78 -33 -212 -1 -261 61 l-19 24 -48 -43 -48 -42 43 -37 c121 -103 347 -112 462 -17 54 44 88 120 88 194 -1 130 -79 213 -242 256 -24 7 -71 25 -104 41 -48 22 -66 37 -79 65 -32 67 -5 138 65 174 73 37 193 18 244 -39 l20 -22 43 43 c41 40 42 43 25 61 -27 30 -102 64 -167 76 -64 12 -70 12 -135 1z"/><path d="M5320 505 l0 -465 65 0 65 0 0 465 0 465 -65 0 -65 0 0 -465z"/><path d="M6210 960 c-147 -25 -264 -114 -328 -249 -32 -65 -36 -84 -40 -175 -7 -161 33 -271 135 -367 140 -132 360 -164 541 -77 227 108 316 395 198 634 -88 177 -290 271 -506 234z m232 -132 c100 -46 165 -136 188 -261 20 -106 -18 -237 -88 -310 -101 -105 -245 -132 -377 -73 -74 33 -120 79 -157 154 -31 62 -33 74 -33 167 0 87 4 107 26 155 64 137 173 204 320 196 43 -2 85 -12 121 -28z"/><path d="M7135 958 c-3 -7 -4 -215 -3 -463 l3 -450 63 -3 62 -3 0 376 c0 207 3 374 8 371 4 -2 115 -171 247 -375 l240 -371 78 0 77 0 0 465 0 465 -60 0 -60 0 -2 -372 -3 -372 -241 370 -241 369 -82 3 c-59 2 -83 -1 -86 -10z"/></g></svg></div>');
         }
-        
+
         // 3. HDR
         if (qualityInfo.hdr && qualityInfo.hdr_type) {
             badges.push('<div class="quality-badge quality-badge--hdr"><svg viewBox="-1 178 313 136" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="181.5" width="306" height="129" rx="17.5" stroke="currentColor" stroke-width="5" fill="none"/><path d="M27.2784 293V199.909H46.9602V238.318H86.9148V199.909H106.551V293H86.9148V254.545H46.9602V293H27.2784ZM155.778 293H122.778V199.909H156.051C165.415 199.909 173.475 201.773 180.233 205.5C186.991 209.197 192.188 214.515 195.824 221.455C199.491 228.394 201.324 236.697 201.324 246.364C201.324 256.061 199.491 264.394 195.824 271.364C192.188 278.333 186.96 283.682 180.142 287.409C173.354 291.136 165.233 293 155.778 293ZM142.46 276.136H154.96C160.778 276.136 165.672 275.106 169.642 273.045C173.642 270.955 176.642 267.727 178.642 263.364C180.672 258.97 181.688 253.303 181.688 246.364C181.688 239.485 180.672 233.864 178.642 229.5C176.642 225.136 173.657 221.924 169.688 219.864C165.718 217.803 160.824 216.773 155.006 216.773H142.46V276.136ZM215.903 293V199.909H252.631C259.661 199.909 265.661 201.167 270.631 203.682C275.631 206.167 279.434 209.697 282.04 214.273C284.676 218.818 285.994 224.167 285.994 230.318C285.994 236.5 284.661 241.818 281.994 246.273C279.328 250.697 275.464 254.091 270.403 256.455C265.373 258.818 259.282 260 252.131 260H227.54V244.182H248.949C252.706 244.182 255.828 243.667 258.312 242.636C260.797 241.606 262.646 240.061 263.858 238C265.1 235.939 265.722 233.379 265.722 230.318C265.722 227.227 265.1 224.621 263.858 222.5C262.646 220.379 260.782 218.773 258.267 217.682C255.782 216.561 252.646 216 248.858 216H235.585V293H215.903ZM266.176 250.636L289.312 293H267.585L244.949 250.636H266.176Z" fill="currentColor"/></svg></div>');
         }
-        
+
         // 4. Sound (7.1/5.1/2.0)
         if (qualityInfo.sound) {
             let soundSvg = '';
@@ -4107,12 +4385,12 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                 badges.push(`<div class="quality-badge quality-badge--sound">${soundSvg}</div>`);
             }
         }
-        
+
         // 5. DUB
         if (qualityInfo.dub) {
             badges.push('<div class="quality-badge quality-badge--dub"><svg viewBox="-1 558 313 136" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="2.5" y="561.5" width="306" height="129" rx="17.5" stroke="currentColor" stroke-width="5" fill="none"/><path d="M60.5284 673H27.5284V579.909H60.8011C70.1648 579.909 78.2254 581.773 84.983 585.5C91.7405 589.197 96.9375 594.515 100.574 601.455C104.241 608.394 106.074 616.697 106.074 626.364C106.074 636.061 104.241 644.394 100.574 651.364C96.9375 658.333 91.7102 663.682 84.892 667.409C78.1042 671.136 69.983 673 60.5284 673ZM47.2102 656.136H59.7102C65.5284 656.136 70.4223 655.106 74.392 653.045C78.392 650.955 81.392 647.727 83.392 643.364C85.4223 638.97 86.4375 633.303 86.4375 626.364C86.4375 619.485 85.4223 613.864 83.392 609.5C81.392 605.136 78.4072 601.924 74.4375 599.864C70.4678 597.803 65.5739 596.773 59.7557 596.773H47.2102V656.136ZM178.153 579.909H197.835V640.364C197.835 647.152 196.214 653.091 192.972 658.182C189.759 663.273 185.259 667.242 179.472 670.091C173.684 672.909 166.941 674.318 159.244 674.318C151.517 674.318 144.759 672.909 138.972 670.091C133.184 667.242 128.684 663.273 125.472 658.182C122.259 653.091 120.653 647.152 120.653 640.364V579.909H140.335V638.682C140.335 642.227 141.108 645.379 142.653 648.136C144.229 650.894 146.441 653.061 149.29 654.636C152.138 656.212 155.456 657 159.244 657C163.063 657 166.381 656.212 169.199 654.636C172.047 653.061 174.244 650.894 175.79 648.136C177.366 645.379 178.153 642.227 178.153 638.682V579.909ZM214.028 673V579.909H251.301C258.15 579.909 263.862 580.924 268.438 582.955C273.013 584.985 276.453 587.803 278.756 591.409C281.059 594.985 282.21 599.106 282.21 603.773C282.21 607.409 281.483 610.606 280.028 613.364C278.574 616.091 276.574 618.333 274.028 620.091C271.513 621.818 268.634 623.045 265.392 623.773V624.682C268.938 624.833 272.256 625.833 275.347 627.682C278.468 629.53 280.998 632.121 282.938 635.455C284.877 638.758 285.847 642.697 285.847 647.273C285.847 652.212 284.619 656.621 282.165 660.5C279.741 664.348 276.15 667.394 271.392 669.636C266.634 671.879 260.771 673 253.801 673H214.028ZM233.71 656.909H249.756C255.241 656.909 259.241 655.864 261.756 653.773C264.271 651.652 265.528 648.833 265.528 645.318C265.528 642.742 264.907 640.47 263.665 638.5C262.422 636.53 260.65 634.985 258.347 633.864C256.074 632.742 253.362 632.182 250.21 632.182H233.71V656.909ZM233.71 618.864H248.301C250.998 618.864 253.392 618.394 255.483 617.455C257.604 616.485 259.271 615.121 260.483 613.364C261.725 611.606 262.347 609.5 262.347 607.045C262.347 603.682 261.15 600.97 258.756 598.909C256.392 596.848 253.028 595.818 248.665 595.818H233.71V618.864Z" fill="currentColor"/></svg></div>');
         }
-        
+
         if (badges.length > 0) {
             badgesContainer.html(badges.join(''));
             badgesContainer.addClass('show');
@@ -4123,7 +4401,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
     function loadLogo(event) {
         const data = event.data.movie;
         const activity = event.object.activity;
-        
+
         if (!data || !activity) return;
 
         // Заполняем основную информацию
@@ -4137,17 +4415,17 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
 
             // После загрузки фона показываем контент
             activity.render().find('.applecation__meta').addClass('show');
-            
+
             const useOverlay = Lampa.Storage.get('applecation_description_overlay', true);
             const descWrapper = activity.render().find('.applecation__description-wrapper').addClass('show');
-            
+
             if (useOverlay) {
                 descWrapper.addClass('selector');
                 if (window.Lampa && Lampa.Controller) {
                     Lampa.Controller.collectionAppend(descWrapper);
                 }
             }
-            
+
             activity.render().find('.applecation__info').addClass('show');
             activity.render().find('.applecation__ratings').addClass('show');
         });
@@ -4169,7 +4447,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                     if (!isAlive(activity)) return;
                     logoContainer.addClass('loaded');
                 });
-                
+
                 // Обновляем логотип в оверлее
                 updateOverlayLogo(logoUrl);
             };
@@ -4181,7 +4459,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
             // Находим логотип на текущем языке или английский/нейтральный
             const lang = Lampa.Storage.field('tmdb_lang') || Lampa.Storage.get('language') || 'ru';
             let logo = data.images.logos.find(l => l.iso_639_1 === lang);
-            
+
             // Если логотипа на текущем языке нет, ищем на английском или нейтральном
             if (!logo && Lampa.Storage.get('applecation_show_foreign_logo', true)) {
                 logo = data.images.logos.find(l => l.iso_639_1 === 'en');
@@ -4215,7 +4493,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                     return renderLogo(logo.file_path);
                 }
             }
-            
+
             // Нет подходящего логотипа - показываем текстовое название
             titleElement.show();
             waitForBackgroundLoad(activity, () => {
@@ -4233,7 +4511,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
     // Ждем загрузки и появления фона
     function waitForBackgroundLoad(activity, callback) {
         const background = activity.render().find('.full-start__background:not(.applecation__overlay)');
-        
+
         if (!background.length) {
             callback();
             return;
@@ -4267,7 +4545,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                 // Ждем завершения transition + небольшая задержка
                 setTimeout(() => {
                     if (!isAlive(activity)) return;
-                    
+
                     background.addClass('applecation-animated');
                     callback();
                 }, 650); // 600ms transition + 50ms запас
@@ -4296,18 +4574,18 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
     function attachScrollBlur(activity) {
         const background = activity.render().find('.full-start__background:not(.applecation__overlay)')[0];
         const scrollBody = activity.render().find('.scroll__body')[0];
-        
+
         if (!background || !scrollBody) return;
-        
+
         // Кешируем состояние для избежания лишних DOM операций
         let isBlurred = false;
-        
+
         // Перехватываем сеттер стиля - самый быстрый и синхронный способ
-        const originalDescriptor = Object.getOwnPropertyDescriptor(scrollBody.style, '-webkit-transform') || 
-                                   Object.getOwnPropertyDescriptor(CSSStyleDeclaration.prototype, 'webkitTransform');
-        
+        const originalDescriptor = Object.getOwnPropertyDescriptor(scrollBody.style, '-webkit-transform') ||
+            Object.getOwnPropertyDescriptor(CSSStyleDeclaration.prototype, 'webkitTransform');
+
         Object.defineProperty(scrollBody.style, '-webkit-transform', {
-            set: function(value) {
+            set: function (value) {
                 // Оптимизированный парсинг без regex
                 if (value) {
                     const yStart = value.indexOf(',') + 1;
@@ -4315,7 +4593,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                     if (yStart > 0 && yEnd > yStart) {
                         const yValue = parseFloat(value.substring(yStart, yEnd));
                         const shouldBlur = yValue < 0;
-                        
+
                         // Применяем только если состояние изменилось
                         if (shouldBlur !== isBlurred) {
                             isBlurred = shouldBlur;
@@ -4323,7 +4601,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                         }
                     }
                 }
-                
+
                 // Вызываем оригинальный сеттер
                 if (originalDescriptor && originalDescriptor.set) {
                     originalDescriptor.set.call(this, value);
@@ -4331,7 +4609,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                     this.setProperty('-webkit-transform', value);
                 }
             },
-            get: function() {
+            get: function () {
                 if (originalDescriptor && originalDescriptor.get) {
                     return originalDescriptor.get.call(this);
                 }
@@ -4345,9 +4623,9 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
     function attachPersonMarquee(activity) {
         const render = activity.render();
         const names = render.find('.full-person__name');
-        
+
         // Очищаем старые marquee если они есть (на случай повторного вызова)
-        names.each(function() {
+        names.each(function () {
             const nameElement = $(this);
             if (nameElement.hasClass('marquee-processed')) {
                 const originalText = nameElement.find('span').first().text();
@@ -4364,31 +4642,31 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
             // Для корректной проверки на скрытых элементах или в процессе отрисовки
             return element.scrollWidth > element.clientWidth + 1;
         }
-        
+
         // Инициализируем marquee для тех, кто переполнен
         // Небольшая задержка, чтобы лайаут успел пересчитаться
         setTimeout(() => {
             if (!isAlive(activity)) return;
 
-            names.each(function() {
+            names.each(function () {
                 const nameElement = $(this);
                 const text = nameElement.text().trim();
-                
+
                 if (!text) return;
-                
+
                 if (isTextOverflowing(nameElement[0])) {
                     // Рассчитываем длительность: ~250мс на символ, но не менее 5с и не более 20с
                     const duration = Math.min(Math.max(text.length * 0.25, 5), 20);
-                    
+
                     nameElement.addClass('marquee-processed marquee-active');
                     nameElement.css('--marquee-duration', duration + 's');
-                    
+
                     // Оборачиваем в структуру для анимации
                     // Используем text() для безопасности от XSS
                     const span1 = $('<span>').text(text);
                     const span2 = $('<span>').text(text);
                     const inner = $('<div class="marquee__inner">').append(span1).append(span2);
-                    
+
                     nameElement.empty().append(inner);
                 } else {
                     nameElement.addClass('marquee-processed');
@@ -4404,20 +4682,20 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
             if (Lampa.Storage.get('applecation_description_overlay', true)) {
                 disableFullDescription(event);
             }
-            
+
             if (event.type === 'complite') {
                 const activity = event.object.activity;
                 const render = activity.render();
-                
+
                 // Добавляем класс для применения стилей
                 render.addClass('applecation');
 
                 // Помечаем активность при уничтожении
                 activity.__destroyed = false;
-                
+
                 // Сохраняем оригинальный метод destroy если он есть
                 var originalDestroy = activity.destroy;
-                activity.destroy = function() {
+                activity.destroy = function () {
                     activity.__destroyed = true;
                     if (originalDestroy) originalDestroy.apply(activity, arguments);
                 };
@@ -4428,14 +4706,14 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
 
                 addOverlay(activity);
                 loadLogo(event);
-                
+
                 // Загружаем рейтинги
                 const data = event.data;
                 const movie = data && data.movie;
                 if (movie) {
                     loadAndDisplayRatings(activity, movie);
                 }
-                
+
                 attachScrollBlur(activity);
                 attachPersonMarquee(activity);
 
@@ -4452,7 +4730,7 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
         type: 'other',
         version: APPLECATION_VERSION,
         name: 'Applecation',
-        description: 'Делает интерфейс в карточке фильма похожим на Apple TV и оптимизирует под 4K',
+        description: 'Делает интерфейс в карточке фильма похожим на Apple TV, оптимизировано для TV, десктопов и планшетов',
         author: '@darkestclouds',
         icon: PLUGIN_ICON
     };
@@ -4474,4 +4752,3 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
     }
 
 })();
-
