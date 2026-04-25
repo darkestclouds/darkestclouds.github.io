@@ -2352,13 +2352,37 @@
 
     function disableFullDescription(e) {
         if (e.type === 'start' && e.link) {
-            // Удаляем 'description' из списка rows перед рендерингом
+            const movie = e.data && e.data.movie;
+            // Не убираем секцию «Подробно», если ядру нужно показать предупреждение 18+ (descr.js).
+            // Дублирующий текст/теги скрываются CSS (.items-line:has(.warning-box--full-adult)).
+            const needsCoreAdultWarning = movie && movie.adult && !Lampa.Storage.field('adult_content_view');
+            if (needsCoreAdultWarning) {
+                return;
+            }
             const rows = e.link.rows;
             const index = rows.indexOf('description');
             if (index > -1) {
                 rows.splice(index, 1);
             }
         }
+    }
+
+    /**
+     * Секция «Подробно» оставлена ради warning-box, остальное скрыто CSS, но класс selector
+     * остаётся в DOM — навигатор пульта всё равно фокусирует скрытые узлы. Снимаем selector
+     * со всего внутри .full-descr__left, кроме самого блока предупреждения (.warning-box).
+     */
+    function stripDescrSelectorsExceptAdultWarning(render) {
+        const $warn = render.find('.items-line .warning-box--full-adult');
+        if (!$warn.length) return;
+
+        const $left = $warn.closest('.full-descr').find('.full-descr__left').first();
+        if (!$left.length) return;
+
+        $left.find('.selector').filter(function () {
+            const $el = $(this);
+            return !$el.hasClass('warning-box') && !$el.closest('.warning-box').length;
+        }).removeClass('selector');
     }
 
     function addStyles() {
@@ -3402,6 +3426,18 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
 body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__photo::after {
     display: none !important;
 }
+
+/* Секция «Подробно» оставлена только ради штатного warning-box--full-adult; остальное скрыто */
+.applecation .items-line:has(.warning-box--full-adult) .items-line__head,
+.applecation .items-line:has(.warning-box--full-adult) .full-descr__text,
+.applecation .items-line:has(.warning-box--full-adult) .full-descr__details,
+.applecation .items-line:has(.warning-box--full-adult) .full-descr__tags {
+    display: none !important;
+}
+
+.applecation .items-line:has(.warning-box--full-adult) .items-line__body {
+    padding-top: 0;
+}
 </style>`;
         
         Lampa.Template.add('applecation_css', styles);
@@ -4412,6 +4448,17 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                 // Добавляем класс для применения стилей
                 render.addClass('applecation');
 
+                const data = event.data;
+                const movie = data && data.movie;
+                if (
+                    Lampa.Storage.get('applecation_description_overlay', true) &&
+                    movie &&
+                    movie.adult &&
+                    !Lampa.Storage.field('adult_content_view')
+                ) {
+                    stripDescrSelectorsExceptAdultWarning(render);
+                }
+
                 // Помечаем активность при уничтожении
                 activity.__destroyed = false;
                 
@@ -4430,8 +4477,6 @@ body.applecation--no-liquid-glass .applecation .full-person.focus .full-person__
                 loadLogo(event);
                 
                 // Загружаем рейтинги
-                const data = event.data;
-                const movie = data && data.movie;
                 if (movie) {
                     loadAndDisplayRatings(activity, movie);
                 }
